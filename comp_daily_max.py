@@ -1,5 +1,5 @@
 #!/bin/env python 
-"""Compute the daily hourly max rainfall from the radar data Seem to have
+"""Compute the daily 2-hourly running hourly max rainfall from the radar data Seem to have
 dodgy seconds data in 2004 & 2005 data, ValueError: invalid second
 provided in cftime.datetime(2005, 5, 1, 8, 30, -32767, 0,
 calendar='gregorian', has_year_zero=False) Looks like missing data so
@@ -17,13 +17,49 @@ a conversion error.
 
 """
 import xarray
-
+import argparse
 import pathlib 
 import itertools
 import pandas as pd
 import numpy as np
 import commonLib
+def time_of_max(ds):
+    """
 
+    Work out time of maxes using the maxValue to determine when the
+    max is and then use that index into maxTime to get the times.
+    Needed because suspect having a bunch of high resoln (1km) data at
+    hourly data will eat all my memory so will process each day and
+    then the data volume is small.
+
+    """
+    indx = ds.maxValue.argmax(dim='time',skipna=False) # index of maxes
+    bad = ds.maxValue.isnull().all('time')  # find out where *all* data null
+    result = ds.maxTime.isel(time=indx).where(~bad) # mask data where ALL is missing     
+    return result
+
+
+
+def process(DS_daily,resample='1M'):
+    """
+    process a chunk of data from the daily processed data
+    Contain maxValue, meanValue, timeMax dataarrays.
+    Compute the max, mean and timeMax for each resampling period.
+    """
+    resampMx = DS_daily.resample(time=resample,
+                               label='left',keep_attrs=True)
+    # set up the resample
+    max= resamp.maxValue.max()
+    mn = resamp.meanValue.mean()
+    indx = resamp.maxValueargmax(dim='time')
+
+    
+    timeMax = resamp.apply(time_of_max) 
+    # TODO wrap up into a dataset. Note input should be a dataArray... 
+    
+    # TODO add appropriate metadata.
+    return median,mn,mx,timeMx # return the data.
+    
     
 def annual_process(DS_daily,time_to_hours=False):
     """
@@ -50,7 +86,7 @@ test = True
 rgn = dict(projection_x_coordinate=slice(5e4,5e5),
            projection_y_coordinate=slice(5e5,1.1e6)) 
 # set rgn to None if don't want slice anything out
-resoln= '1km'
+resoln= '5km'
 daily1hr_max_dir = pathlib.Path("./daily_max")
 daily_mean_dir = pathlib.Path("./daily_mean")
 annual1hr_max_dir = pathlib.Path(f"./annual_max_{resoln}")
@@ -92,14 +128,10 @@ for year in years:
 
     # iterate over files.
     expect_members = 24*4 # every 15 minutes.
-    ds_annual=[] # where we will store the daily datasets -- only for a year.
+    ds_all=[] # where we will store the daily datasets -- only for one year.
     last_month = 0
     for file in directory.glob(glob_pattern):
-        rain = handyFns.extract_nimrod_day(file)
-        if rgn is not None:
-            rain = rain.sel(**rgn) # extract the sub-region out.
-        # QC - set any values > 400 to nan. (400 mm/hr = 100 mm in 15 minutes)
-        rain = rain.where(rain <= 400) 
+        rain = commonLib.extract_nimrod_day(file,QCmax=40,region=rgn)
         time=rain.time.values[0]
         if last_month != rain.time.dt.month.values[0]:
             last_month = rain.time.dt.month.values[0]
@@ -113,21 +145,20 @@ for year in years:
             print("WARNING -- some data not cannonical times",\
                   rain.time.values[0])
 
-        rain_daily=rain.mean('time',skipna=False,keep_attrs=True).rename('dailyMeanRain')*24 # mean rain -- assuming missing data same as rest
+        rain_daily=rain.mean('time',skipna=False,keep_attrs=True)
+        rain_daily = rain_daily.rename('meanValue')*24 
+        # mean rain converted to mm/day assuming missing data same as rest
         rain_daily.attrs['units'] = 'mm/day'
-        rain_max = rain.max('time',skipna=False,keep_attrs=True).rename('dailyMaxRain') # max rain.
-        rain_maxHr = rain.idxmax('time',skipna=False).rename('dailyMaxTime') # time of max rain
+        rain_max = rain.max('time',skipna=False,keep_attrs=True).rename('maxValue') # max rain.
+        rain_maxTime = rain.idxmax('time',skipna=False).rename('maxTime') # time of max rain
         # generate DataSet from max and maxHr then set the time
-        rainDS=xarray.merge([rain_max,rain_maxHr]).expand_dims(time=[time])
-        rainDSout=xarray.merge([rain_max,rain_maxHr.dt.hour.rename('dailyMaxHr')]).expand_dims(time=[time])
-        ds_annual.append(rainDS)
-        outfile=daily1hr_max_dir/(file.name.replace('.dat.gz.tar','_max.nc'))
-        rainDSout.to_netcdf(outfile)
-        outfile=daily_mean_dir/(file.name.replace('.dat.gz.tar','_total.nc'))
-        rain_daily.to_netcdf(outfile)
+        rainDS=xarray.merge([rain_max,rain_maxTime,rain_daily]).expand_dims(time=[time])
+        ds_all.append(rainDS)
+        rainDSout = rainDS.copy()
         
     # done with loop over days
-    ds_annual=xarray.combine_nested(ds_annual,'time',combine_attrs='drop_conflicts') # merge list of datasets
+    ds_all=xarray.combine_nested(ds_all,'time',combine_attrs='drop_conflicts') # merge list of datasets
+    breakpoint()
     ds = annual_process(ds_annual,time_to_hours=True)
     outfile="_".join(file.name.split('_')[0:2])+f"_{year}_{resoln}_max.nc"
     outfile = annual1hr_max_dir/outfile

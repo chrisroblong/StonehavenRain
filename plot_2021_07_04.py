@@ -13,7 +13,7 @@ hr_start=14 #-- hour (UTC) to start time plots
 hr_end = 20 # Hour (UTC) to end time plots
 year=2021
 
-read_data = False # If true read the data...
+read_data = True # If true read the data...
 
 rgn = dict(projection_x_coordinate=slice(5e4,5e5),
            projection_y_coordinate=slice(5e5,1.1e6))
@@ -29,9 +29,12 @@ edinburgh_castle = dict(projection_x_coordinate=325166,
 edinburgh_botanics = dict(projection_x_coordinate=324836,
                           projection_y_coordinate=675483)
 
+edinburgh_KB = dict(projection_x_coordinate=326495,
+                          projection_y_coordinate=670628)
+
 # sites we want to plot and the colors they are.
-sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics)
-colors = dict(castle='purple',botanics='brown')
+sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics,KB=edinburgh_KB)
+colors = dict(castle='purple',botanics='brown',KB='green')
 
 time_str=f"{year:04d}{month:02d}{day:02d}"
 # get the data

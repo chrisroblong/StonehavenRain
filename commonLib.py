@@ -14,6 +14,7 @@ import pathlib
 import cartopy
 import cartopy.feature 
 import pandas as pd
+import numpy as np
 dataDir = pathlib.Path(r'c:\users\stett2\data\Edinburgh_rain')
 # get in the UK country borders.
 #file = pathlib.Path('Countries_(December_2017)_Boundaries/Countries_(December_2017)_Boundaries.shp')
@@ -25,8 +26,8 @@ def time_convert(DataArray,ref='1970-01-01',unit='h',set_attrs=True):
     """
     convert times to hours (etc) since reference time.
     :param DataAray -- dataArray values to be converted
-    :param ref -- reference time as ISO string default is 1970-01-01
-    :param unit -- unit defualt is h for hours
+    :param ref -- reference time as ISO string. Default is 1970-01-01
+    :param unit -- unit default is h for hours
     :return -- returns dataarray with units reset and values converted
     """
     name_conversion=dict(h='hours',d='days')
