@@ -16,6 +16,21 @@ import cartopy.feature
 import pandas as pd
 import numpy as np
 dataDir = pathlib.Path(r'c:\users\stett2\data\Edinburgh_rain')
+
+edinburgh_castle = dict(projection_x_coordinate=325166,
+           projection_y_coordinate=673477)
+
+
+edinburgh_botanics = dict(projection_x_coordinate=324836,
+                          projection_y_coordinate=675483)
+
+edinburgh_KB = dict(projection_x_coordinate=326495,
+                          projection_y_coordinate=670628)
+
+# sites we want to plot and the colors they are.
+sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics,KB=edinburgh_KB)
+colors = dict(castle='purple',botanics='brown',KB='green')
+
 # get in the UK country borders.
 #file = pathlib.Path('Countries_(December_2017)_Boundaries/Countries_(December_2017)_Boundaries.shp')
 #shp  = cartopy.io.shapereader.Reader(file)

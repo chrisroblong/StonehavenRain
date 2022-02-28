@@ -46,7 +46,7 @@ def process(DS_daily,resample='1M'):
     Contain maxValue, meanValue, timeMax dataarrays.
     Compute the max, mean and timeMax for each resampling period.
     """
-    resampMx = DS_daily.resample(time=resample,
+    resamp = DS_daily.resample(time=resample,
                                label='left',keep_attrs=True)
     # set up the resample
     max= resamp.maxValue.max()
