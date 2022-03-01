@@ -40,25 +40,7 @@ def time_of_max(ds):
 
 
 
-def process(DS_daily,resample='1M'):
-    """
-    process a chunk of data from the daily processed data
-    Contain maxValue, meanValue, timeMax dataarrays.
-    Compute the max, mean and timeMax for each resampling period.
-    """
-    resamp = DS_daily.resample(time=resample,
-                               label='left',keep_attrs=True)
-    # set up the resample
-    max= resamp.maxValue.max()
-    mn = resamp.meanValue.mean()
-    indx = resamp.maxValueargmax(dim='time')
 
-    
-    timeMax = resamp.apply(time_of_max) 
-    # TODO wrap up into a dataset. Note input should be a dataArray... 
-    
-    # TODO add appropriate metadata.
-    return median,mn,mx,timeMx # return the data.
     
     
 def annual_process(DS_daily,time_to_hours=False):

@@ -15,7 +15,20 @@ import cartopy
 import cartopy.feature 
 import pandas as pd
 import numpy as np
-dataDir = pathlib.Path(r'c:\users\stett2\data\Edinburgh_rain')
+import platform
+
+machine = platform.node()
+if 'jasmin.ac.uk' in machine:
+    # specials for Jasmin cluster.
+    nimrodRootDir = pathlib.Path("/badc/ukmo-nimrod/data/composite/uk") # where the nimrod data lives
+    outdir = pathlib.Path(".")  #writing locally. Really need a workspace..
+elif 'geos-' in machine:
+    nimrodRootDir = pathlib.Path(r'C:\Users\stett2\data\Edinburgh_rain\nimrod_data')
+    outdir = pathlib.Path(r'C:\Users\stett2\data\Edinburgh_rain\output')
+else: # don't know what to do so raise an error.
+    raise Exception(f"On platform {machine} no idea where data lives")
+# create the outdir
+outdir.mkdir(parents=True,exist_ok=True)
 
 edinburgh_castle = dict(projection_x_coordinate=325166,
            projection_y_coordinate=673477)
@@ -50,8 +63,10 @@ def time_convert(DataArray,ref='1970-01-01',unit='h',set_attrs=True):
     with xarray.set_options(keep_attrs=True):
         hour = (DataArray - np.datetime64(ref))/np.timedelta64(1,unit)
     u = name_conversion.get(unit,unit)
-    if set_attrs:
+    try:
         hour.attrs['units']=f'{u} since {ref}'
+    except AttributeError: # hour does not have attrs.
+        pass
     return hour
 
 
