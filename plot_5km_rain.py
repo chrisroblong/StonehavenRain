@@ -39,8 +39,10 @@ commonLib.saveFig(fig)
 proj=ccrs.OSGB()
 fig,ax=plt.subplots(nrows=1,ncols=1,clear=True,num='mean_summer_max',figsize=[7,8],subplot_kw=dict(projection=proj))
 cmap='Blues'
-seas_max.sel(time=(seas_max.time.dt.month == 6)).mean('time').plot(ax=ax,robust=True,cmap=cmap,
-                                                                   cbar_kwargs=dict(orientation='horizontal',pad=0.1,label='mm/hr'))
+mn = seas_max.sel(time=(seas_max.time.dt.month == 6))
+
+cbar_kwargs=dict(orientation='horizontal',pad=0.1,label='mm/hr')
+mn.mean('time').plot(ax=ax,robust=True,cmap=cmap, cbar_kwargs=cbar_kwargs)
 ax.coastlines()
 commonLib.std_decorators(ax)
 ext = [commonLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
