@@ -7,6 +7,7 @@ import cartopy
 import iris
 import tarfile
 import gzip
+import zlib # so we can trap an error
 import tempfile
 import shutil
 import xarray
@@ -18,7 +19,7 @@ import numpy as np
 import platform
 import cftime
 import cf_units
-
+bad_data_err = (zlib.error,ValueError,TypeError,iris.exceptions.ConstraintMismatchError,gzip.BadGzipFile) # possible bad data
 machine = platform.node()
 if ('jasmin.ac.uk' in machine) or ('jc.rl.ac.uk' in machine):
     # specials for Jasmin cluster or LOTUS cluster
@@ -153,11 +154,11 @@ def extract_nimrod_day(file,region=None,QCmax=None,gzip_min=85,check_date=False)
             with tar.extractfile(tmember) as fp:
                 f_out=tempfile.NamedTemporaryFile(delete=False)
                 fname = f_out.name
-                with gzip.GzipFile("somefilename",fileobj=fp) as f_in:
-                    # uncompress the data writing to the tempfile
-                    shutil.copyfileobj(f_in,f_out) # 
-                    f_out.close()
-                    try: # deal with bad data by ignoring it! 
+                try: # handle bad gzip files etc...
+                    with gzip.GzipFile("somefilename",fileobj=fp) as f_in:
+                        # uncompress the data writing to the tempfile
+                        shutil.copyfileobj(f_in,f_out) # 
+                        f_out.close()
                         # doing various transforms to the cube here rather than all at once. 
                         # cubes are quite large so worth doing. 
                         cube = iris.load_cube(fname)
@@ -171,11 +172,9 @@ def extract_nimrod_day(file,region=None,QCmax=None,gzip_min=85,check_date=False)
                         # drop forecast vars (if we have it) -- not sure why they are there!
                         da = da.drop_vars(['forecast_period','forecast_reference_time'],errors='ignore')
                         rain.append(da) # add to the list
-                    except (ValueError,TypeError,iris.exceptions.ConstraintMismatchError):
-                        print(f"bad data in {tmember}")
-
-                    pathlib.Path(fname).unlink() # remove the temp file.
-                    
+                except bad_data_err:
+                    print(f"bad data in {tmember}")
+                pathlib.Path(fname).unlink() # remove the temp file.
             # end loop over members          (every 15 or 5  mins)
     # end dealing with tarfile -- which will close the tar file.
     if len(rain) == 0: # no data
