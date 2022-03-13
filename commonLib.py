@@ -37,16 +37,16 @@ edinburgh_castle = dict(projection_x_coordinate=325166,
            projection_y_coordinate=673477)
 
 
-edinburgh_botanics = dict(projection_x_coordinate=324836,
-                          projection_y_coordinate=675483)
+edinburgh_botanics = dict(projection_x_coordinate=324770,
+                          projection_y_coordinate=675587)
 
 edinburgh_KB = dict(projection_x_coordinate=326495,
                           projection_y_coordinate=670628)
 
 # sites we want to plot and the colors they are.
-sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics,KB=edinburgh_KB)
+sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics)#,KB=edinburgh_KB)
 edinburgh_region = dict()
-for k,v in edinburgh_castle.items():
+for k,v in edinburgh_castle.items(): # 50km around edinburgh
     edinburgh_region[k]=slice(v-50e3,v+50e3)
 
 colors = dict(castle='purple',botanics='brown',KB='green')

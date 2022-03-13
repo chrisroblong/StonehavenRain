@@ -33,8 +33,7 @@ edinburgh_KB = dict(projection_x_coordinate=326495,
                           projection_y_coordinate=670628)
 
 # sites we want to plot and the colors they are.
-sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics,KB=edinburgh_KB)
-colors = dict(castle='purple',botanics='brown',KB='green')
+
 
 time_str=f"{year:04d}{month:02d}{day:02d}"
 # get the data
@@ -43,7 +42,7 @@ if read_data:
     rain1h=dict()
     rain15m=dict()
     for resoln in ['1km','5km']:
-        nimrod_dir=pathlib.Path(f"/badc/ukmo-nimrod/data/composite/uk-{resoln}")/f"{year:04d}"
+        nimrod_dir=commonLib.nimrodRootDir/f"uk-{resoln}/{year:04d}"
         file_name = f'metoffice-c-band-rain-radar_uk_{time_str}_{resoln}-composite.dat.gz.tar'
         path = nimrod_dir/file_name
         rain = commonLib.extract_nimrod_day(path,region=rgn,QCmax=400.0)
@@ -56,21 +55,45 @@ if read_data:
 time_sel=slice(f'{year}-{month:02d}-{day:02d}T{hr_start:02d}',f'{year}-{month:02d}-{day:02d}T{hr_end:02d}')
 
 # setup for landscape. 
-figts,axes = plt.subplots(nrows=2,ncols=3,clear=True,sharex='all',sharey='row',
+# figts,axes = plt.subplots(nrows=2,ncols=3,clear=True,sharex='all',sharey='row',
+#                           num=f'UKradarEDts{year}_{month:02d}_{day:02d}',figsize=[11,7])
+# axes=axes.T
+# # plot not quite overlapping
+# for ax,(title,var) in zip(axes.flatten(),itertools.chain(rain2hr.items(),rain1h.items(),rain15m.items())):
+#     for label,loc in sites.items():
+#         ts = var.sel(method='nearest',**loc).sel(time=time_sel)
+#         ts.plot.step(ax=ax,color=colors[label],linewidth=2,label=label)
+#     ax.set_title(title)
+#     ax.grid(visible=True,axis='x')
+#
+#
+#
+# figts.suptitle(f"Rainfall rates (mm/hr) {year}-{month:02d}-{day:02d}")
+# axes[0][0].legend()
+# figts.tight_layout()
+# figts.show()
+# commonLib.saveFig(figts)
+sites = commonLib.sites.copy() # remove KB
+kb = sites.pop('KB')
+figts,axes = plt.subplots(nrows=1,ncols=2,clear=True,sharex='all',sharey='row',
                           num=f'UKradarEDts{year}_{month:02d}_{day:02d}',figsize=[11,7])
-axes=axes.T
-# plot not quite overlapping
-for ax,(title,var) in zip(axes.flatten(),itertools.chain(rain2hr.items(),rain1h.items(),rain15m.items())):
+
+for ax,key,var in zip(axes.flatten(),['1km 15min','5km hr'],[rain15m,rain1h]):
     for label,loc in sites.items():
-        ts = var.sel(method='nearest',**loc).sel(time=time_sel)
-        ts.plot.step(ax=ax,color=colors[label],linewidth=2,label=label)
-    ax.set_title(title)
+        scale =1
+        if '15min' in key:
+            scale=4
+        ts = var[key].sel(method='nearest',**loc).sel(time=time_sel)/scale
+        ts.plot.step(ax=ax,color=commonLib.colors[label],linewidth=2,label=f"{label} {int(ts.sum()):3d} mm")
+    ax.set_title(key)
+    ax.set_ylabel("Rain (mm/period)")
     ax.grid(visible=True,axis='x')
+    ax.legend()
 
 
 
-figts.suptitle(f"Rainfall rates (mm/hr) {year}-{month:02d}-{day:02d}")
-axes[0][0].legend()
+figts.suptitle(f"{year}-{month:02d}-{day:02d}")
+
 figts.tight_layout()
 figts.show()
 commonLib.saveFig(figts)
@@ -84,38 +107,69 @@ levels_15m=levels_1h*2
 kw_cbar=dict(orientation='horizontal',fraction=0.05,pad=0.1)
 cmap='Blues'
 
-# Setup for portrait
-fig,axes = plt.subplots(nrows=2,ncols=3,clear=True,sharex=True,sharey=True,
-                        num=f'UKradar{year}_{month:02d}_{day:02d}',figsize=[11,7],
-                        subplot_kw=dict(projection=proj))
-axes=axes.T 
+# # Setup for portrait
+# fig,axes = plt.subplots(nrows=2,ncols=3,clear=True,sharex=True,sharey=True,
+#                         num=f'UKradar{year}_{month:02d}_{day:02d}',figsize=[11,7],
+#                         subplot_kw=dict(projection=proj))
+# axes=axes.T # make landscape
+#
+# for rain,axe,levels in zip([rain2hr,rain1h,rain15m],
+#                            axes[:],
+#                            [levels_2h_r,levels_1h,levels_15m]):
+#
+#     for ax,(title,var) in zip(axe,rain.items()):
+#
+#         ax.set_extent([-3.5,-2.5,55.75,56.25],crs=ccrs.PlateCarree())
+#         maxV = var.max('time')
+#         cm=maxV.plot(ax=ax,cmap=cmap,levels=levels,transform=proj,add_colorbar=False)
+#         ax.set_title(f"Max {title}")
+#         # add on Edinburgh (centre) & Edinburgh castle.
+#         commonLib.std_decorators(ax) # put std stuff on axis
+#
+#     fig.colorbar(cm,ax=axe,**kw_cbar) # colorbar for the releant plots
+# # end looping over vars
+# for ax in axes.flatten(): # put the sites on
+#     for key in sites.keys():
+#         c = commonLib.colors[key]
+#         loc = commonLib.sites[key]
+#         ax.plot(*(loc.values()),marker='o',ms=4,color=c)
+#
+#
+# fig.suptitle(f"Max Rainfall rates (mm/hr) {year}-{month:02d}-{day:02d}")
+#
+#
+# fig.tight_layout()
+# fig.show()
+# commonLib.saveFig(fig)
 
-for rain,axe,levels in zip([rain2hr,rain1h,rain15m],
-                           axes[:],
-                           [levels_2h_r,levels_1h,levels_15m]):
-    
-    for ax,(title,var) in zip(axe,rain.items()):
+fig, axes = plt.subplots(nrows=1, ncols=2, clear=True, sharex=True, sharey=True,
+                         num=f'UKradar{year}_{month:02d}_{day:02d}', figsize=[11, 7],
+                         subplot_kw=dict(projection=proj))
 
-        ax.set_extent([-3.5,-2.5,55.75,56.25],crs=ccrs.PlateCarree())
-        maxV = var.max('time')
-        cm=maxV.plot(ax=ax,cmap=cmap,levels=levels,transform=proj,add_colorbar=False)
-        ax.set_title(f"Max {title}")
-        # add on Edinburgh (centre) & Edinburgh castle.
-        commonLib.std_decorators(ax) # put std stuff on axis
+ext = [commonLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
+       commonLib.edinburgh_region['projection_y_coordinate'].start,commonLib.edinburgh_region['projection_y_coordinate'].stop]
 
-    fig.colorbar(cm,ax=axe,**kw_cbar) # colorbar for the releant plots
+for ax,key,var,levels in zip(axes.flatten(),['1km 15min','5km hr'],[rain15m,rain1h],
+                                [levels_15m,levels_1h]):
+
+    ax.set_extent(ext, crs=proj)
+
+    maxV = var[key].max('time')
+    cm = maxV.plot(ax=ax, cmap=cmap, levels=levels, transform=proj, add_colorbar=True,cbar_kwargs=kw_cbar)
+    ax.set_title(f"Max {key}")
+
+    commonLib.std_decorators(ax)  # put std stuff on axis
+# add on botanics & castle
 # end looping over vars
-for ax in axes.flatten(): # put the sites on
+for ax in axes.flatten():  # put the sites on
     for key in sites.keys():
-        c = colors[key]
-        loc = sites[key]
-        ax.plot(*(loc.values()),marker='o',ms=4,color=c)
-
+        c = commonLib.colors[key]
+        loc = commonLib.sites[key]
+        ax.plot(*(loc.values()), marker='o', ms=4, color=c)
 
 fig.suptitle(f"Max Rainfall rates (mm/hr) {year}-{month:02d}-{day:02d}")
 
-
 fig.tight_layout()
 fig.show()
-commonLib.saveFig(fig)    
+commonLib.saveFig(fig)
 

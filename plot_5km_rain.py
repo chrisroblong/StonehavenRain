@@ -8,7 +8,7 @@ import commonLib
 import cartopy.crs as ccrs
 import scipy.stats
 import numpy as np
-read_data = False
+read_data = True
 gen_data = False
 if read_data:
     print("Reading data")
@@ -21,7 +21,9 @@ if read_data:
     print("Read monthly summary data")
     seas_max=ds.monthlyMax.sel(**commonLib.edinburgh_region).resample(time='QS-Dec').max().load()
     timeseries=dict()
-    for name,loc in commonLib.sites.items():
+    sites = commonLib.sites.copy()
+    sites.pop('KB')
+    for name,loc in sites.items():
         timeseries[name]=ds.monthlyMax.sel(method='nearest',**loc).resample(time='QS-Dec').max().load()
 
 
