@@ -1,6 +1,6 @@
 #!/bin/env python
 """
-plot some diagnosticvs from processed radar data
+plot some diagnostics from processed radar data
 """
 import pandas as pd
 import xarray
@@ -65,7 +65,9 @@ axes[0].set_ylabel("mm/hr")
 x=np.linspace(5,105,100)
 seas_max.sel(time=(seas_max.time.dt.month==6)).plot.hist(bins=x,ax=axes[1],density=True)
 # let's fit a gev to this
-distp=scipy.stats.genextreme.fit(seas_max.sel(time=(seas_max.time.dt.month==6)).values.flatten())
+data = seas_max.sel(time=(seas_max.time.dt.month==6))
+data = data.where(~data.isnull(),data.median())
+distp=scipy.stats.genextreme.fit(data.values.flatten())
 dist=scipy.stats.genextreme(*distp)
 axes[1].plot(x,dist.pdf(x),linewidth=2,color='green')
 #axes[1]
@@ -78,7 +80,7 @@ axes[1].set_xlabel("Max Summer rain (mm/hr)")
 axes[1].plot(x,dist.sf(x),linewidth=2,color='red')
 for xx in [1e-2,1e-3]:
     axes[1].axhline(xx,color='black',linestyle='dashed')
-for yy in [25,40]:
+for yy in [35,50]:
     axes[1].axvline(yy,color='black',linestyle='dashed')
 
 fig.show()
