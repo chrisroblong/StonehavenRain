@@ -22,7 +22,6 @@ if read_data:
     seas_max=ds.monthlyMax.sel(**commonLib.edinburgh_region).resample(time='QS-Dec').max().load()
     timeseries=dict()
     sites = commonLib.sites.copy()
-    sites.pop('KB')
     for name,loc in sites.items():
         timeseries[name]=ds.monthlyMax.sel(method='nearest',**loc).resample(time='QS-Dec').max().load()
 
