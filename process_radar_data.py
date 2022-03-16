@@ -1,11 +1,8 @@
-x1#!/bin/env python
+#!/bin/env python
 
 """
 Process radar data. 
-Problems at the moment
-1) Think I delete data from first of the month so whole month is offset by a day.
-2) data is not (always) time ordered. So when merging should sort it.  Which leads to a case in Dec/Nov 2010 when 61 days are processed at once..
-3) Need to catch (and handle) cases when have no cube -- jan 2006 seems to have that problem.
+
 
 """
 import pathlib
@@ -18,6 +15,7 @@ import resource # so we can see memory usage every month.
 import warnings
 
 warnings.filterwarnings('ignore',message='.*Vertical coord 5 not yet handled.*')
+# warning from iris filter out!
 
 
 
@@ -133,14 +131,22 @@ def write_data(ds, outFile, summary_prefix=''):
     return ds2
 
 
-def end_period_process(dailyData, outDir, period='1M',extra_name=''):
+def end_period_process(dailyData, outDir, period='1M',extra_name='',writeDaily=True):
+
+    """
+    Deal with data processing at end of a period -- normally a calendar month.
+    :param dailyData -- input list of dailyDate datasets
+    :param outDir -- output directory where data will be written to
+    :param period (default '1M'). Time period over which data to be resampled to
+    :param extra_name (defult '')
+    :param writeDaily (default True). If True write out daily data
+    """
     if len(dailyData) == 0:
         return [] # nothing to do so return empty list
     name_keys = {'1D': 'daily', '1M': 'monthly'}
     no_days = len(dailyData)
     time_write = pd.to_datetime(dailyData[-1].time.values[0])
-    time_str = f'{time_write.year:04d}-{time_write.month:02d}'
-    print(f"Writing summary and daily {extra_name} data for {no_days} days for {time_str}")
+    time_str= f'{time_write.year:04d}-{time_write.month:02d}'
     summary_prefix = name_keys.get(period, period)
 
     split_name = f.name.split(".")[0].split("_")
@@ -150,10 +156,14 @@ def end_period_process(dailyData, outDir, period='1M',extra_name=''):
         [split_name[0], split_name[1], time_str, split_name[-1], f'daily{extra_name}.nc'])
     dsDaily = xarray.concat(dailyData, 'time')
     resampDS = dsDaily.resample(time=period).map(time_process, summary_prefix=summary_prefix)
-    breakpoint()
     resampDS = resampDS.assign(No_samples=dsDaily.No_samples.rename(time='time_sample')) # add in the no of samples and  time of the sample
-    write_data(dsDaily,outFile=outFileDaily,summary_prefix='daily')
+    if writeDaily:
+        write_data(dsDaily,outFile=outFileDaily,summary_prefix='daily')
+        print(f"Wrote daily data for {no_days} days for {time_str} to {outFileDaily}")
+
     write_data(resampDS, outFile=outFile, summary_prefix=summary_prefix)
+    print(f"Wrote summary {extra_name} data for {no_days} days for {time_str} to {outFile}")
+
     return resampDS # return summary dataset
 
 def two_hr_mean(ds):
@@ -177,8 +187,12 @@ parser.add_argument('--verbose','-v',action='store_true',
 parser.add_argument('--outdir','-o',type=str,help='Name of output directory')
 parser.add_argument('--monitor','-m',action='store_true',
                     help='Monitor memory')
+parser.add_argument('--region',nargs=4,type=float,help='Region to extract (x0, x1,y0,y1)')
 
 parser.add_argument('--minhours',type=int,help='Minium number of unique hours in data to process daily data (default 6 hours)',default=6)
+parser.add_argument("--nodaily",action='store_false',
+                    help='Do not write out daily data')
+parser.add_argument("--resample",type=str,help='Time to resample input radar data to (default = 1h)',default='1h')
 args=parser.parse_args()
 glob_patt=args.glob
 test = args.test
@@ -188,7 +202,16 @@ if outdir is None: # default
     outdir=commonLib.outdir/f'summary_{resoln}'
 else:
     outdir = pathlib.Path(outdir)
+writeDaily=args.nodaily    
 verbose = args.verbose
+region=None
+if args.region is not None:
+    region=dict(
+        projection_x_coordinate = slice(args.region[0],args.region[1]),
+        projection_y_coordinate = slice(args.region[2],args.region[3])
+    )
+
+resample_prd = args.resample
 if verbose:
     print("Command line args",args)
 
@@ -214,20 +237,19 @@ for year in args.year:
         if test: # test mode
             print(f"Would read {f} but in test mode")
             continue
-        rain = commonLib.extract_nimrod_day(f, QCmax=400,check_date=True)
+        rain = commonLib.extract_nimrod_day(f, QCmax=400,check_date=True,region=region)
         if (rain is None) or (len(np.unique(rain.time.dt.hour)) <= minhours): # want minhours hours of data
             print(f"Not enough data for {f} ")
             if rain is None:
                 print("No data at all")
             else:
                 print(f"Only {len(np.unique(rain.time.dt.hour))} unique hours")
-            
 
             last = None # no last data for the next day
             continue # no or not enough data so onto the next day
-            
+        # now we can process a days worth of data.    
         no_samples = len(rain.time)
-        rain=rain.resample(time='1h').mean(keep_attrs=True)  # mean rain/hour units mm/hr
+        rain=rain.resample(time=resample_prd).mean(keep_attrs=True)  # mean rain/hour units mm/hr
         rain.attrs["Number_samples"]=no_samples # how many samples went in
         time = pd.to_datetime(rain.time.values[0])
 # from https://medium.com/survata-engineering-blog/monitoring-memory-usage-of-a-running-python-program-49f027e3d1ba
@@ -241,8 +263,8 @@ for year in args.year:
            (time.month != last_month): # change of month -- could be quarter etc
             # starting a new month so save data and start again.
             print("Starting a new period. Summarizing and writing data out")
-            summaryDS = end_period_process(dailyData, outdir, period='1M')  # process and write out data
-            summaryDS2hr = end_period_process(dailyData2hr, outdir, period='1M', extra_name='2hr')  # process and write out data
+            summaryDS = end_period_process(dailyData, outdir, period='1M',writeDaily=writeDaily)  # process and write out data
+            summaryDS2hr = end_period_process(dailyData2hr, outdir, period='1M', extra_name='2hr',writeDaily=writeDaily)  # process and write out data
             if monitor: # report on memory
                 mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss 
                 max_mem = max(max_mem,mem) 
@@ -271,8 +293,8 @@ for year in args.year:
     # end loop over years.
 # and we might have data to write out!
 
-summaryDS = end_period_process(dailyData, outdir, period='1M')  # process and write out data
-summaryDS2hr = end_period_process(dailyData2hr, outdir, period='1M', extra_name='2hr')  # process and write out data
+summaryDS = end_period_process(dailyData, outdir, period='1M',writeDaily=writeDaily)  # process and write out data
+summaryDS2hr = end_period_process(dailyData2hr, outdir, period='1M', extra_name='2hr',writeDaily=writeDaily)  # process and write out data
 
 if monitor: # report on memory
     mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss 
