@@ -19,6 +19,7 @@ import numpy as np
 import platform
 import cftime
 import cf_units
+import matplotlib.pyplot as plt
 bad_data_err = (zlib.error,ValueError,TypeError,iris.exceptions.ConstraintMismatchError,gzip.BadGzipFile) # possible bad data
 machine = platform.node()
 if ('jasmin.ac.uk' in machine) or ('jc.rl.ac.uk' in machine):
@@ -49,7 +50,7 @@ edinburgh_region = dict()
 for k,v in edinburgh_castle.items(): # 50km around edinburgh
     edinburgh_region[k]=slice(v-50e3,v+50e3)
 
-colors = dict(castle='purple',botanics='brown',KB='green')
+colors = dict(castle='purple',botanics='green',KB='orange')
 
 # get in the UK country borders.
 #file = pathlib.Path('Countries_(December_2017)_Boundaries/Countries_(December_2017)_Boundaries.shp')
@@ -104,6 +105,30 @@ def hack_nimrod_time(cube, field):
 import iris.fileformats
 iris.fileformats.nimrod_load_rules.time=hack_nimrod_time
 print("WARNING MONKEY PATCHING iris.fileformats.nimrod_load_rules.time")
+
+
+def time_process(DS, varPrefix='daily', summary_prefix=''):
+    """
+    Process a dataset of (daily) data
+    :param DS -- Dataset to process
+    :param outFile (default None). Name of file for summary data to output. If None  nothing will be written.
+            All times in attributes or "payload" will be converted used commonLib.convert_time
+    :param varPrefix (default 'daily') -- variable prefix on DataArrays in datasets)
+    :param summary_prefix (default '') -- prefix to be added to output maxes etc
+    """
+    mx = DS[varPrefix + 'Max'].max('time', keep_attrs=True).rename(f'{summary_prefix}Max')  # max of maxes
+    mx_idx = DS[varPrefix + 'Max'].fillna(0.0).argmax('time', skipna=True)  # index  of max
+    mx_time = DS[varPrefix + 'MaxTime'].isel(time=mx_idx).drop_vars('time').rename(f'{summary_prefix}MaxTime')
+    time_max = DS[varPrefix + 'Max'].time.max().values
+    mn = DS[varPrefix + 'Mean'].mean('time', keep_attrs=True).rename(f'{summary_prefix}Mean')
+    # actual time. -- dropping time as has nothing and will fix later
+
+    ds = xarray.merge([mn, mx, mx_time])
+
+    ds.attrs['max_time'] = time_max
+
+    return ds
+
 def time_convert(DataArray,ref='1970-01-01',unit='h',set_attrs=True):
     """
     convert times to hours (etc) since reference time.
@@ -112,7 +137,7 @@ def time_convert(DataArray,ref='1970-01-01',unit='h',set_attrs=True):
     :param unit -- unit default is h for hours
     :return -- returns dataarray with units reset and values converted
     """
-    name_conversion=dict(h='hours',d='days')
+    name_conversion=dict(m='minutes',h='hours',d='days')
     
     with xarray.set_options(keep_attrs=True):
         hour = (DataArray - np.datetime64(ref))/np.timedelta64(1,unit)
@@ -195,7 +220,7 @@ def extract_nimrod_day(file,region=None,QCmax=None,gzip_min=85,check_date=False)
         if len(rain) != lren:
             print("Cleaned data for ",file)
         if len(rain) == 0:
-            print(f"Not enough data for {check_time} in {file}")
+            print(f"Not enough data for {check_date} in {file}")
         
     return rain
 

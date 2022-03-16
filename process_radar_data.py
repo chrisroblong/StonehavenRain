@@ -135,7 +135,7 @@ def end_period_process(dailyData, outDir, period='1M',extra_name='',writeDaily=T
 
     """
     Deal with data processing at end of a period -- normally a calendar month.
-    :param dailyData -- input list of dailyDate datasets
+    :param dailyData -- input list of daily datasets
     :param outDir -- output directory where data will be written to
     :param period (default '1M'). Time period over which data to be resampled to
     :param extra_name (defult '')

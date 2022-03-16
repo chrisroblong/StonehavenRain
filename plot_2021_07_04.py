@@ -13,7 +13,7 @@ hr_start=14 #-- hour (UTC) to start time plots
 hr_end = 20 # Hour (UTC) to end time plots
 year=2021
 
-read_data = True # If true read the data...
+read_data = False # If true read the data...
 
 rgn = dict(projection_x_coordinate=slice(5e4,5e5),
            projection_y_coordinate=slice(5e5,1.1e6))
@@ -54,27 +54,8 @@ if read_data:
 ## Plot the timeseries from the day for the two sites. 
 time_sel=slice(f'{year}-{month:02d}-{day:02d}T{hr_start:02d}',f'{year}-{month:02d}-{day:02d}T{hr_end:02d}')
 
-# setup for landscape. 
-# figts,axes = plt.subplots(nrows=2,ncols=3,clear=True,sharex='all',sharey='row',
-#                           num=f'UKradarEDts{year}_{month:02d}_{day:02d}',figsize=[11,7])
-# axes=axes.T
-# # plot not quite overlapping
-# for ax,(title,var) in zip(axes.flatten(),itertools.chain(rain2hr.items(),rain1h.items(),rain15m.items())):
-#     for label,loc in sites.items():
-#         ts = var.sel(method='nearest',**loc).sel(time=time_sel)
-#         ts.plot.step(ax=ax,color=colors[label],linewidth=2,label=label)
-#     ax.set_title(title)
-#     ax.grid(visible=True,axis='x')
-#
-#
-#
-# figts.suptitle(f"Rainfall rates (mm/hr) {year}-{month:02d}-{day:02d}")
-# axes[0][0].legend()
-# figts.tight_layout()
-# figts.show()
-# commonLib.saveFig(figts)
+
 sites = commonLib.sites.copy() # remove KB
-kb = sites.pop('KB')
 figts,axes = plt.subplots(nrows=1,ncols=2,clear=True,sharex='all',sharey='row',
                           num=f'UKradarEDts{year}_{month:02d}_{day:02d}',figsize=[11,7])
 
@@ -84,7 +65,7 @@ for ax,key,var in zip(axes.flatten(),['1km 15min','5km hr'],[rain15m,rain1h]):
         if '15min' in key:
             scale=4
         ts = var[key].sel(method='nearest',**loc).sel(time=time_sel)/scale
-        ts.plot.step(ax=ax,color=commonLib.colors[label],linewidth=2,label=f"{label} {int(ts.sum()):3d} mm")
+        ts.plot.step(ax=ax,color=commonLib.colors[label],linewidth=4,label=f"{label} {int(ts.sum()):3d} mm")
     ax.set_title(key)
     ax.set_ylabel("Rain (mm/period)")
     ax.grid(visible=True,axis='x')
@@ -165,7 +146,7 @@ for ax in axes.flatten():  # put the sites on
     for key in sites.keys():
         c = commonLib.colors[key]
         loc = commonLib.sites[key]
-        ax.plot(*(loc.values()), marker='o', ms=4, color=c)
+        ax.plot(*(loc.values()), marker='o', ms=7, color=c)
 
 fig.suptitle(f"Max Rainfall rates (mm/hr) {year}-{month:02d}-{day:02d}")
 
