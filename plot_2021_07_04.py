@@ -88,40 +88,6 @@ levels_15m=levels_1h*2
 kw_cbar=dict(orientation='horizontal',fraction=0.05,pad=0.1)
 cmap='Blues'
 
-# # Setup for portrait
-# fig,axes = plt.subplots(nrows=2,ncols=3,clear=True,sharex=True,sharey=True,
-#                         num=f'UKradar{year}_{month:02d}_{day:02d}',figsize=[11,7],
-#                         subplot_kw=dict(projection=proj))
-# axes=axes.T # make landscape
-#
-# for rain,axe,levels in zip([rain2hr,rain1h,rain15m],
-#                            axes[:],
-#                            [levels_2h_r,levels_1h,levels_15m]):
-#
-#     for ax,(title,var) in zip(axe,rain.items()):
-#
-#         ax.set_extent([-3.5,-2.5,55.75,56.25],crs=ccrs.PlateCarree())
-#         maxV = var.max('time')
-#         cm=maxV.plot(ax=ax,cmap=cmap,levels=levels,transform=proj,add_colorbar=False)
-#         ax.set_title(f"Max {title}")
-#         # add on Edinburgh (centre) & Edinburgh castle.
-#         commonLib.std_decorators(ax) # put std stuff on axis
-#
-#     fig.colorbar(cm,ax=axe,**kw_cbar) # colorbar for the releant plots
-# # end looping over vars
-# for ax in axes.flatten(): # put the sites on
-#     for key in sites.keys():
-#         c = commonLib.colors[key]
-#         loc = commonLib.sites[key]
-#         ax.plot(*(loc.values()),marker='o',ms=4,color=c)
-#
-#
-# fig.suptitle(f"Max Rainfall rates (mm/hr) {year}-{month:02d}-{day:02d}")
-#
-#
-# fig.tight_layout()
-# fig.show()
-# commonLib.saveFig(fig)
 
 fig, axes = plt.subplots(nrows=1, ncols=2, clear=True, sharex=True, sharey=True,
                          num=f'UKradar{year}_{month:02d}_{day:02d}', figsize=[11, 7],
