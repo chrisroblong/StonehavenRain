@@ -263,6 +263,7 @@ for year in args.year:
            (time.month != last_month): # change of month -- could be quarter etc
             # starting a new month so save data and start again.
             print("Starting a new period. Summarizing and writing data out")
+            breakpoint()
             summaryDS = end_period_process(dailyData, outdir, period='1M',writeDaily=writeDaily)  # process and write out data
             summaryDS2hr = end_period_process(dailyData2hr, outdir, period='1M', extra_name='2hr',writeDaily=writeDaily)  # process and write out data
             if monitor: # report on memory

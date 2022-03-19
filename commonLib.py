@@ -21,6 +21,7 @@ import cftime
 import cf_units
 import matplotlib.pyplot as plt
 bad_data_err = (zlib.error,ValueError,TypeError,iris.exceptions.ConstraintMismatchError,gzip.BadGzipFile) # possible bad data
+bad_data_err = (zlib.error,iris.exceptions.ConstraintMismatchError,gzip.BadGzipFile) # possible bad data
 machine = platform.node()
 if ('jasmin.ac.uk' in machine) or ('jc.rl.ac.uk' in machine):
     # specials for Jasmin cluster or LOTUS cluster
@@ -74,14 +75,20 @@ def hack_nimrod_time(cube, field):
         # have a validity time.
         return
     else:
-        valid_date = cftime.datetime(
+        missing = field.data_header_int16_25 # missing data indicator 
+        dt =[ 
             field.vt_year,
             field.vt_month,
             field.vt_day,
             field.vt_hour,
             field.vt_minute,
-            #field.vt_second, # seconds occasionally invalid but not needed for nimrod...
-        )
+            field.vt_second] # set up a list with the dt cpts
+        for indx in range(3,len(dt)): # check out hours/mins/secs and set to 0 if missing
+            if dt[indx] == missing:
+                dt[indx] = 0
+
+        valid_date = cftime.datetime(*dt) # make a cftime datetime.
+
     point = np.around(iris.fileformats.nimrod_load_rules.TIME_UNIT.date2num(valid_date)).astype(np.int64)
 
     period_seconds = None
