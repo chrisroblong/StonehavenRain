@@ -25,11 +25,13 @@ bad_data_err = (zlib.error,iris.exceptions.ConstraintMismatchError,gzip.BadGzipF
 machine = platform.node()
 if ('jasmin.ac.uk' in machine) or ('jc.rl.ac.uk' in machine):
     # specials for Jasmin cluster or LOTUS cluster
+    dataDir = pathlib.Path.cwd()
     nimrodRootDir = pathlib.Path("/badc/ukmo-nimrod/data/composite") # where the nimrod data lives
     outdir = pathlib.Path(".")  #writing locally. Really need a workspace..
 elif 'geos-' in machine:
-    nimrodRootDir = pathlib.Path(r'C:\Users\stett2\data\Edinburgh_rain\nimrod_data')
-    outdir = pathlib.Path(r'C:\Users\stett2\data\Edinburgh_rain\output')
+    dataDir = pathlib.Path(r'C:\Users\stett2\data\Edinburgh_rain')
+    nimrodRootDir = dataDir/'nimrod_data'
+    outdir = dataDir/'output_data'
 else: # don't know what to do so raise an error.
     raise Exception(f"On platform {machine} no idea where data lives")
 # create the outdir

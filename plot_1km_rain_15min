@@ -11,7 +11,7 @@ import scipy.stats
 import numpy as np
 import dask
 read_data = True
-gen_data = True
+gen_data = False
 if read_data:
     print("Reading data")
     if gen_data:
@@ -62,7 +62,7 @@ fig,axes = plt.subplots(nrows=1,ncols=2,num='Reg_Clim_max_1km_15min',clear=True,
 seas_max.groupby('time.month').mean().mean(['projection_x_coordinate','projection_y_coordinate']).to_pandas().plot.bar(ax=axes[0])
 axes[0].set_title("Mean seasonal 15min max 1km")
 axes[0].set_ylabel("mm/hr")
-x=np.linspace(5,105,100)
+x=np.linspace(5,150,150)
 seas_max.sel(time=(seas_max.time.dt.month==6)).plot.hist(bins=x,ax=axes[1],density=True)
 # let's fit a gev to this
 data = seas_max.sel(time=(seas_max.time.dt.month==6))

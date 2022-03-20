@@ -1,6 +1,7 @@
 """
-Plot data summaries for 4th of July 2021 in Edinburgh
-Use iris to load in a day of data then convert to xarray
+Plot radar and ERA-5 MSLP for 4th of July 2021 in Southern Scotland/Northern England.
+Will do for 15:00 & 16:00 Z
+
 """
 
 import matplotlib.pyplot as plt
@@ -13,110 +14,54 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import xarray
 import commonLib
+import numpy as np
+edinburgh_region = dict()
+for k,v in commonLib.edinburgh_castle.items(): # 100km around edinburgh
+    edinburgh_region[k]=slice(v-100e3,v+100e3)
 
+read_data = False
+if read_data:
+    file= commonLib.nimrodRootDir/'uk-1km/2021/metoffice-c-band-rain-radar_uk_20210704_1km-composite.dat.gz.tar'
+    rainAll=commonLib.extract_nimrod_day(file,QCmax=400.)
+    era_5 = xarray.open_dataset(commonLib.dataDir/'UK_ERA5_data_2021_07_03to05.nc')
+    time_sel = ['2021-07-04T14','2021-07-04T15','2021-07-04T16']
+    msl = era_5.msl.sel(time=time_sel,longitude=slice(-15,0),latitude=slice(59,53))/100.
+    era_5_rain = era_5.tp.sel(time=time_sel, longitude=slice(-15,0),latitude=slice(57,53))*1000
+    rain = rainAll.sel(time=time_sel,**edinburgh_region)
+    # get bathymetry/topography data
+    topog = xarray.load_dataset(commonLib.dataDir/'GEBCO_topog_bathy_scotland.nc')
 
-def select_nimrod(cube, field, filename):
-    """
-    Process nimrod cube so we can merge it.
-    Does by removing recursive_filter_iterations
-    :param cube: cube being processed
-    :param field: field
-    :param filename: filename
-    :return:
-    """
-    filter = cube.attributes.pop('recursive_filter_iterations')  # pop gets rid of this which should make merging work.
-    return cube
-
-
-d = pathlib.Path(r"C:\Users\stett2\data\Edinburgh_rain")
-file = d / '202107041300_nimrod_ng_radar_rainrate_composite_1km_UK'
-files = [str(f) for f in d.glob('20210704*UK')]
-# use iris to read nimrod cubes but then convert to xarray for subsequent work.
-c = iris.cube.CubeList(iris.fileformats.nimrod.load_cubes(files, callback=select_nimrod)).merge('time')[0]
-# and convert to xarray as that is much easier to work with.
-radar_rain = xarray.DataArray.from_iris(c)
-# co-ords of data are UK National grid.
-# Edinburgh castle is  324990 Easting & 672876 Northing
-ed_botanics = dict(projection_x_coordinate=324990, projection_y_coordinate=672876, method='nearest')
-ed_castle = dict(projection_x_coordinate=325204, projection_y_coordinate=673447, method='nearest')
-rgn = dict(projection_y_coordinate=slice(500e3, 750e3), projection_x_coordinate=slice(200e3, 450e3))
-ed_rgn = dict(projection_y_coordinate=slice(645e3, 695e3), projection_x_coordinate=slice(280e3, 370e3))
-radar_rain_rgn = radar_rain.sel(**rgn)  # and extract the rgn we want.
-radar_rain_rgn = radar_rain_rgn.resample(time='h').mean()  # hourly data
-# then pullout Edinburgh...
-radar_rain_ed = radar_rain_rgn.sel(**ed_rgn)
 
 ## make plots
-regions = cfeature.NaturalEarthFeature(
-    category='cultural',
-    name='admin_1_states_provinces_lines',
-    scale='10m',
-    facecolor='none')
-nations = cfeature.NaturalEarthFeature(
-    category='cultural',
-    name='admin_0_countries',
-    scale='10m',
-    facecolor='none')
+
 projection = ccrs.OSGB()
-times = ['13', '14', '15', '16', '17']
-figure_scot, ax_scot = plt.subplots(nrows=3, ncols=2, num='Sth_Scot', clear=True, figsize=[8, 12],
+cmap='Blues'
+figure_scot, ax_scot = plt.subplots(nrows=1, ncols=3, num='Sth_Scot', clear=True, figsize=[11, 5],
                                     subplot_kw=dict(projection=projection))
-ax_scot = ax_scot.flat
+
 label_scot = commonLib.plotLabel()
-
-figure, ax = plt.subplots(nrows=3, ncols=2, num='Edinburgh', clear=True, figsize=[8, 12],
-                          subplot_kw=dict(projection=projection))
+rn_levels=[1,2,5,10,20,50]
+slp_levels=np.linspace(999,1006,8)
 label = commonLib.plotLabel()
-ax = ax.flat
-norm = mcol.LogNorm()
-cbar = dict(orientation='horizontal')
-for a, dataArray in zip([ax[0], ax_scot[0]], [radar_rain_ed, radar_rain_rgn]):
-    dataArray.max('time').plot.pcolormesh(rasterized=True, vmin=1, vmax=64, norm=norm, ax=a,cbar_kwargs=cbar)
-    # Edinburgh Castle is roughly easting 325000 Northing 673000
-    a.plot(325204, 673447, marker='*', ms=10, color='black', transform=ccrs.OSGB(), alpha=0.5)
-    a.add_feature(regions, edgecolor='red')
-    a.add_feature(cfeature.BORDERS, edgecolor='red', resolution='10m')
-    a.coastlines(resolution='10m')
-    a.set_title("Max hourly rain")
+rgn = [edinburgh_region['projection_x_coordinate'].start,edinburgh_region['projection_x_coordinate'].stop,
+              edinburgh_region['projection_y_coordinate'].start,edinburgh_region['projection_y_coordinate'].stop]
+for indx,ax in enumerate(ax_scot.flatten()):
+    ax.set_extent(rgn,crs=projection)
+
+    topog.elevation.plot(ax=ax,transform=ccrs.PlateCarree(),add_colorbar=False,cmap='YlOrBr')
+    ax.plot(*list(commonLib.edinburgh_botanics.values()), marker='o', ms=6, color=commonLib.colors['botanics'],
+            transform=projection)
+    cm = rain.isel(time=indx).plot(ax=ax, levels=rn_levels, cmap=cmap,add_colorbar=False,alpha=0.7)
+    #cmE=era_5_rain.isel(time=indx).plot(ax=ax,levels=rn_levels,cmap=cmap,transform=ccrs.PlateCarree(),alpha=0.2,add_colorbar=False)
+
+    label.plot(ax)
 
 
-for a, a_scot, time in zip(ax[1:], ax_scot[1:], times):
-    radar_rain.sel(time=f'2021-07-04T{time}:00', **ed_rgn).plot.pcolormesh(rasterized=True, vmin=1, vmax=64, norm=norm,
-                                                                           ax=a, add_colorbar=False)
+    c=msl.isel(time=indx).plot.contour(ax=ax,levels=slp_levels,transform=ccrs.PlateCarree(),colors='grey',linestyles='dashed')
+    ax.clabel(c)
+    commonLib.std_decorators(ax)
 
-    radar_rain.sel(time=f'2021-07-04T{time}:00', **rgn).plot.pcolormesh(rasterized=True, vmin=1, vmax=64, norm=norm,
-                                                                        ax=a_scot, add_colorbar=False)
-    for aa in [a, a_scot]:  # common axis stuff
-        aa.set_title(f'5min {time}00Z')
-        a.plot(325204, 673447, marker='*', ms=10, color='black', transform=ccrs.OSGB(), alpha=0.5)
-        aa.add_feature(regions, edgecolor='red')
-        aa.coastlines(resolution='10m')
-
-# add labels to all plots.
-
-for a in ax_scot:
-    label_scot.plot(a)
-for a in ax:
-    label.plot(a)
-
-for fig, title in zip([figure, figure_scot], ['Edinburgh', 'Southern Scotland']):
-    fig.suptitle(f"{title} rain (mm/hour) 2021-07-04")
-    fig.tight_layout()
-    fig.show()
-    commonLib.saveFig(fig)
-
-
-## plot t/s of rain at Castle and botanics.
-
-fig,axes = plt.subplots(nrows=2,ncols=1,num='Edinburgh_ts',clear=True,figsize=[6,6],sharex='all',sharey='all')
-for ax,loc,title in zip(axes.flat,[ed_castle,ed_botanics],['Edinburgh Castle','Botanic Gardens']):
-    ts=radar_rain.sel(**loc).sel(time=slice('2021-07-04T14:00','2021-07-04T18:00'))/12 # convert to mm/5 min
-    ts.cumsum().plot.step(ax=ax) # and plot it
-    ax.set_ylabel('Total Rain (mm)')
-    ax.set_title(title)
-    ax.axvline('2021-07-04T16:00',color='grey',linestyle='dashed')
-fig.suptitle("Cumulative rain (mm) 2021-07-04")
-fig.tight_layout()
-fig.show()
-commonLib.saveFig(fig)
-
+figure_scot.colorbar(cm,orientation='horizontal',ax=ax_scot,fraction=0.08,pad=0.05,aspect=40)
+#figure_scot.tight_layout()
+figure_scot.show()
+commonLib.saveFig(figure_scot)

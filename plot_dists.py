@@ -40,19 +40,18 @@ read_data = True
 if read_data:
     seas_max_5km = comp_seas_max("Edinburgh_extremes.nc",time=slice('2000','2019'))
     seas_max_1km = comp_seas_max("Edinburgh_extremes_1km.nc",time=slice('2000','2019'))
+    seas_max_1km_15min = comp_seas_max("Edinburgh_extremes_1km_15min.nc",time=slice('2000','2019'))
     print("Read monthly summary data")
 
 fig,axes = plt.subplots(nrows=1,ncols=2,num='Reg_Clim_max_1km',clear=True,figsize=[8,6])
 sm = []
 spatial_coords  = ['projection_x_coordinate', 'projection_y_coordinate']
 color = {'1km_50km':'blue','5km_50km':'skyblue','1km_25km':'black',
-         '5km_25km':'grey','1km_10km':'red','5km_10km':'orange'}
-region50 = rgn(50.)
-region25 = rgn(25.)
-region10= rgn(10.)
-rgns = {'50km':50.,'25km':25.,'10km':10.}
+         '5km_25km':'grey','1km_15min_50km':'purple','1km_15min_25km':'fuchsia'}
+
+rgns = {'50km':50.,'25km':25.}
 for rname,region in rgns.items():
-    for seas_max,name in zip([seas_max_1km,seas_max_5km],['1km','5km']):
+    for seas_max,name in zip([seas_max_1km,seas_max_5km,seas_max_1km_15min],['1km','5km','1km_15min']):
         ds = seas_max.groupby('time.month').mean()
         ds = rgn_dist(ds,region)
         sm.append(
@@ -63,10 +62,10 @@ sm.plot.bar(ax=axes[0],color=color)
 axes[0].set_title("Mean seasonal max 1km")
 axes[0].set_ylabel("mm/hr")
 
-x=np.linspace(5,105,100)
+x=np.linspace(5,150,150)
 ##
 for rname,region in rgns.items():
-    for ds,t in zip([seas_max_1km,seas_max_5km],['1km','5km']):
+    for ds,t in zip([seas_max_1km,seas_max_5km,seas_max_1km_15min],['1km','5km','1km_15min']):
         name = t+'_'+rname
         data = rgn_dist(ds.sel(time=(ds.time.dt.month==6)),region)
         data = data.values.flatten() #
