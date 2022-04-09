@@ -28,15 +28,17 @@ if ('jasmin.ac.uk' in machine) or ('jc.rl.ac.uk' in machine):
     dataDir = pathlib.Path.cwd()
     nimrodRootDir = pathlib.Path("/badc/ukmo-nimrod/data/composite") # where the nimrod data lives
     outdir = pathlib.Path(".")  #writing locally. Really need a workspace..
-elif 'geos-' in machine:
-    dataDir = pathlib.Path(r'C:\Users\stett2\data\Edinburgh_rain')
+elif 'GEOS-' in machine.upper() :
+    dataDir = pathlib.Path(r'C:\Users\stett2\OneDrive - University of Edinburgh\data\EdinburghRainfall')
     nimrodRootDir = dataDir/'nimrod_data'
     outdir = dataDir/'output_data'
 else: # don't know what to do so raise an error.
+    #print(f"On platform {machine} no idea where data lives")
+
     raise Exception(f"On platform {machine} no idea where data lives")
 # create the outdir
 outdir.mkdir(parents=True,exist_ok=True)
-
+horizontal_coords = ['projection_x_coordinate','projection_y_coordinate'] # for radar data.
 edinburgh_castle = dict(projection_x_coordinate=325166,
            projection_y_coordinate=673477)
 
@@ -51,7 +53,7 @@ edinburgh_KB = dict(projection_x_coordinate=326495,
 sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics)#,KB=edinburgh_KB)
 edinburgh_region = dict()
 for k,v in edinburgh_castle.items(): # 50km around edinburgh
-    edinburgh_region[k]=slice(v-50e3,v+50e3)
+    edinburgh_region[k]=slice(v-150e3,v+150e3)
 
 colors = dict(castle='purple',botanics='green',KB='orange')
 
@@ -234,112 +236,7 @@ def extract_nimrod_day(file,region=None,QCmax=None,gzip_min=85,check_date=False)
     return rain
 
 
-def saveFig(fig, name=None, savedir=None, figtype=None, dpi=None, verbose=False):
-    """
-
-
-    :param fig -- figure to save
-    :param name (optional) set to None if undefined
-    :param savedir (optional) directory as a pathlib.Path. Path to save figure to. Default is fig_dir
-    :param figtype (optional) type of figure. (If not specified then png will be used)
-    :param dpi: dots per inch to save at. Default is none which uses matplotlib default.
-    :param verbose:  If True (default False) printout name of file being written to
-    """
-
-    defFigType = '.png'
-    if dpi is None:
-        dpi = 300
-    # set up defaults
-    if figtype is None:
-        figtype = defFigType
-    # work out sub_plot_name.
-    if name is None:
-        fig_name = fig.get_label()
-    else:
-        fig_name = name
-
-    if savedir is None:
-        savedir = fig_dir
-
-    # try and create savedir
-    # possibly create the fig_dir.
-    savedir.mkdir(parents=True, exist_ok=True)  # create the directory
-
-    outFileName = savedir / (fig_name + figtype)
-    if verbose:
-        print(f"Saving to {outFileName}")
-    fig.savefig(outFileName, dpi=dpi)
-
-    ##
-
-class plotLabel:
-    """
-    Class for plotting labels on sub-plots
-    """
-
-    def __init__(self, upper=False, roman=False,fontdict={}):
-        """
-        Make instance of plotLabel class
-        parameters:
-        :param upper -- labels in upper case if True
-        :param roman -- labels use roman numbers if True
-        """
-
-        import string
-        if roman:  # roman numerals
-            strings = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii']
-        else:
-            strings = [x for x in string.ascii_lowercase]
-
-        if upper:  # upper case if requested
-            strings = [x.upper() for x in strings]
-
-        self.strings = strings[:]
-        self.num = 0
-        self.fontdict=fontdict
-
-    def label_str(self):
-        """
-        Return the next label
-        """
-        string = self.strings[self.num] + " )"
-        self.num += 1
-        self.num = self.num % len(self.strings)
-        return string
-
-    def plot(self, ax=None, where=None):
-        """
-        Plot the label on the current axis.
-        :param ax -- axis to plot on. Default is current axis (using plt.gca())
-        :param where -- (x,y) tuple saying where  to plot label using axis coords. Default is (-0.03,1.03)
-        """
-
-        if ax is None:
-            plt_axis = plt.gca()
-        else:
-            plt_axis = ax
-        try:
-            if plt_axis.size > 1:  # got more than one element
-                for a in plt_axis.flatten():
-                    self.plot(ax=a, where=where)
-                return
-        except AttributeError:
-            pass
-
-        # now go and do the actual work!
-
-        text = self.label_str()
-        if where is None:
-            x = -0.03
-            y = 1.03
-        else:
-            (x, y) = where
-
-        plt_axis.text(x, y, text, transform=plt_axis.transAxes,
-                      horizontalalignment='right', verticalalignment='bottom',fontdict=self.fontdict)
-
-
-## standard stuff for plots. 
+## standard stuff for plots.
 
 
 # UK local authorities.
