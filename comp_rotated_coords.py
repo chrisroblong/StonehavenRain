@@ -20,9 +20,11 @@ coords=dict(Edinburgh=(-3.1833,55.95),
 coords_rotated = dict()
 
 for name,c in coords.items():
-    transform = cordex.rotated_coord_transform(c[0],c[1],pole_long,pole_lat,direction='geo2rot')
-    print(f"{name}: {transform[0]:4.2f} {transform[1]:4.2f}")
-    coords_rotated[name]=[round(t,2) for t in transform] # store to 2sf
+    rot_lon,rot_lat = cordex.rotated_coord_transform(c[0],c[1],pole_long,pole_lat,direction='geo2rot')
+    rot_lon += 360.
+    print(f"{name}: {rot_lon:4.2f} {rot_lat:4.2f}")
+    # need co-ords around 360 for matching the model..
+    coords_rotated[name]=[round(t,2) for t in (rot_lon,rot_lat)] # store to 2sf
 
 # now plot things so can check..
 projRot=ccrs.RotatedPole(pole_longitude=pole_long,pole_latitude=pole_lat)
