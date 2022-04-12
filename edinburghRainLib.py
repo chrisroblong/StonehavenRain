@@ -52,12 +52,12 @@ edinburgh_KB = dict(projection_x_coordinate=326495,
 
 # co-ords of relevant places on rotated grid. See comp_rotated_coords to actually generate them
 # note only to 2 sf (~ 1km) which is enough precision... Not computing these here
-# as needs cordex module which not available on jasmin.
-rotated_coords = dict(Edinburgh=(-0.38, 3.45),
-    Rothampsted=(1.33, -0.68),
-    Malvern= (0.11, -0.38),
-    Squires_Gate=(-0.32, 1.27),
-    Ringway=(0.14, 0.85))
+# as needs cordex module which not available on jasmin. Coords around 360 as that is what grid_longitude is
+rotated_coords = dict(Edinburgh=(359.62, 3.45),
+    Rothampsted=(361.33, -0.68),
+    Malvern= (360.11, -0.38),
+    Squires_Gate=(359.68, 1.27),
+    Ringway=(360.14, 0.85))
 
 # sites we want to plot and the colors they are.
 sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics)#,KB=edinburgh_KB)
