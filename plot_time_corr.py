@@ -5,6 +5,7 @@ Do for all 4 seasons.
 import xarray
 
 import edinburghRainLib
+import commonLib
 import numpy as np
 import  matplotlib.pyplot as plt
 import cartopy.crs as ccrs
@@ -43,8 +44,8 @@ fig, axes = plt.subplots(nrows=1, ncols=2, clear=True, sharex=True, sharey=True,
 
 
 
-ext = [commonLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
-       commonLib.edinburgh_region['projection_y_coordinate'].start,commonLib.edinburgh_region['projection_y_coordinate'].stop]
+ext = [edinburghRainLib.edinburgh_region['projection_x_coordinate'].start,edinburghRainLib.edinburgh_region['projection_x_coordinate'].stop,
+       edinburghRainLib.edinburgh_region['projection_y_coordinate'].start,edinburghRainLib.edinburgh_region['projection_y_coordinate'].stop]
 dist = [50,100,150]
 for ax,title,var in zip(axes.flatten(),['1km_15min','5km'],[p_1km_15min,p_5km]):
 
@@ -56,7 +57,7 @@ for ax,title,var in zip(axes.flatten(),['1km_15min','5km'],[p_1km_15min,p_5km]):
     ##cl = var.sel(month=6).plot.contour(ax=ax, colors='black', levels=levels, transform=proj, add_colorbar=False)
     ax.set_title(f"{title}")
 
-    commonLib.std_decorators(ax)  # put std stuff on axis
+    edinburghRainLib.std_decorators(ax)  # put std stuff on axis
 fig.colorbar(cm,ax=axes,**kw_cbar)
 fig.show()
 commonLib.saveFig(fig)
