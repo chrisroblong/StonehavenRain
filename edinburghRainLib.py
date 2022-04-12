@@ -27,6 +27,7 @@ if ('jasmin.ac.uk' in machine) or ('jc.rl.ac.uk' in machine):
     # specials for Jasmin cluster or LOTUS cluster
     dataDir = pathlib.Path.cwd()
     nimrodRootDir = pathlib.Path("/badc/ukmo-nimrod/data/composite") # where the nimrod data lives
+    cpmDir = pathlib.Path("/badc/ukcp18/data/land-cpm/uk/2.2km/rcp85") # where the CPM data lives
     outdir = pathlib.Path(".")  #writing locally. Really need a workspace..
 elif 'GEOS-' in machine.upper() :
     dataDir = pathlib.Path(r'C:\Users\stett2\OneDrive - University of Edinburgh\data\EdinburghRainfall')
@@ -57,8 +58,6 @@ rotated_coords = dict(Edinburgh=(-0.38, 3.45),
     Malvern= (0.11, -0.38),
     Squires_Gate=(-0.32, 1.27),
     Ringway=(0.14, 0.85))
-
-edinburgh_rotated = dict(grid_longitude=-0.38,grid_latitude=3.45) # co-ords for Edinburgh on rotated grid
 
 # sites we want to plot and the colors they are.
 sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics)#,KB=edinburgh_KB)
