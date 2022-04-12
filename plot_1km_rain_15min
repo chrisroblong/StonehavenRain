@@ -5,7 +5,7 @@ plot some diagnostics from processed 1km 15 min  radar data
 import pandas as pd
 import xarray
 import matplotlib.pyplot as plt
-import commonLib
+import edinburghRainLib
 import cartopy.crs as ccrs
 import scipy.stats
 import numpy as np

@@ -1,7 +1,7 @@
 # plot the july 4th 2021 extremes near Edinburgh from 1km and 5km data
 import matplotlib.pyplot as plt
 import xarray
-import commonLib
+import edinburghRainLib
 import pathlib
 import cartopy.crs as ccrs
 import numpy as np

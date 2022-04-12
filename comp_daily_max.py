@@ -22,7 +22,7 @@ import pathlib
 import itertools
 import pandas as pd
 import numpy as np
-import commonLib
+import edinburghRainLib
 def time_of_max(ds):
     """
 

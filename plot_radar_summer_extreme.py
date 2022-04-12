@@ -8,7 +8,7 @@ Some dodgy data that will need finding and (ignoring)
 see https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-extremes which should suggest some reasonable values
 """
 
-import commonLib
+import edinburghRainLib
 import xarray
 import matplotlib.pyplot as plt
 import numpy

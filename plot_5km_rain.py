@@ -4,7 +4,7 @@ plot some diagnosticvs from processed radar data
 import pandas as pd
 import xarray
 import matplotlib.pyplot as plt
-import commonLib
+import edinburghRainLib
 import cartopy.crs as ccrs
 import scipy.stats
 import numpy as np

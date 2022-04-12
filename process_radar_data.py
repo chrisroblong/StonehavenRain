@@ -6,7 +6,7 @@ Process radar data.
 
 """
 import pathlib
-import commonLib
+import edinburghRainLib
 import xarray
 import numpy as np
 import pandas as pd

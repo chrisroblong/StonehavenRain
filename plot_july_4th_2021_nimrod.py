@@ -2,6 +2,8 @@
 Plot radar and ERA-5 MSLP for 4th of July 2021 in Southern Scotland/Northern England.
 Will do for 15:00 & 16:00 Z
 
+Needs matplotlib >=3.5.1(well 3.4 has a bug with alpha as an array which 3.5.1 does not have)
+
 """
 
 import matplotlib.pyplot as plt
@@ -13,7 +15,7 @@ import matplotlib.colors as mcol
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import xarray
-import commonLib
+import edinburghRainLib
 import numpy as np
 edinburgh_region = dict()
 for k,v in commonLib.edinburgh_castle.items(): # 100km around edinburgh
@@ -40,26 +42,32 @@ figure_scot, ax_scot = plt.subplots(nrows=1, ncols=3, num='Sth_Scot', clear=True
                                     subplot_kw=dict(projection=projection))
 
 label_scot = commonLib.plotLabel()
-rn_levels=[1,2,5,10,20,50]
-slp_levels=np.linspace(999,1006,8)
+rn_levels=[1,2,5,10,20,50,100]
+slp_levels=np.linspace(1003,1006,7)
 label = commonLib.plotLabel()
 rgn = [edinburgh_region['projection_x_coordinate'].start,edinburgh_region['projection_x_coordinate'].stop,
               edinburgh_region['projection_y_coordinate'].start,edinburgh_region['projection_y_coordinate'].stop]
 for indx,ax in enumerate(ax_scot.flatten()):
     ax.set_extent(rgn,crs=projection)
 
-    topog.elevation.plot(ax=ax,transform=ccrs.PlateCarree(),add_colorbar=False,cmap='YlOrBr')
-    ax.plot(*list(commonLib.edinburgh_botanics.values()), marker='o', ms=6, color=commonLib.colors['botanics'],
-            transform=projection)
-    cm = rain.isel(time=indx).plot(ax=ax, levels=rn_levels, cmap=cmap,add_colorbar=False,alpha=0.7)
+    topog.elevation.plot(ax=ax,transform=ccrs.PlateCarree(),add_colorbar=False,cmap='YlOrBr',levels=[100,200,300,400,500,600])
+
+    #
+    r = rain.isel(time=indx)
+    alpha = np.where(r > 1, 1.0, 0.0) # this makes the plotting very slow.
+    #alpha=0.7
+    cm = r.plot.pcolormesh(ax=ax, levels=rn_levels, cmap=cmap,add_colorbar=False,alpha=alpha)
+    #cm = ax.pcolormesh(r.projection_x_coordinate,r.projection_y_coordinate,r.values,alpha=alpha)
     #cmE=era_5_rain.isel(time=indx).plot(ax=ax,levels=rn_levels,cmap=cmap,transform=ccrs.PlateCarree(),alpha=0.2,add_colorbar=False)
 
     label.plot(ax)
 
 
-    c=msl.isel(time=indx).plot.contour(ax=ax,levels=slp_levels,transform=ccrs.PlateCarree(),colors='grey',linestyles='dashed')
+    c=msl.isel(time=indx).plot.contour(ax=ax,levels=slp_levels,transform=ccrs.PlateCarree(),colors='grey',linestyles=['solid','dashed'])
     ax.clabel(c)
     commonLib.std_decorators(ax)
+    ax.plot(*list(commonLib.edinburgh_botanics.values()), marker='o', ms=6, color=commonLib.colors['botanics'],
+            transform=projection,alpha=0.7)
 
 figure_scot.colorbar(cm,orientation='horizontal',ax=ax_scot,fraction=0.08,pad=0.05,aspect=40)
 #figure_scot.tight_layout()

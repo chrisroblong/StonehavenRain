@@ -1,7 +1,7 @@
 # plot the 2022-02-16 1km data for the UK
 import matplotlib.pyplot as plt
 import xarray
-import commonLib
+import edinburghRainLib
 import pathlib
 import cartopy.crs as ccrs
 import numpy as np
