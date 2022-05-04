@@ -10,6 +10,7 @@ import cartopy.crs as ccrs
 import scipy.stats
 import numpy as np
 import dask
+import commonLib
 read_data = True
 gen_data = False
 if read_data:
@@ -22,16 +23,16 @@ if read_data:
     else:
         ds = xarray.load_dataset("Edinburgh_extremes_1km_15min.nc")
     print("Read monthly summary data")
-    seas_max=ds.monthlyMax.sel(**commonLib.edinburgh_region).resample(time='QS-Dec').max().load()
+    seas_max=ds.monthlyMax.sel(**edinburghRainLib.edinburgh_region).resample(time='QS-Dec').max().load()
     timeseries=dict()
-    for name,loc in commonLib.sites.items():
+    for name,loc in edinburghRainLib.sites.items():
         timeseries[name]=ds.monthlyMax.sel(method='nearest',**loc).resample(time='QS-Dec').max().load()
 
 
 ## make some plots for summer. 
 fig,ax = plt.subplots(nrows=1,ncols=1,num='ed_ts_1km_15min',clear=True,figsize=[8,5])
 for name, ts in timeseries.items():
-    col=commonLib.colors[name]
+    col=edinburghRainLib.colors[name]
     ts.sel(time=(ts.time.dt.month==6)).plot.line(color=col,ax=ax,label=name)
 ax.legend()
 ax.set_title("Seasonal Max 15min Rainfall (mm/hr) 1km")
@@ -47,9 +48,9 @@ mn = seas_max.sel(time=(seas_max.time.dt.month == 6))
 cbar_kwargs=dict(orientation='horizontal',pad=0.1,label='mm/hr')
 mn.mean('time').plot(ax=ax,robust=True,cmap=cmap, cbar_kwargs=cbar_kwargs)
 ax.coastlines()
-commonLib.std_decorators(ax)
-ext = [commonLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
-       commonLib.edinburgh_region['projection_y_coordinate'].start,commonLib.edinburgh_region['projection_y_coordinate'].stop]
+edinburghRainLib.std_decorators(ax)
+ext = [edinburghRainLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
+       edinburghRainLib.edinburgh_region['projection_y_coordinate'].start,commonLib.edinburgh_region['projection_y_coordinate'].stop]
 ax.set_extent(ext,crs=proj)
 
 fig.tight_layout()

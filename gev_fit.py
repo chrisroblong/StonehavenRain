@@ -109,20 +109,25 @@ def qsat(temperature):
     return es
 
 
+sim_cpm=xarray.load_dataset(edinburghRainLib.dataDir/'cpm_reg_ts.nc')
 sim_cet=xarray.load_dataset(edinburghRainLib.dataDir/'cet_cpm.nc')
-sim_cet = sim_cet.tas.resample(time='QS-DEC').mean().dropna('time') # seasonal mean
-sim_cet = sim_cet.sel(time=(sim_cet.time.dt.month==6)) # summer
+sim_ed=xarray.load_dataset(edinburghRainLib.dataDir/'ed_reg_ts.nc')
+
+sat_hum= qsat(sim_cpm)
+#sat_hum = sim_cet
+sat_hum = sat_hum.tas.resample(time='QS-DEC').mean().dropna('time') # seasonal mean
+sat_hum = sat_hum.sel(time=(sat_hum.time.dt.month==6)) # summer
 max_precip= xarray.concat(data_set.values(),dim='time').pr.drop_vars('ensemble_member_id') # get rid of the string id
-sat_hum= qsat(sim_cet)
+
 plt.figure(num='cet_mn_extreme_scatter',clear=True)
 for time in [1,2,5]:
     mn_sat_hum=sat_hum.coarsen(time=time).mean()
     mn_sat_hum /= mn_sat_hum.mean()
     for space in [1,2,5,10]:
-        mn_extreme = max_precip.coarsen(grid_longitude=space,grid_latitude=space,time=time,boundary='trim').max().mean(grid_coords).T
+        mn_extreme = max_precip.coarsen(grid_longitude=space,grid_latitude=space,boundary='trim').max().mean(grid_coords).coarsen(time=time).mean().T
         mn_extreme /= mn_extreme.mean()
         if time in [1] and space in [1,10]:
-            plt.scatter(mn_sat_hum,mn_extreme,color='k',marker='o',s=5)
+            plt.scatter(mn_sat_hum,mn_extreme,marker='o',s=5,label=f"space: {space} time:{time}")
         reg=scipy.stats.linregress(mn_sat_hum.values.flatten(),mn_extreme.values.flatten())
         reg_robust = scipy.stats.theilslopes(mn_extreme.values.flatten(),x=mn_sat_hum.values.flatten())
         print(f"time {time} space {space}")
@@ -134,7 +139,7 @@ for time in [1,2,5]:
 # es=es/np.mean(es)
 # plt.plot(x,es,color='blue')
 
-
+plt.legend()
 plt.xlabel('QSAT(CET) (g/kg)')
 plt.ylabel("Mn Hourly Extreme (mm/hr) ")
 plt.show()
