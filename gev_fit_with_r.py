@@ -184,7 +184,7 @@ for ts,title in zip([cet,cpm,ed,hum],['CET','CPM_region','Edinburgh_region','Hum
     file = outdir_gev/f"cov_{title}.nc"
     if refresh or (not file.exists()): #
         print(f"Generating data for {file}")
-        ts_summer=ts.resample(time='QS-DEC').mean().dropna('time')
+        cet_summer=ts.resample(time='QS-DEC').mean().dropna('time')
         ts_summer = ts_summer.sel(time=(ts_summer.time.dt.month==6))
         ts_summer['time'] = ed_extreme_precip.time # make sure times are the same
         xfit[title] = xarray_gev(ed_extreme_precip.stack(time_ensemble=stack_dims), ts_summer.stack(time_ensemble=stack_dims))
@@ -353,20 +353,47 @@ for a, title,xtitle,ytitle in zip(ax, ['Intensity Ratio Increase (%) ', 'Probabi
 
 fig.tight_layout()
 fig.show()
-## Plot some helpfull figures.
-## Scatter of CPM ht vs fraction change in param relative to present_value estimates
-fig=plt.figure(clear=True,num='Scatter_ht_D')
+## Plot some helpful figures.
+# Scatter of CPM ht vs fraction change in param relative to present_value estimates
+# and PM CET vs median extreme precip.
+# + obs cet as range.,
+
+cet_summer = cet.resample(time='QS-DEC').mean().dropna('time')
+cet_summer = cet_summer.sel(time=(cet_summer.time.dt.month == 6))
+cet_summer['time'] = ed_extreme_precip.time  # make sure times are the same
+fig,(ax_ht_params,ax_cet)=plt.subplots(nrows=1,ncols=2,clear=True,num='Scatter_ht_D',figsize=[8,5])
 mask=(-1 < cpm_ht.ht) & (cpm_ht.ht < 2000) # where we want values
 maskf = mask.values.flatten()
 for p in ['location','scale']:
-    ratio = fit.Parameters.sel(parameter='D'+p)/value_today.sel(parameter=p).where(mask)
+    ratio = 100*fit.Parameters.sel(parameter='D'+p)/value_today.sel(parameter=p).where(mask)
     print(f"{p} {float(ratio.mean()):3.2f} {float(ratio.std()):3.2f}")
-    plt.scatter(cpm_ht.ht.where(mask),ratio,label='D'+p+'/K',s=4)
+    ax_ht_params.scatter(cpm_ht.ht.where(mask),ratio,label='%D'+p,s=4)
     corr= np.ma.corrcoef(ratio.stack(horiz=horiz_coords)[maskf],cpm_ht.ht.stack(horiz=horiz_coords)[maskf])
     print(f"Corr D{p} ht {float(corr[0][1]):4.2f}")
-plt.axhline(.075,color='black',linestyle='dashed',linewidth=2)
+ax_ht_params.axhline(7.5,color='black',linestyle='dashed',linewidth=2)
 for v in [1,200]:
-    plt.axvline(v,color='black',linewidth=2,linestyle='dashed')
-plt.legend()
+    ax_ht_params.axvline(v,color='black',linewidth=2,linestyle='dashed')
+ax_ht_params.legend()
+ax_ht_params.set_ylabel('% Rx1Hr/2005-2020')
+ax_ht_params.set_xlabel("Height (m)")
+ax_ht_params.set_title("Time dependant parameters vs Height")
+
+# plot the scatter of median (over the masked region) vs CET
+ex_precip = ed_extreme_precip.where(mask).max(horiz_coords)
+ax_cet.scatter(cet_summer,ex_precip,s=6)
+L=(obs_cet.time.dt.month==7) & (obs_cet.time.dt.year > 1849)
+L2=(obs_cet.time.dt.month==7) & (obs_cet.time.dt.year > 2005) & (obs_cet.time.dt.year < 2020)
+min_cet = obs_cet.sel(time=L).min()
+max_cet = obs_cet.sel(time=L).max()
+
+min_cet_today = obs_cet.sel(time=L2).min()
+max_cet_today = obs_cet.sel(time=L2).max()
+ax_cet.plot([min_cet,t_pi,t_today,t_p2k,max_cet],[ex_precip.quantile([0.1])]*5,color='red',linewidth=4,marker='o',ms=8)
+ax_cet.plot([min_cet_today,max_cet_today],[ex_precip.quantile([0.2])]*2,color='blue',linewidth=4)
+ax_cet.set_title("CET vs Max Regional Rx1hr")
+ax_cet.set_xlabel("CET (C)")
+ax_cet.set_ylabel("Max Rx1hr")
+fig.tight_layout()
 fig.show()
+commonLib.saveFig(fig)
 
