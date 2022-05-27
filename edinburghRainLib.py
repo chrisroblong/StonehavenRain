@@ -64,7 +64,7 @@ edinburgh_region = dict()
 for k,v in edinburgh_castle.items(): # 50km around edinburgh
     edinburgh_region[k]=slice(v-150e3,v+150e3)
 
-colors = dict(castle='purple',botanics='green',KB='orange')
+colors = dict(castle='purple',botanics='green')
 gshhs = GSHHS_WDBII.GSHHS_WDBII()
 coastline = gshhs.coastlines(scale='full') # so we can have high resoln coastlines.
 # get in the UK country borders.
@@ -241,6 +241,8 @@ def extract_nimrod_day(file,region=None,QCmax=None,gzip_min=85,check_date=False)
             print(f"Not enough data for {check_date} in {file}")
         
     return rain
+# stuff for fits
+
 
 
 ## standard stuff for plots.
@@ -267,7 +269,7 @@ metadata = pd.read_excel('radar_station_metadata.xlsx',index_col=[0],na_values=[
 L=metadata.Working.str.upper() == 'Y'
 metadata = metadata[L]
 
-def std_decorators(ax):
+def std_decorators(ax,showregions=True):
     """
     Add a bunch of stuff to an axis
     :param ax: axis
@@ -277,7 +279,8 @@ def std_decorators(ax):
 
     ax.plot(metadata.Easting,metadata.Northing,marker='h',color='red',ms=7,linestyle='none',transform=cartopy.crs.OSGB(approx=True)) #  radar stations location.
     #ax.gridlines(draw_labels=False, x_inline=False, y_inline=False)
-    ax.add_feature(regions, edgecolor='red')
+    if showregions:
+        ax.add_feature(regions, edgecolor='red')
     ax.add_feature(coastline)
     #ax.add_feature(nations, edgecolor='black')
     
