@@ -1,7 +1,7 @@
 #!/bin/env python
 
 """
-Process radar data. 
+Process radar data on JASMIN. Generate monthly-means of rain, monthly extremes and time of monthly extreme.
 
 
 """
@@ -57,7 +57,7 @@ def process(dataArray, resample='1D', total=True):
     process a chunk of data from the hourly processed data
     Compute  dailyMax, dailyMaxTime and dailyMean and return them in a dataset
     :param dataArray -- input data array to be resampled and processes to daily
-    :param total (default True) If True  not compute the daily total.
+    :param total (default True) If True   compute the daily total.
 
     """
     name_keys = {'1D': 'daily', '1M': 'monthly'}
@@ -66,7 +66,8 @@ def process(dataArray, resample='1D', total=True):
     # set up the resample
     mx = resamp.max(keep_attrs=True).rename(name + 'Max')
     nsamps = mx.attrs.pop('Number_samples')
-    if total:
+    if total: # this is problematic if process 15min data. In which case total will be 4 times too large.
+        #TODO fix processing.
         tot = resamp.sum(keep_attrs=True).rename(name + 'Total')
         tot.attrs['units'] = 'mm/day'
         nsamps = tot.attrs.pop('Number_samples')
@@ -96,6 +97,7 @@ def time_process(DS, varPrefix='daily', summary_prefix=''):
     mx_idx = DS[varPrefix + 'Max'].fillna(0.0).argmax('time', skipna=True)  # index  of max
     mx_time = DS[varPrefix + 'MaxTime'].isel(time=mx_idx).drop_vars('time').rename(f'{summary_prefix}MaxTime')
     time_max = DS[varPrefix + 'Max'].time.max().values
+    #TODO modify to make a total.
     mn = DS[varPrefix + 'Total'].mean('time', keep_attrs=True).rename(f'{summary_prefix}Mean')
     # actual time. -- dropping time as has nothing and will fix later
 
@@ -117,11 +119,11 @@ def write_data(ds, outFile, summary_prefix=''):
     """
     ds2 = ds.copy()  # as modifying things...
     try:
-        ds2.attrs['max_time'] = commonLib.time_convert(ds2.attrs['max_time'])
+        ds2.attrs['max_time'] = edinburghRainLib.time_convert(ds2.attrs['max_time'])
     except KeyError: # no maxTime.,
         pass
     var = summary_prefix + "MaxTime"
-    ds2[var] = commonLib.time_convert(ds2[var])
+    ds2[var] = edinburghRainLib.time_convert(ds2[var])
     # compress the ouput... (useful because most rain is zero...and quite a lot of the data is missing)
     encoding=dict()
     comp = dict(zlib=True)
@@ -199,7 +201,7 @@ test = args.test
 resoln=args.resolution
 outdir=args.outdir
 if outdir is None: # default
-    outdir=commonLib.outdir/f'summary_{resoln}'
+    outdir=edinburghRainLib.outdir/f'summary_{resoln}'
 else:
     outdir = pathlib.Path(outdir)
 writeDaily=args.nodaily    
@@ -230,15 +232,15 @@ last = None
 dailyData = []
 dailyData2hr = []
 for year in args.year:
-    dataYr = commonLib.nimrodRootDir / f'uk-{resoln}/{year:04d}'
+    dataYr = edinburghRainLib.nimrodRootDir / f'uk-{resoln}/{year:04d}'
     # initialise the list...
     files = sorted(list(dataYr.glob(f'*{year:02d}{glob_patt}[0-3][0-9]*-composite.dat.gz.tar')))
     for f in files:
         if test: # test mode
             print(f"Would read {f} but in test mode")
             continue
-        rain = commonLib.extract_nimrod_day(f, QCmax=400,check_date=True,region=region)
-        if (rain is None) or (len(np.unique(rain.time.dt.hour)) <= minhours): # want minhours hours of data
+        rain = edinburghRainLib.extract_nimrod_day(f, QCmax=400,check_date=True,region=region)
+        if (rain is None) or (len(np.unique(rain.time.dt.hour)) <= minhours): # want min hours hours of data
             print(f"Not enough data for {f} ")
             if rain is None:
                 print("No data at all")
@@ -263,7 +265,6 @@ for year in args.year:
            (time.month != last_month): # change of month -- could be quarter etc
             # starting a new month so save data and start again.
             print("Starting a new period. Summarizing and writing data out")
-            breakpoint()
             summaryDS = end_period_process(dailyData, outdir, period='1M',writeDaily=writeDaily)  # process and write out data
             summaryDS2hr = end_period_process(dailyData2hr, outdir, period='1M', extra_name='2hr',writeDaily=writeDaily)  # process and write out data
             if monitor: # report on memory

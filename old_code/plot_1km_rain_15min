@@ -1,0 +1,89 @@
+#!/bin/env python
+"""
+plot some diagnostics from processed 1km 15 min  radar data
+"""
+import pandas as pd
+import xarray
+import matplotlib.pyplot as plt
+import edinburghRainLib
+import cartopy.crs as ccrs
+import scipy.stats
+import numpy as np
+import dask
+import commonLib
+read_data = True
+gen_data = False
+if read_data:
+    print("Reading data")
+    if gen_data:
+        print("Generating data -- slow...")
+        dask.config.set({"array.slicing.split_large_chunks": True})
+        ds=xarray.open_mfdataset("summary_1km_15min/*monthly.nc",chunks=dict(time=24,projection_y_coordinate=200,projection_x_coordinate=200),combine='nested').sel(**commonLib.edinburgh_region).load()
+        ds.to_netcdf("Edinburgh_extremes_1km_15min.nc")
+    else:
+        ds = xarray.load_dataset("Edinburgh_extremes_1km_15min.nc")
+    print("Read monthly summary data")
+    seas_max=ds.monthlyMax.sel(**edinburghRainLib.edinburgh_region).resample(time='QS-Dec').max().load()
+    timeseries=dict()
+    for name,loc in edinburghRainLib.sites.items():
+        timeseries[name]=ds.monthlyMax.sel(method='nearest',**loc).resample(time='QS-Dec').max().load()
+
+
+## make some plots for summer. 
+fig,ax = plt.subplots(nrows=1,ncols=1,num='ed_ts_1km_15min',clear=True,figsize=[8,5])
+for name, ts in timeseries.items():
+    col=edinburghRainLib.colors[name]
+    ts.sel(time=(ts.time.dt.month==6)).plot.line(color=col,ax=ax,label=name)
+ax.legend()
+ax.set_title("Seasonal Max 15min Rainfall (mm/hr) 1km")
+fig.tight_layout()
+fig.show()
+commonLib.saveFig(fig)
+
+proj=ccrs.OSGB()
+fig,ax=plt.subplots(nrows=1,ncols=1,clear=True,num='mean_summer_max_1km_15min',figsize=[7,8],subplot_kw=dict(projection=proj))
+cmap='Blues'
+mn = seas_max.sel(time=(seas_max.time.dt.month == 6))
+
+cbar_kwargs=dict(orientation='horizontal',pad=0.1,label='mm/hr')
+mn.mean('time').plot(ax=ax,robust=True,cmap=cmap, cbar_kwargs=cbar_kwargs)
+ax.coastlines()
+edinburghRainLib.std_decorators(ax)
+ext = [edinburghRainLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
+       edinburghRainLib.edinburgh_region['projection_y_coordinate'].start,commonLib.edinburgh_region['projection_y_coordinate'].stop]
+ax.set_extent(ext,crs=proj)
+
+fig.tight_layout()
+ax.set_title("Mean Summer Max 15min Rain (mm/hr) 1km")
+fig.show()
+commonLib.saveFig(fig)
+
+## plot reginally aggregated stats.. 
+fig,axes = plt.subplots(nrows=1,ncols=2,num='Reg_Clim_max_1km_15min',clear=True,figsize=[8,6])
+seas_max.groupby('time.month').mean().mean(['projection_x_coordinate','projection_y_coordinate']).to_pandas().plot.bar(ax=axes[0])
+axes[0].set_title("Mean seasonal 15min max 1km")
+axes[0].set_ylabel("mm/hr")
+x=np.linspace(5,150,150)
+seas_max.sel(time=(seas_max.time.dt.month==6)).plot.hist(bins=x,ax=axes[1],density=True)
+# let's fit a gev to this
+data = seas_max.sel(time=(seas_max.time.dt.month==6))
+data = data.where(~data.isnull(),data.median())
+distp=scipy.stats.genextreme.fit(data.values.flatten())
+dist=scipy.stats.genextreme(*distp)
+axes[1].plot(x,dist.pdf(x),linewidth=2,color='green')
+#axes[1]
+
+axes[1].set_yscale('log')
+axes[1].set_title("Regional Dist of 1km 15min  Summer Maxes")
+axes[1].set_ylabel("PDF")
+axes[1].set_xlabel("Max 15min Summer rain (mm/hr)")
+# plot the return time vs rainfall.
+axes[1].plot(x,dist.sf(x),linewidth=2,color='red')
+for xx in [1e-2,1e-3]:
+    axes[1].axhline(xx,color='black',linestyle='dashed')
+for yy in [35,50]:
+    axes[1].axvline(yy,color='black',linestyle='dashed')
+
+fig.show()
+fig.tight_layout()
+commonLib.saveFig(fig)

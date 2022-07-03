@@ -4,6 +4,7 @@ Provides classes, variables and functions used across the project
 import pathlib
 import fiona
 import cartopy
+import rioxarray
 import iris
 import tarfile
 import gzip
@@ -38,8 +39,9 @@ else: # don't know what to do so raise an error.
 # create the outdir
 outdir.mkdir(parents=True,exist_ok=True)
 horizontal_coords = ['projection_x_coordinate','projection_y_coordinate'] # for radar data.
+cpm_horizontal_coords= ['grid_latitude', 'grid_longitude'] # horizontal coords for CPM data.
 edinburgh_castle = dict(projection_x_coordinate=325166,
-           projection_y_coordinate=673477)
+           projection_y_coordinate=673477+50) # adjust the castle 50M north!
 
 
 edinburgh_botanics = dict(projection_x_coordinate=324770,
@@ -61,7 +63,7 @@ rotated_coords = dict(Edinburgh=(359.62, 3.45),
 sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics)#,KB=edinburgh_KB)
 edinburgh_region = dict()
 for k,v in edinburgh_castle.items(): # 50km around edinburgh
-    edinburgh_region[k]=slice(v-150e3,v+150e3)
+    edinburgh_region[k]=slice(v-50e3,v+50e3)
 
 colors = dict(castle='purple',botanics='green',KB='orange')
 try:
@@ -71,6 +73,72 @@ try:
 except ModuleNotFoundError:
     coastline = cartopy.feature.NaturalEarthFeature('physical','coastline','10m',edgecolor='black',facecolor='none')
 
+def gen_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', quantiles=None,
+                   region=None, height_range=slice(0,200), discrete_hr=12):
+    """
+    generated flattend radar data.
+    Read in data, keep data between height_range, mask by seasonal total rainfall < 1000 mm, group by time (discretized to 12 hours by default), requiring at least 25 values.  and then compute quantiles for each grouping
+    :param discrete_hr: discretisation time.
+    :param file: file where data lives.
+    :param quantiles: quantiles wanted. Defaults (if None set) are [0.05,0.1,0.2,0.5, 0.8, 0.9, 0.95]
+    :param region. Region wanted to work with. Specified as dict with each element being co-ord name, slice of min & max values wanted. Used in sel
+    :param height_range. Heights which are wanted. Provide as a slice. Heights > start and < stop will be used,
+    :return: radar data and quantiles of rainfall for Edinburgh castle grouping.
+    """
+
+    if region is None:
+        region = edinburgh_region
+    if quantiles is None:
+        quantiles = [0.05,0.1,0.2,0.5, 0.8, 0.9, 0.95]
+    radar_precip = xarray.open_dataset(file).sel(**region)
+    rseas = radar_precip.drop_vars('No_samples').resample(time='QS-Dec')
+    rseas = rseas.map(time_process, varPrefix='monthly', summary_prefix='seasonal')
+    rseas = rseas.sel(time=(rseas.time.dt.season == 'JJA'))  # Summer max rain
+    # should compute resample from rseas.
+    if '5km' in file.name:
+        topog_grid = 55
+    else:
+        topog_grid = 11
+    topog990m = read_90m_topog(region=region, resample=topog_grid)
+    top_fit_grid = topog990m.interp_like(rseas.isel(time=0).squeeze())
+
+    htMsk = (top_fit_grid > height_range.start) & (top_fit_grid < height_range.stop) # in ht range
+    # mask by seasonal sum < 1000.
+    mskRain = ((rseas.seasonalMean*(30+31+31)/4.) < 1000.) & htMsk
+    rseasMskmax = xarray.where(mskRain,rseas.seasonalMax,np.nan)
+    mxTime = rseas.seasonalMaxTime
+    indx = (mxTime.dt.year - 2000) * 366 + mxTime.dt.dayofyear + (mxTime.dt.hour // discrete_hr) * discrete_hr/24.
+    indx = xarray.where(rseasMskmax, indx, np.nan)
+    rain_count = rseasMskmax.groupby(indx).count()
+    radar_data = rseasMskmax.groupby(indx).quantile(quantiles).rename(group='time_index', quantile='time_quant')  # .values
+    ok_count=(~rseasMskmax.isnull()).groupby(indx).sum().rename(group='time_index')    # count non nan
+    radar_data=radar_data[(ok_count > 25)] # want at least 25 values
+    ed_indx = indx.sel(edinburgh_castle, method='nearest').sel(time='2021')
+    rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
+    ed_indx = indx.sel(edinburgh_castle, method='nearest').sel(time='2020')
+    rainC2020 = radar_data.sel(time_index=ed_indx).squeeze()
+    ds=xarray.Dataset(dict(radar=radar_data,critical2021=rainC2021,critical2020=rainC2020,rain_count=rain_count,indx=indx,mask=rseasMskmax))
+    return ds
+
+def read_90m_topog(region=edinburgh_region,resample=None):
+    """
+    Read 90m DEM data from UoE regridded OSGB data.
+    Fix various problems
+    :param region: region to select to.
+    :param resample: If not None then the amount to coarsen by.
+    :return: topography dataset
+    """
+    topog=rioxarray.open_rasterio(dataDir/'uk_srtm')
+    topog = topog.reindex(y=topog.y[::-1]).rename(x='projection_x_coordinate',y='projection_y_coordinate')
+    if region is not None:
+        topog = topog.sel(**region)
+    topog = topog.load().squeeze()
+    L=(topog > -10000) & (topog < 10000) # fix bad data. L is where data is good!
+    topog=topog.where(L)
+    if resample is not None:
+        topog= topog.coarsen(projection_x_coordinate=resample,
+                             projection_y_coordinate=resample,boundary='pad').mean()
+    return topog
 
 fig_dir = pathlib.Path("figures")
 
@@ -177,11 +245,11 @@ def extract_nimrod_day(file,region=None,QCmax=None,gzip_min=85,check_date=False)
     Algorithm opens the tarfile. Iterates through files in tarfile 
     uncompresses each file to tempfile. 
     Reads tempfile then deletes it when done.
-    returns an dataset of rainfall for the whole day. Note badc archive 
+    returns a dataset of rainfall for the whole day. Note BADC archive
     seems to be missing data so some days will not be complete. 
 
     :param file -- pathlib path to file for data to be extracted
-    :param region (default None) -- if not None then shoul be a dict of co-ords to be extacted.
+    :param region (default None) -- if not None then shoul be a dict of co-ords to be extracted.
     :param QCmax (default None) -- if not None then values > QCmax are set missing as crude QC.
     :param check_date (default False) -- if True check the dates are as expected. Complain if not but keep going
     :param gzip_min (default 85) -- if the gziped file (individual field) is less than this size ignore it -- likely becuase it is zero size.
@@ -244,7 +312,28 @@ def extract_nimrod_day(file,region=None,QCmax=None,gzip_min=85,check_date=False)
             print(f"Not enough data for {check_date} in {file}")
         
     return rain
-# stuff for fits
+
+def time_process(DS, varPrefix='daily', summary_prefix=''):
+    f"""
+    Process a dataset of (daily) data
+    :param DS -- Dataset to process. Should contain variables called:
+      f"{varPrefix}Max", f"{varPrefix}MaxTime", f"{varPrefix}Mean" 
+    :param varPrefix (default 'daily') -- variable prefix on DataArrays in datasets)
+    :param summary_prefix (default '') -- prefix to be added to output maxes etc
+    """
+    mx = DS[varPrefix + 'Max'].max('time', keep_attrs=True).rename(f'{summary_prefix}Max')  # max of maxes
+    mx_idx = DS[varPrefix + 'Max'].fillna(0.0).argmax('time', skipna=True)  # index  of max
+    mx_time = DS[varPrefix + 'MaxTime'].isel(time=mx_idx).drop_vars('time').rename(f'{summary_prefix}MaxTime')
+    time_max = DS[varPrefix + 'Max'].time.max().values
+    mn = DS[varPrefix + 'Mean'].mean('time', keep_attrs=True).rename(f'{summary_prefix}Mean')
+    # actual time. -- dropping time as has nothing and will fix later
+
+    ds = xarray.merge([mn, mx, mx_time])
+
+    ds.attrs['max_time'] = time_max
+
+    return ds
+
 
 
 
@@ -269,25 +358,32 @@ except fiona.errors.DriverError:
     scale='10m',
     edgecolor='red',
     facecolor='none')
-    
-    
+
+
 # radar stations
 metadata = pd.read_excel('radar_station_metadata.xlsx',index_col=[0],na_values=['-']).T
 L=metadata.Working.str.upper() == 'Y'
 metadata = metadata[L]
 
-def std_decorators(ax,showregions=True):
+def std_decorators(ax,showregions=True,radarNames=False):
     """
     Add a bunch of stuff to an axis
     :param ax: axis
+    :param showregions: If True show the county borders
+    :param radarNames: If True label the radar stations
     :return: Nada
     """
 
 
-    ax.plot(metadata.Easting,metadata.Northing,marker='h',color='red',ms=7,linestyle='none',transform=cartopy.crs.OSGB(approx=True)) #  radar stations location.
+    ax.plot(metadata.Easting,metadata.Northing,marker='h',color='red',ms=7,linestyle='none',
+            transform=cartopy.crs.OSGB(approx=True)) #  radar stations location.
     #ax.gridlines(draw_labels=False, x_inline=False, y_inline=False)
     if showregions:
         ax.add_feature(regions, edgecolor='red')
+    if radarNames:
+        for name,row in metadata.iterrows():
+            ax.annotate(name,(row.Easting+500,row.Northing+500),transform=cartopy.crs.OSGB(approx=True))
+
     ax.add_feature(coastline)
     #ax.add_feature(nations, edgecolor='black')
     

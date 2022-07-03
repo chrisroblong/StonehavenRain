@@ -112,8 +112,9 @@ def xarray_gev(ds, cov=None, shapeCov=False, dim='time_ensemble', file=None, rec
     :param ds: dataset for which GEV is to be fit
     :param cov: covariate (If None not used)
     :param shapeCov: If True allow the shape to vary with the covariate.
+    :param dim: The dimension over which to collapse.
     :param file -- if defined save fit to this file. If file exists then read data from it and so not actually do fit.
-    :param recreate_fit -- even if True even if file exists compute fit.
+    :param recreate_fit -- if True even if file exists compute fit.
     :param verbose -- be verbose if True
     :param kwargs: any kwargs passed through to the fitting function
     :return: a dataset containing:
@@ -172,9 +173,9 @@ def xarray_sf(params, output_dim_name='value', **kwargs):
     """
     Compute the survival value for different values based on dataframe of fit parameters.
     :param params: xarray dataarray of shape, location and scale values
-    :param output_dim_name: name of output dimension. Defualt is "value" but set it to what ever you are using. E.g "Rx1hr"
+    :param output_dim_name: name of output dimension. Default is "value" but set it to what ever you are using. E.g "Rx1hr"
     :param kwargs: passed to fn_sf which does the computation. Must contain x which is used for the computation.
-    :return:
+    :return:dataset of survival function values (1-cdf for values specified)
     """
     sf = xarray.apply_ufunc(fn_sf, params.sel(parameter='shape'), params.sel(parameter='location'),
                             params.sel(parameter='scale'),
@@ -185,12 +186,12 @@ def xarray_sf(params, output_dim_name='value', **kwargs):
     return sf
 
 
-def xarray_isf(params, name='value', **kwargs):
+def xarray_isf(params, output_dim_name='probability', **kwargs):
     """
-    Compute the inverse survival function for given values of sf.
-    :param params:
-    :param name:
-    :param kwargs:
+    Compute the inverse survival function for specified probability values
+    :param output_dim_name: name of output_dim -- default is probability
+    :param params: dataset of parameter values.
+    :param kwargs:Additional keyword arguments passes to fn_isf. Make sure p is set.
     :return:
     """
     output_dim_name = 'probability'
@@ -198,11 +199,18 @@ def xarray_isf(params, name='value', **kwargs):
                            params.sel(parameter='scale'),
                            output_core_dims=[[output_dim_name]],
                            vectorize=True, kwargs=kwargs)
-    x = x.assign_coords({output_dim_name: kwargs['p']})  # .rename(name)
+    x = x.assign_coords({output_dim_name: kwargs['p']}).rename('isf')
     return x
 
 def param_cov(params,cov):
+    raise Warning("Use param_at_cov")
     p = ['location', 'scale', 'shape']
     p2 = ["D" + a.lower() for a in p]
     params_c=params.Parameters.sel(parameter=p2).assign_coords(parameter=p) * cov + params.Parameters.sel(parameter=p)
+    return params_c
+
+def param_at_cov(params,cov):
+    p = ['location', 'scale', 'shape']
+    p2 = ["D" + a.lower() for a in p]
+    params_c=params.sel(parameter=p2).assign_coords(parameter=p) * cov + params.sel(parameter=p)
     return params_c
