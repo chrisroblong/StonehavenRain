@@ -4,7 +4,6 @@ Provides classes, variables and functions used across the project
 import pathlib
 import fiona
 import cartopy
-import rioxarray
 import iris
 import tarfile
 import gzip
@@ -120,25 +119,30 @@ def gen_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', quantiles
     ds=xarray.Dataset(dict(radar=radar_data,critical2021=rainC2021,critical2020=rainC2020,rain_count=rain_count,indx=indx,mask=rseasMskmax))
     return ds
 
-def read_90m_topog(region=edinburgh_region,resample=None):
-    """
-    Read 90m DEM data from UoE regridded OSGB data.
-    Fix various problems
-    :param region: region to select to.
-    :param resample: If not None then the amount to coarsen by.
-    :return: topography dataset
-    """
-    topog=rioxarray.open_rasterio(dataDir/'uk_srtm')
-    topog = topog.reindex(y=topog.y[::-1]).rename(x='projection_x_coordinate',y='projection_y_coordinate')
-    if region is not None:
-        topog = topog.sel(**region)
-    topog = topog.load().squeeze()
-    L=(topog > -10000) & (topog < 10000) # fix bad data. L is where data is good!
-    topog=topog.where(L)
-    if resample is not None:
-        topog= topog.coarsen(projection_x_coordinate=resample,
-                             projection_y_coordinate=resample,boundary='pad').mean()
-    return topog
+try:
+    import rioxarray # not available on jasmin
+    def read_90m_topog(region=edinburgh_region,resample=None):
+        """
+        Read 90m DEM data from UoE regridded OSGB data.
+        Fix various problems
+        :param region: region to select to.
+        :param resample: If not None then the amount to coarsen by.
+        :return: topography dataset
+        """
+        topog=rioxarray.open_rasterio(dataDir/'uk_srtm')
+        topog = topog.reindex(y=topog.y[::-1]).rename(x='projection_x_coordinate',y='projection_y_coordinate')
+        if region is not None:
+            topog = topog.sel(**region)
+        topog = topog.load().squeeze()
+        L=(topog > -10000) & (topog < 10000) # fix bad data. L is where data is good!
+        topog=topog.where(L)
+        if resample is not None:
+            topog= topog.coarsen(projection_x_coordinate=resample,
+                                 projection_y_coordinate=resample,boundary='pad').mean()
+        return topog
+
+except ModuleNotFoundError:
+    pass
 
 fig_dir = pathlib.Path("figures")
 
