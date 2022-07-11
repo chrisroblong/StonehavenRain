@@ -12,8 +12,9 @@ class empDist(object):
     """
 
     def __init__(self, data,copy=True):
-        sort_data, count = np.unique(data, return_counts=True) # extract the unique values
-        cdf_values = (np.cumsum(count)-1) / (data.size) # and work out the cdf
+        ok=~np.isnan(data) # where data is OK.
+        sort_data, count = np.unique(data[ok], return_counts=True) # extract the unique values
+        cdf_values = (np.cumsum(count)-1) / np.sum(count) # and work out the cdf
         #cdf_values = np.r_[cdf_values, 1.0]
         #sort_data = np.r_[sort_data, np.inf]
 

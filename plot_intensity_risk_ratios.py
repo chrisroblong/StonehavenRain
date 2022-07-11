@@ -40,13 +40,16 @@ def scale_fn(cdf_values, params=None, params_ref=None):
     return ratio
 
 
-def gen_intens_prob_ratios(radar_fit_all, dScale, rain_values, return_period_values, temperatures, ref_name='PI'):
+def gen_intens_prob_ratios(radar_fit_all, dScale, rain_values, return_period_values, temperatures,
+                           scale_ref='2005-2020',ref_name='PI'):
     """
+
     :param radar_data:  radar data to be fit.
     :param dScale: simulated scale data to be used.
     :param rain_values: rain values wanted
     :param return_period_values: return periods wanted
     :param temperatures: temperatures. Dict -- keys are names. Values are temperature differences from present day.
+    :param scale_ref: Reference for scaling.
     :param ref_name: name of reference for which Prob and intensity ratios are being computed.
     :return: dataset of the intensity, probability ratios relative to PI, and gev fit to current distribution.
     """
@@ -63,7 +66,7 @@ def gen_intens_prob_ratios(radar_fit_all, dScale, rain_values, return_period_val
     isf = dict()
     scales = dict()
     for k in temperatures.keys():
-        delta_t = temperatures[k]-temperatures[ref_name]
+        delta_t = temperatures[k]-temperatures[scale_ref]
         scale = 1+(dScale * delta_t)
 
         scales[k] = scale  # and store it.
@@ -107,18 +110,20 @@ mn_ratio = xarray.load_dataarray(mn_file, decode_times=False)
 bootstrap_ratio = xarray.load_dataarray(bs_file, decode_times=False)
 # get in observed CET
 obs_cet = commonLib.read_cet()
-t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('2005', '2021')).mean())
+t_ref = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('2005','2020')).mean()) # mn temp for radar data
+t_today= float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('2012','2021')).mean())
+t_1980s= float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('1980','1989')).mean())
 t_1961_1990 = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('1961', '1990')).mean())
 t_pi = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('1850', '1899')).mean())
 temp_p2k = scipy.stats.norm(loc=2 * 0.94 + t_pi, scale=2 * 0.03)
 # how much more summer-time CET is at +2K warming Values provided by Prof. Ed Hawkins (Reading)
 
-temperatures = {'PI': t_pi, '2005-2020': t_today, '1961-1990': t_1961_1990, 'PI+2K': temp_p2k.mean()}
+temperatures = {'PI': t_pi, '2012-2021': t_today, '2005-2020':t_ref,'1961-1990': t_1961_1990, '1980s':t_1980s, 'PI+2K': temp_p2k.mean()}
 npt=200
 rain = np.linspace(5, 200, npt)
 rtn_period = np.geomspace(5, 200, npt)
 all_ir, all_pr, dist_now, scales = gen_intens_prob_ratios(radar_fit.Parameters, mn_ratio, rain, rtn_period,
-                                                          temperatures)
+                                                          temperatures,scale_ref='2005-2020')
 
 ts = xarray.open_dataset(file).monthlyMax.sel(**edinburghRainLib.edinburgh_castle, method='nearest')
 castle2021 = float(ts.sel(time='2021-07'))
@@ -152,7 +157,7 @@ if refresh:
         t = temp_p2k.rvs(random_state=rng)
         temperatures_mc['PI+2K'] = t
         ir, pr, dist_now_mc, scales_mc = gen_intens_prob_ratios(mc_radar_params, mc_scale, rain, rtn_period,
-                                                                temperatures_mc)
+                                                                temperatures_mc, scale_ref='2005-2020')
         mc_all_ir.append(ir)
         mc_all_pr.append(pr)
         mc_dist_now.append(dist_now_mc)
@@ -188,11 +193,12 @@ qt = 0.95
 # rp_now = 1./gev_r.xarray_sf(dist_now.Parameters,'Rx15min',x=rain)
 # mc_rp_now = (1./gev_r.xarray_sf(mc_dist_now.Parameters,'Rx15min',x=rain)).quantile(q,'sample')
 
-colors_ls = {'2005-2020': ('blue', 'solid'),
-             '1961-1990': ('skyblue', 'solid'),
-             'PI+2K': ('red', 'solid')}
-# ,'PI+2Ku':('darkred','dashed'),'PI+2Kl':('lightcoral','dashed')}
-# colors_ls=  {'2005-2020':('blue','solid')}
+colors_ls = {
+    #'1961-1990': ('skyblue', 'solid'),
+    '1980s':('royalblue','solid'),
+    '2012-2021': ('blue', 'solid'),
+    'PI+2K': ('red', 'solid')}
+
 def plot_cc(dT,ax,color,cc_scale,cc_range):
     """
     Plot the CC range
@@ -232,7 +238,7 @@ for k, v in colors_ls.items():
 
 ax[0].set_xlim(5, 150)
 ax_sens[0].set_xlim(2, 40)
-ax[1].set_xlim(20, 150)
+ax[1].set_xlim(50, 150)
 ax[1].set_ylim(1, 2.)
 ax[1].yaxis.set_ticks_position('both')
 ax_sens[1].yaxis.set_ticks_position('both')
@@ -266,14 +272,13 @@ for quant in dist_now.time_quant:
     rp.append(1.0 / gev.sf(radar.critical2021.sel(time_quant=quant)))
 rp = np.array(rp)
 rp = xarray.DataArray(data=rp, coords=dict(time_quant=dist_now.time_quant))
-linestyles = {'2005-2020': 'solid', '1961-1990': 'dotted', 'PI+2K': 'dashed'}
+
 tq_values = [0.05, 0.1, 0.2, 0.5, 0.8, 0.9, 0.95]
 rp = rp.sel(time_quant=tq_values)
-for k in all_ir.keys():
+for k in colors_ls.keys():
     col, ls = colors_ls[k]
     plot_args = dict(linewidth=1, color=col, alpha=0.2)
-    # ((all_ir[k]*100)-100).plot.line(x='Return Period',ax=ax_sens[0],add_legend=False,**plot_args)
-    # ((all_ir[k].sel(time_quant=qt) * 100) - 100).plot(x='Return Period', ax=ax_sens[0], add_legend=False,color=col,linewidth=2)
+
     # add on CC line for intensity.
     # add on CC line for intensity.
     dT = temperatures[k] - temperatures['PI']
@@ -289,7 +294,7 @@ for k in all_ir.keys():
     prr = pr.sel(time_quant=qt)
     ax_sens[1].plot(float(prr.Rx15min), float(prr), color=col, marker='h', ms=12)
     # prr.plot(ax=ax_sens[1],x='Rx15min',color=col,marker='x',ms=9)
-# plot (with dots) for 2005-2020 the PR's
+# plot (with dots) for 2021 the PR's
 # annotate the dots with qt values *100 and rounded to 1 SF
 k = 'PI+2K'
 pr = all_pr[k].sel(Rx15min=radar.critical2021.sel(time_quant=tq_values), method='nearest').sel(time_quant=tq_values)
@@ -322,10 +327,26 @@ for v, ls in zip([castle2021, castle2020], ['solid', 'dashed']):
 for v in [1, 1.2, 1.4, 1.6, 1.8]:
     for a in [ax[1], ax_sens[1]]:
         a.axhline(v, color='black', linestyle='dotted')
-fig.subplots_adjust(bottom=0.125)  # make room for the legend
-a = fig.legend(loc='lower left', ncol=3, fontsize='small')
+fig.subplots_adjust(bottom=0.15)  # make room for the legend
+a = fig.legend(loc='lower center', ncol=3, fontsize='small')
 a.set_in_layout(False)
 fig.tight_layout()
 fig.subplots_adjust(bottom=0.125)  # make room for the legend
 fig.show()
 commonLib.saveFig(fig)
+
+## print out the best estimates and ranges for both IR and PR's
+value = float(radar.critical2021.sel(time_quant=qt))
+rp=rain_to_rp(value) # get return period.
+per = lambda x: (x-1)*100.
+for k in colors_ls.keys():
+    delta_t = temperatures[k]-temperatures['PI']
+    cc = cc_scale * delta_t
+    pr = float(all_pr[k].sel(time_quant=qt).interp(Rx15min=value))
+    prmin=float(mc_all_pr[k].sel(time_quant=qt).quantile(0.05,'sample').interp(Rx15min=value))
+    prmax = float(mc_all_pr[k].sel(time_quant=qt).quantile(0.95,'sample').interp(Rx15min=value))
+    print(f"PR {k:12s}: {pr:3.2f} ({prmin:3.2f}-{prmax:3.2f})" )
+    ir = float(all_ir[k].sel(time_quant=qt).interp({'Return Period':rp}))
+    irmin=float(mc_all_ir[k].sel(time_quant=qt).quantile(0.05,'sample').interp({'Return Period':rp}))
+    irmax = float(mc_all_ir[k].sel(time_quant=qt).quantile(0.95,'sample').interp({'Return Period':rp}))
+    print(f"IR {k:12s}: {per(ir):2.0f} ({per(irmin):2.0f}-{per(irmax):2.0f}) dT {delta_t: 2.1f} CC:{cc:2.0f} " )

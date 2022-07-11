@@ -67,7 +67,7 @@ def confidence_ellipse(x, y, ax, n_std=3.0, facecolor='none', **kwargs):
                       facecolor=facecolor, **kwargs)
 
     # Calculating the standard deviation of x from
-    # the squareroot of the variance and multiplying
+    # the square root of the variance and multiplying
     # with the given number of standard deviations.
     scale_x = np.sqrt(cov[0, 0]) * n_std
     mean_x = np.mean(x)
@@ -99,10 +99,12 @@ outdir_gev = edinburghRainLib.dataDir / 'gev_fits'
 outdir_gev.mkdir(parents=True, exist_ok=True)  # create the directory
 
 ## read in the data we need
-cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_cpm.nc').tas
-cpm = xarray.load_dataset(edinburghRainLib.dataDir / 'cpm_reg_ts.nc').tas
-cet_hum = qsat(cpm)  # compute humidity
-ed_temp = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_ts.nc').tas
+cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_tas.nc').tas
+cpm = xarray.load_dataset(edinburghRainLib.dataDir / 'cpm_reg_tas.nc').tas
+
+ed_temp = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_tas.nc').tas
+ed_precip = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_pr.nc').pr
+ed_reg_hum=qsat(ed_temp)
 ed_extreme_precip = xarray.load_dataset(
     edinburghRainLib.dataDir / 'ed_reg_max_precip.nc').pr  ##.isel(grid_longitude=slice(10,20),grid_latitude=slice(10,20))
 
@@ -119,15 +121,17 @@ msk = (cpm_ht > 0) & (cpm_ht < 200)
 
 # get in observed CET
 obs_cet = commonLib.read_cet()
-t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('2005', '2021')).mean())
+t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('2005', '2020')).mean())
+t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time='2020'))
 t_pi = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('1850', '1899')).mean())
+temp_p2k = 2 * 0.94 + t_pi # from Ed
 
 ## Do the fit
 stack_dims = ['time', 'ensemble_member']
 
 xfit = dict()
 covariates = dict()
-for ts, title in zip([cet, cpm, ed_temp, cet_hum], ['CET', 'CPM_region', 'Edinburgh_region', 'Humidity']):
+for ts, title in zip([cet, cpm, ed_temp, ed_reg_hum], ['CET', 'CPM_region', 'Edinburgh_region', 'Ed_Humidity']):
     file = outdir_gev / f"cov_{title}.nc"
     ts_summer = ts.resample(time='QS-DEC').mean().dropna('time')
     ts_summer = ts_summer.sel(time=(ts_summer.time.dt.month == 6))
@@ -179,7 +183,7 @@ else:
 
 
 ## generate scatter diagram of summer CET  vs summer edinburgh humidity
-# also generate the sat humitity with CET relationship.
+# also generate the sat humidity with CET relationship.
 import statsmodels.api as sm
 def comp_summer(ts, dim='time'):
     """
@@ -195,36 +199,60 @@ def comp_summer(ts, dim='time'):
     return summer
 ed_qsat=qsat(ed_temp)
 ed_temp_summer  = comp_summer(ed_temp)
+ed_precip_summer = comp_summer(ed_precip)
 cet_summer = comp_summer(cet)
+obs_cet_summer = comp_summer(obs_cet.sel(time=slice('1850',None)))
 ed_qsat_summer = comp_summer(ed_qsat)
-median_max_Rx15min=ed_extreme_precip.where(msk,np.nan).max(edinburghRainLib.cpm_horizontal_coords)
-fig_scatter,axes=plt.subplots(nrows=1,ncols=3,num='cet_scatter',figsize=[8,5],clear=True)
+median_max_Rx15min=ed_extreme_precip.where(msk,np.nan).median(edinburghRainLib.cpm_horizontal_coords)
+fig_scatter,axes=plt.subplots(nrows=2,ncols=2,num='cet_scatter',figsize=[8,5],clear=True)
 
 def plot_regress(x,y,ax):
     X = x.values.flatten()
     X = sm.add_constant(X)
     Y = y.values.flatten()
+    ens_m = y.ensemble_member.broadcast_like(y).values.flatten()
     model = sm.OLS(Y, X)
     fit = model.fit()
 
     pred_ols = fit.get_prediction()
     iv_l = pred_ols.summary_frame()["obs_ci_lower"]
     iv_u = pred_ols.summary_frame()["obs_ci_upper"]
-    ax.scatter(X[:,1],Y,s=5,marker='o')
-    ax.plot(X[:, 1], fit.fittedvalues, "r--.", label="OLS")
-    ax.plot(X[:, 1], iv_u, "r--")
-    ax.plot(X[:, 1], iv_l, "r--")
+    ax.scatter(X[:,1],Y,s=10,marker='o',c=ens_m,cmap='tab20')
+    indx = [np.argmin(X[:,1]),np.argmax(X[:,1])]
+    ax.plot(X[indx, 1], fit.fittedvalues[indx], color='black')
+    #ax.plot(X[indx, 1], iv_u.iloc[indx], color='black',linestyle='dashed')
+    #ax.plot(X[indx, 1], iv_l.iloc[indx], color='black',linestyle='dashed')
     return fit
 
 label=commonLib.plotLabel()
 linear_fit=dict()
-for ax,y,name in zip(axes,[ed_qsat_summer,ed_temp_summer,median_max_Rx15min],['qsat','Ed_Temp','Rx15min']):
+min_obs=obs_cet_summer.min()
+max_obs=obs_cet_summer.max()
+median_obs = obs_cet_summer.median()
+xerr=np.array([[median_obs-min_obs,max_obs -median_obs]]).T
+for ax,y,name in zip(axes.flatten(),[ed_qsat_summer,ed_temp_summer,ed_precip_summer,median_max_Rx15min],['qsat','Ed_Temp','Ed_Precip','Rx15min']):
     linear_fit[name] = plot_regress(cet_summer,y,ax)
-    print(name,linear_fit[name].summary())
+
     label.plot(ax)
-    ax.set_title(f'CET vs {name}')
+    ax.set_title(f'CET vs {name} $R^2$:{linear_fit[name].rsquared_adj*100:2.0f} %')
     ax.set_xlabel("CET (C)")
     ax.set_ylabel(name)
+    for t in [t_pi,t_today,temp_p2k]:
+        ax.axvline(t,color='black',linestyle='dotted')
+    # plot range of CET
+    today_v = float(linear_fit[name].get_prediction([1, t_today]).predicted_mean)
+    if name != 'Ed_Temp':
+        text=f"{100*float(linear_fit[name].params[1]/today_v):3.1f} $\pm$ {100*float(linear_fit[name].HC3_se[1]/today_v):4.2f} %"
+
+    else:
+        text=f"{float(linear_fit[name].params[1]):3.2f} $\pm$ {float(linear_fit[name].HC3_se[1]):4.3f}"
+
+    print(name, text)
+    ax.text(0.1,0.85,text,transform=ax.transAxes,bbox=dict(boxstyle="square",fc='lightgrey'))
+    for t in [min_obs,max_obs]:
+        ax.axvline(t,color='red',linestyle='dotted')
+    #ax.errorbar(median_obs,today_v,xerr=xerr,linewidth=2,color='red',capsize=3,capthick=2)
+    #ax.scatter(temp_p2k,today_v,color='red',marker='o',s=20)
 
 fig_scatter.tight_layout()
 fig_scatter.show()
@@ -234,6 +262,9 @@ f=linear_fit['qsat'].get_prediction([1,t_today])
 cc_scale = 100*(linear_fit['qsat'].params[1]/f.predicted_mean)
 # save the qsat fit
 linear_fit['qsat'].save(edinburghRainLib.dataDir/'gev_fits'/'cet_qsat_fit.sav')
+# and the decline in precipit.
+f=linear_fit['Ed_Precip'].get_prediction([1,t_today])
+rain_change = 100*float(linear_fit['Ed_Precip'].params[1]/f.predicted_mean)
 
 ## and make plot for SI
 projRot=ccrs.RotatedPole(pole_longitude=177.5,pole_latitude=37.5)
@@ -294,7 +325,7 @@ label.plot(ax)
 
 # plot qq-plots for covariate fits
 ## plot the fits for CPM data
-cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_cpm.nc').tas
+cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_tas.nc').tas
 ed_extreme_precip = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_max_precip.nc').pr
 ed=edinburghRainLib.rotated_coords['Edinburgh']
 ed_ext=ed_extreme_precip.sel(grid_latitude=ed[1],grid_longitude=ed[0],method='nearest').load() #
@@ -333,5 +364,8 @@ for data,name in zip( [ed_ext,ed_west_ext],['r_gev_fit_ed','r_gev_fit_w_ed']):
 fig.tight_layout()
 fig.show()
 commonLib.saveFig(fig)
+
+# print out ratios relative to CC
+print(mn_ratio.drop_vars(['t','longitude','latitude','surface'])/cc_scale)
 
 

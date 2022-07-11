@@ -72,23 +72,19 @@ try:
 except ModuleNotFoundError:
     coastline = cartopy.feature.NaturalEarthFeature('physical','coastline','10m',edgecolor='black',facecolor='none')
 
-def gen_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', quantiles=None,
-                   region=None, height_range=slice(0,200), discrete_hr=12):
+def get_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', region=None,
+                   height_range=slice(0,200), mxMeanRain=1000.):
     """
-    generated flattend radar data.
-    Read in data, keep data between height_range, mask by seasonal total rainfall < 1000 mm, group by time (discretized to 12 hours by default), requiring at least 25 values.  and then compute quantiles for each grouping
-    :param discrete_hr: discretisation time.
-    :param file: file where data lives.
-    :param quantiles: quantiles wanted. Defaults (if None set) are [0.05,0.1,0.2,0.5, 0.8, 0.9, 0.95]
-    :param region. Region wanted to work with. Specified as dict with each element being co-ord name, slice of min & max values wanted. Used in sel
-    :param height_range. Heights which are wanted. Provide as a slice. Heights > start and < stop will be used,
-    :return: radar data and quantiles of rainfall for Edinburgh castle grouping.
+    read in radar data and mask it by heights and mean rain being reasonable.
+    :param file: file to be read in
+    :param region: region to extract. If None is Edinburgh region
+    :param height_range: Height range to use (all data strictly *between* these values will be used)
+    :param mxMeanRain: the maximum mean rain allowed (QC)
+    :return: Data masked for region requested & mxTime
     """
-
     if region is None:
         region = edinburgh_region
-    if quantiles is None:
-        quantiles = [0.05,0.1,0.2,0.5, 0.8, 0.9, 0.95]
+
     radar_precip = xarray.open_dataset(file).sel(**region)
     rseas = radar_precip.drop_vars('No_samples').resample(time='QS-Dec')
     rseas = rseas.map(time_process, varPrefix='monthly', summary_prefix='seasonal')
@@ -101,11 +97,33 @@ def gen_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', quantiles
     topog990m = read_90m_topog(region=region, resample=topog_grid)
     top_fit_grid = topog990m.interp_like(rseas.isel(time=0).squeeze())
 
-    htMsk = (top_fit_grid > height_range.start) & (top_fit_grid < height_range.stop) # in ht range
+    htMsk = (top_fit_grid > height_range.start) & (top_fit_grid < height_range.stop)  # in ht range
     # mask by seasonal sum < 1000.
-    mskRain = ((rseas.seasonalMean*(30+31+31)/4.) < 1000.) & htMsk
-    rseasMskmax = xarray.where(mskRain,rseas.seasonalMax,np.nan)
+    mskRain = ((rseas.seasonalMean * (30 + 31 + 31) / 4.) < mxMeanRain) & htMsk
+    rseasMskmax = xarray.where(mskRain, rseas.seasonalMax, np.nan)
     mxTime = rseas.seasonalMaxTime
+
+    return rseasMskmax,mxTime
+
+def gen_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', quantiles=None,
+                   region=None, height_range=slice(0,200), discrete_hr=12):
+    """
+    generated flattened radar data.
+    Read in data, keep data between height_range, mask by seasonal total rainfall < 1000 mm, group by time (discretized to 12 hours by default), requiring at least 25 values.  and then compute quantiles for each grouping
+
+    :param file: file where data lives.
+    :param quantiles: quantiles wanted. Defaults (if None set) are [0.05,0.1,0.2,0.5, 0.8, 0.9, 0.95]
+    :param region. Region wanted to work with. Specified as dict with each element being co-ord name, slice of min & max values wanted. Used in sel
+    :param height_range. Heights which are wanted. Provide as a slice. Heights > start and < stop will be used,
+    :param discrete_hr: discretisation time.
+    :return: radar data and quantiles of rainfall for Edinburgh castle grouping.
+    """
+
+
+    if quantiles is None:
+        quantiles = [0.05,0.1,0.2,0.5, 0.8, 0.9, 0.95]
+
+    rseasMskmax, mxTime = get_radar_data(file=file,region=region,height_range=height_range,mxMeanRain=1000.)
     indx = (mxTime.dt.year - 2000) * 366 + mxTime.dt.dayofyear + (mxTime.dt.hour // discrete_hr) * discrete_hr/24.
     indx = xarray.where(rseasMskmax, indx, np.nan)
     rain_count = rseasMskmax.groupby(indx).count()

@@ -1,18 +1,27 @@
 """
-Compute gev fits to radar data and bootstrap estimates of the GEV fits
+Compute gev fits to radar data and bootstrap estimates of the GEV fits.
+Also compute emprical fit (without bootstraping)
 
 """
 import edinburghRainLib
 import gev_r
 import xarray
 import numpy as np
+import emp_dist
 
 
-
+time=slice('2005','2020')
 file = edinburghRainLib.dataDir / 'radar_precip/summary_1km_15min.nc'
-radar_data_all= edinburghRainLib.gen_radar_data(file=file)
-radar_fit = gev_r.xarray_gev(radar_data_all.radar, dim='time_index')
+radar_data_all= edinburghRainLib.gen_radar_data(file=file).sel(time=time)
 
+radar_fit = gev_r.xarray_gev(radar_data_all.radar, dim='time_index')
+rn,mx = edinburghRainLib.get_radar_data(file=file)
+emp_rn = emp_dist.empDist(rn.sel(time=time).values.flatten())
+# print out edinburgh rain value and where it is in the empirical distribution
+ed_v = float(rn.sel(**edinburghRainLib.edinburgh_castle,method='nearest').sel(time='2021'))
+ed_rp = 1.0/emp_rn.sf(ed_v)
+
+print(f"Castle Rain  {ed_v:3.1f} (mm/hr) Emp. RP {ed_rp:3.0f} Years")
 # now to sample...
 mc_dist=[]
 n_monte_carlo=1000
