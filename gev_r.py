@@ -11,7 +11,7 @@ import collections
 
 os.environ[
     'R_HOME'] = r'C:\Users\stett2\AppData\Local\Microsoft\AppV\Client\Integration\FC689017-A9BB-4A9B-B971-6AC52117BA03\Root'  # where R is...
-# will need adjusting depending where R got installed
+# will need adjusting depending on where R got installed
 import rpy2
 import rpy2.robjects as robjects
 import rpy2.robjects.packages as rpackages
@@ -70,10 +70,12 @@ def gev_fit(x, cov=None, returnType='named', shapeCov=False, **kwargs):
             params = np.zeros(5)
             se=np.zeros(5)
             params[0::2]=np.array(fit.rx2('par'))
-            se[0::2]=np.array(fit.rx2('se.theta'))
-        if isinstance(se,rpy2.rinterface_lib.sexp.NULLType):
+            se_v = fit.rx2('se.theta')
+        if isinstance(se_v,rpy2.rinterface_lib.sexp.NULLType):
             # std err not present (for some reason) set everything to nan
             se[:] = np.nan
+        else:
+            se[0::2] = np.array(se_v)
         if shapeCov: # shape covaries.
             params[-2:] *= -1  # negate two shape parameters as python convention differs from R
         else:
@@ -105,10 +107,45 @@ def gev_fit(x, cov=None, returnType='named', shapeCov=False, **kwargs):
 
     return result
 
+import scipy.stats
+def gev_fit_python(data,**kwargs):
+    fit = scipy.stats.genextreme.fit(data,**kwargs)
+    fit = np.array([fit[1],0.0,fit[2],0.0,fit[0],0.0]) # return in order location, scale, shape
+    return fit
+def xarray_gev_python(ds,dim='time_ensemble', file=None, recreate_fit=False, verbose=False, **kwargs):
+    """
+    Fit a GEV to xarray data using scipy.stats. Less powerful than R
+    :param ds: dataset for which GEV is to be fit
+    :param dim: The dimension over which to collapse.
+    :param file -- if defined save fit to this file. If file exists then read data from it and so not actually do fit.
+    :param recreate_fit -- if True even if file exists compute fit.
+    :param verbose -- be verbose if True
+    :param kwargs: any kwargs passed through to the fitting function
+    :return: a dataset containing:
+        Parameters -- the parameters of the fit; location, scale, shape
+    """
+    if (file is not None) and file.exists() and (not recreate_fit): # got a file specified, it exists and we are not recreating fit
+        ds=xarray.load_dataset(file) # just load the dataset and return it
+        if verbose:
+            print(f"Loaded existing data from {file}")
+        return ds
 
+    params = xarray.apply_ufunc(gev_fit_python, ds, input_core_dims=[[dim]],
+                                                   output_core_dims=[['parameter'] ],
+                                                   vectorize=True, kwargs=kwargs)
+    pnames = ['location', 'Dlocation', 'scale', 'Dscale', 'shape', 'Dshape']
+
+
+    params = params.rename("Parameters")
+    ds = xarray.Dataset(dict(Parameters=params)).assign_coords(parameter=pnames)
+    if file is not None:
+        ds.to_netcdf(file)  # save the dataset.
+        if verbose:
+            print(f"Wrote fit information to {file}")
+    return ds
 def xarray_gev(ds, cov=None, shapeCov=False, dim='time_ensemble', file=None, recreate_fit=False, verbose=False,**kwargs):
     """
-    Fit a GEV to xarray data.
+    Fit a GEV to xarray data using R.
     :param ds: dataset for which GEV is to be fit
     :param cov: covariate (If None not used)
     :param shapeCov: If True allow the shape to vary with the covariate.
@@ -158,39 +195,62 @@ def xarray_gev(ds, cov=None, shapeCov=False, dim='time_ensemble', file=None, rec
 ## use apply ufunc to generate distributions...
 
 def fn_isf(c, loc, scale, p=None, dist=scipy.stats.genextreme):
-    fdist = dist(c, loc=loc, scale=scale)
-    x = fdist.isf(p)  # values for 1-cdf.
+    x = dist.isf(p,c, loc=loc, scale=scale)
+    #x = fdist.isf(p)  # values for 1-cdf.
     return x
 
 
 def fn_sf(c, loc, scale, x=None, dist=scipy.stats.genextreme):
-    fdist = dist(c, loc=loc, scale=scale)
-    p = fdist.sf(x)  # 1-cdf for given x
+    p = dist.sf(x,c, loc=loc, scale=scale)
+    #p = fdist.sf(x)  # 1-cdf for given x
     return p
 
+def fn_interval(c, loc, scale, alpha=None, dist=scipy.stats.genextreme):
+    #fdist = dist(c, loc=loc, scale=scale)
+    range = dist.interval(alpha,c,loc=loc,scale=scale)  # range for dist
+    return np.array([range[0],range[1]])
 
-def xarray_sf(params, output_dim_name='value', **kwargs):
+
+def xarray_sf(x,params, output_dim_name='value'):
     """
     Compute the survival value for different values based on dataframe of fit parameters.
     :param params: xarray dataarray of shape, location and scale values
     :param output_dim_name: name of output dimension. Default is "value" but set it to what ever you are using. E.g "Rx1hr"
     :param kwargs: passed to fn_sf which does the computation. Must contain x which is used for the computation.
     :return:dataset of survival function values (1-cdf for values specified)
+
     """
     sf = xarray.apply_ufunc(fn_sf, params.sel(parameter='shape'), params.sel(parameter='location'),
                             params.sel(parameter='scale'),
                             output_core_dims=[[output_dim_name]],
-                            vectorize=True, kwargs=kwargs)
-    sf = sf.assign_coords({output_dim_name: kwargs['x']}).rename('sf')
+                            vectorize=True, kwargs=dict(x=x))
+    sf = sf.assign_coords({output_dim_name: x}).rename('sf')
 
     return sf
 
+def xarray_interval(alpha,params):
+    """
+    Compute the interval for different values based on dataframe of fit parameters.
+    :param params: xarray dataarray of shape, location and scale values
+    :param alpha -- alpha value for interval fn.
+    :return:dataset of intervals
+    """
+    interval = xarray.apply_ufunc(fn_interval, params.sel(parameter='shape'), params.sel(parameter='location'),
+                            params.sel(parameter='scale'),
+                            output_core_dims=[['interval']],
+                            vectorize=True, kwargs=dict(alpha=alpha))
+    offset = (1-alpha)/2
+    interval = interval.Parameters.assign_coords(interval=[offset,1-offset]).rename('interval')
 
-def xarray_isf(params, output_dim_name='probability', **kwargs):
+    return interval
+
+
+def xarray_isf(p,params):
     """
     Compute the inverse survival function for specified probability values
     :param output_dim_name: name of output_dim -- default is probability
     :param params: dataset of parameter values.
+    :param p: sf values at which values to be computed
     :param kwargs:Additional keyword arguments passes to fn_isf. Make sure p is set.
     :return:
     """
@@ -198,8 +258,8 @@ def xarray_isf(params, output_dim_name='probability', **kwargs):
     x = xarray.apply_ufunc(fn_isf, params.sel(parameter='shape'), params.sel(parameter='location'),
                            params.sel(parameter='scale'),
                            output_core_dims=[[output_dim_name]],
-                           vectorize=True, kwargs=kwargs)
-    x = x.assign_coords({output_dim_name: kwargs['p']}).rename('isf')
+                           vectorize=True, kwargs=dict(p=p))
+    x = x.assign_coords({output_dim_name: p}).rename('isf')
     return x
 
 def param_cov(params,cov):

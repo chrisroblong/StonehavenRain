@@ -46,8 +46,8 @@ if readData:
 
 ## plot the data now.
 q = [0.05, 0.95]  # quantiles for fit between
-rp = 1. / gev_r.xarray_sf(radar_fit.Parameters, 'Rx15min', x=rain)
-mc_rp = (1. / gev_r.xarray_sf(mc_dist.Parameters, 'Rx15min', x=rain)).quantile(q, 'sample')
+rp = 1. / gev_r.xarray_sf(rain,radar_fit.Parameters, 'Rx15min', )
+mc_rp = (1. / gev_r.xarray_sf(rain,mc_dist.Parameters, 'Rx15min')).quantile(q, 'sample')
 projLand = ccrs.epsg(3035)  # for land cover
 projGB = ccrs.OSGB() # OS GB grid.
 projRot = ccrs.RotatedPole(pole_longitude=177.5,pole_latitude=37.5) # for rotated grid (cpm)

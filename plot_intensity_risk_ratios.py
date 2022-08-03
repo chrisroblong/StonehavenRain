@@ -72,9 +72,8 @@ def gen_intens_prob_ratios(radar_fit_all, dScale, rain_values, return_period_val
         scales[k] = scale  # and store it.
         s = np.append(1,scale.sel(parameter=['Dlocation','Dscale']))
         radar_fit_scale = s * radar_fit  # compute the scaled distributions.
-        sf[k] = gev_r.xarray_sf(radar_fit_scale, output_dim_name='Rx15min',
-                                x=rain_values)  # probability for different rain values
-        isf[k] = gev_r.xarray_isf(radar_fit_scale, p=sf_values)  # rainfall for different p-values
+        sf[k] = gev_r.xarray_sf(rain_values,radar_fit_scale, output_dim_name='Rx15min')  # probability for different rain values
+        isf[k] = gev_r.xarray_isf(sf_values,radar_fit_scale)  # rainfall for different p-values
     # now to compute intensity and probability ratios relative to 2005-2020
 
     ref_sf = sf.pop(ref_name)
