@@ -1,7 +1,9 @@
 #!/bin/env python
 
 """
-Process CPM data on JASMIN. Generate seasonal-means of rain, seasonal extremes and time of seasonal extreme for 1hr 
+
+Process CPM data on JASMIN. Generate seasonal-totals, seasonal maxes
+and time of seasonal extreme for data.
 
 
 """
@@ -12,7 +14,7 @@ import xarray
 import numpy as np
 import pandas as pd
 import argparse
-import resource # so we can see memory usage every month.
+import resource # so we can see memory usage
 import warnings
 
 import pathlib
@@ -156,22 +158,19 @@ parser.add_argument('--rolling',type=int,nargs='+',help='Additional rolling mean
 #                    help='If set run in test mode -- no data read or generated')
 parser.add_argument('--verbose','-v',action='store_true',
                     help='If set be verbose')
-parser.add_argument('--outdir','-o',type=str,help='Name of output directory')
+parser.add_argument('--outfile','-o',type=str,help='Base name of output file',default='ens_seas_max')
 parser.add_argument('--monitor','-m',action='store_true',
                     help='Monitor memory')
 parser.add_argument('--region',nargs=4,type=float,help='Region to extract (x0, x1,y0,y1)')
+parser.add_argument('--range',nargs=2,type=str,help='Start and end time as ISO string')
+parser.add_argument('--test',action='store_true',help='Run test. Exit before processing')
 args=parser.parse_args()
 
 if args.verbose:
     print("args are \n",args)
 
-if args.outdir: # got an out directory
-    outDir=pathlib.Path(args.outdir)
-    outDir.mkdir(parents=True, exist_ok=True) # make the directory and all its parents.
+outfile=args.outfile
     
-else:
-    outDir=None
-
 files_glob = [glob.glob(f) for f in args.files]
 # flatten array
 files=[]
@@ -182,18 +181,28 @@ if args.verbose:
     print("reading in data")
     
 chunks=dict(grid_longitude=100,grid_latitude=100)
-ds = xarray.open_mfdataset(files,
-                           chunks=chunks,#parallel=True,
-                           concat_dim='time',combine='nested',
-                           data_vars='minimal',coords='minimal',
-                           compat='override').sortby('time')
+# ds = xarray.open_mfdataset(files,
+#                            chunks=chunks,#parallel=True,
+#                            concat_dim='time',combine='nested',
+#                            data_vars='minimal',coords='minimal',
+#                            compat='override').sortby('time')
 
+ds = xarray.open_mfdataset(files,chunks=chunks).sortby('time')
 
 # extract data if requested
 if args.region is not None:
     rgn = args.region # save some typing... 
     ds=ds.sel(grid_longitude=slice(rgn[0],rgn[1]),grid_latitude=slice(rgn[2],rgn[3]))
 
+if args.range is not None:
+    ds=ds.sel(time=slice(args.range[0],args.range[1]))
+
+if args.verbose:
+    print(f"Have {len(ds.time)} times from {ds.time.min()} to {ds.time.max()}")
+    print(ds)
+    print("====================================")
+if args.test:
+    exit()
 if args.verbose:
     print("Processing")
 dsmax = process(ds.pr).load()# process and load  the raw data
@@ -222,8 +231,12 @@ if args.rolling is not None:
     all_max['seasonalTotal']=seasTot
 
 # now write the data out       
-outfile=outputName(f"pr_{str(all_max.ensemble_member_id.values[0])[2:-2]}",outDir=outDir)
+outfile=args.outfile+"_"+str(all_max.ensemble_member_id.values[0])[2:-2] # the ensemble
+syr=str(int(ds.time.dt.year.min()))
+eyr=str(int(ds.time.dt.year.max()))
+outfile+="_"+syr+"_"+eyr+".nc"
 dsmax2=write_data(all_max, outFile=outfile)
+print("Wrote data to :",outfile)
 
 
               
