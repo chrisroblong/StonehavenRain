@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # run processing jobs for 5km radar data -- takes about 30 minutes per year.
-# for 1 km data will probably take ~ 100 times as long (larger data volume)
+# for 1 km data will  takes ~ 100 times as long (larger data volume)
 module load jaspy #load jaspy environment
 export PYTHONPATH=$PYTHONPATH:$PWD
 mkdir -p output # where output is going

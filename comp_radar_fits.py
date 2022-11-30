@@ -1,14 +1,13 @@
 """
 Compute gev fits to radar data and bootstrap estimates of the GEV fits.
-Also compute emprical fit (without bootstraping)
+Also compute empirical fit (without bootstraping)
 
 """
 import edinburghRainLib
 import gev_r
 import xarray
 import numpy as np
-import emp_dist
-
+from old_code import emp_dist
 
 time=slice('2005','2020')
 file = edinburghRainLib.dataDir / 'radar_precip/summary_1km_15min.nc'

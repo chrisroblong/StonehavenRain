@@ -11,7 +11,7 @@ import gev_r
 import cartopy.crs as ccrs
 import numpy as np
 import xarray
-import emp_dist #support for empirical distributions
+from old_code import emp_dist
 from matplotlib_scalebar.scalebar import ScaleBar
 # std plotting stuff
 scalebarprops=dict(frameon=False,length_fraction=0.4)
@@ -42,6 +42,11 @@ if readData:
     radar_data_all= xarray.load_dataset(edinburghRainLib.dataDir/'radar_precip'/'reg_radar_rain.nc')
     e_dist = emp_dist.empDist(radar_data_all.radar.sel(time_quant=qt))
     emp_rp = 1.0/e_dist.sf(rain)
+    # get in the monthly max data and work out the rain at the Castle in July 2021 and Aug 2022
+    ds = xarray.load_dataset(edinburghRainLib.dataDir / 'radar_precip' / 'summary_1km_15Min.nc')
+    castle_rain = ds.monthlyMax.sel(time=(ds.monthlyMax.time.dt.season == 'JJA')).\
+        sel(time=['2020-08-31','2021-07-31'],**edinburghRainLib.edinburgh_castle,method='nearest').load()
+
     print("read data")
 
 ## plot the data now.
@@ -142,6 +147,10 @@ value = float(radar_data.critical2021)
 value2020 = float(radar_data.critical2020)
 ax.axvline(value,color=color,linestyle='solid')
 ax.axvline(value2020,color=color,linestyle='dashed')
+# plot the actual castle rainfall for 2020 and 2021.
+for yr,linestyle in zip(['2020','2021'],['dashed','solid']):
+    value = castle_rain.sel(time=yr)
+    ax.axvline(value,color='red',linestyle=linestyle)
 ax.set_xlim(30,150.)
 ax.set_ylim(5,1000)
 label = commonLib.plotLabel()

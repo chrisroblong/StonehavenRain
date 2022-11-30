@@ -27,10 +27,10 @@ if len(names_to_install) > 0:
     utils.install_packages(robjects.vectors.StrVector(names_to_install))
 for package in packnames:
     rpackages.importr(package)  # so available
-gevFit = collections.namedtuple('gevFit', ['params', 'std_err', 'AIC', 'negloglike'])
+#gevFit = collections.namedtuple('gevFit', ['params', 'std_err', 'AIC', 'negloglike'])
 
 
-def gev_fit(x, cov=None, returnType='named', shapeCov=False, **kwargs):
+def gev_fit(x, cov=None,  shapeCov=False, **kwargs):
     """
     Do GEV fit using R and return named tuple of relevant values.
     :param x: Data to be fit
@@ -40,21 +40,24 @@ def gev_fit(x, cov=None, returnType='named', shapeCov=False, **kwargs):
         tuple -- return a tuple -- useful for apply_ufunc
         DataSet -- return a DataSet
     :param shapeCov -- If True allow the shape to vary with the covariate.
-    :return:
+    :return: A dataset of the parameters of the fit.
     """
-    allowed_types={'DataSet','tuple','named'}
-    if returnType not in allowed_types:
-        raise ValueError(f"returnType = {returnType} not supported. Should be one of {allowed_types}")
+
     L = ~np.isnan(x)
     df_data = [x[L]]  # remove nan from data]
     cols = ['x']
+    npts=3
+    if cov is not None:
+        npts+=2
+        if shapeCov:
+            npts+=1
     r_code = 'fevd(x=x,data=df'
     if cov is not None:
         df_data.append(cov[L])  # remove places where x was nan from cov.
         cols.append('cov')
         r_code = r_code + ',location.fun=~cov,scale.fun=~cov'
         if shapeCov:
-            r_code += 'shape.fun=~cov'
+            r_code += ',shape.fun=~cov'
     r_code += ')'  # add on the trailing bracket.
     r_code_summ = 'summary(' + r_code + ',silent=TRUE)'
     df = pd.DataFrame(np.array(df_data).T, columns=cols)
@@ -63,25 +66,37 @@ def gev_fit(x, cov=None, returnType='named', shapeCov=False, **kwargs):
     try:
         fit = robjects.r(r_code_summ)  # do the fit
         # extract the data
-        if cov is not None:
-            params = np.array(fit.rx2('par'))
-            se = fit.rx2('se.theta')
-        else:
-            params = np.zeros(5)
-            se=np.zeros(5)
-            params[0::2]=np.array(fit.rx2('par'))
-            se_v = fit.rx2('se.theta')
-        if isinstance(se_v,rpy2.rinterface_lib.sexp.NULLType):
+        params = fit.rx2('par')
+        se = fit.rx2('se.theta')
+
+        if isinstance(se,rpy2.rinterface_lib.sexp.NULLType):
             # std err not present (for some reason) set everything to nan
-            se[:] = np.nan
+            se = np.repeat(np.nan,npts)
         else:
-            se[0::2] = np.array(se_v)
-        if shapeCov: # shape covaries.
-            params[-2:] *= -1  # negate two shape parameters as python convention differs from R
+            se = np.array(se)
+        if isinstance(params,rpy2.rinterface_lib.sexp.NULLType):
+            # std err not present (for some reason) set everything to nan
+            params = np.repeat(np.nan,npts)
         else:
-            params[-1] *= -1 # only got one.
-            params = np.append(params, 0.0)  # Dshape is 0.
-            se = np.append(se, 0.0)
+            params = np.array(params)
+
+        # add on zeros if cov is None
+        if cov is None:
+            se = np.append(se,np.zeros(3))
+            params = np.append(params,np.zeros(3))
+
+        else: # need to shuffle data so dlocation, dscale move...
+        # add on zero for covariance with shape when shapeCov is False
+            if not shapeCov:
+                params = np.append(params, 0.0)  # Dshape is 0.
+                se = np.append(se, 0.0)
+            shuffle = [0,2,4,1,3,5]
+            params = params[shuffle]
+            se=se[shuffle]
+
+
+        # now shuffle the params around. We expect to have 6 at this point.
+        params[[2,5]] *= -1  # negate two shape parameters as python convention differs from R
         nllh = np.array(fit.rx2('nllh'))
         aic = np.array(fit.rx2('AIC'))
     except rpy2.rinterface_lib.embedded.RRuntimeError:
@@ -91,21 +106,10 @@ def gev_fit(x, cov=None, returnType='named', shapeCov=False, **kwargs):
         nllh=np.array([np.nan])
         aic = nllh
 
+    return (params,se,nllh,aic)
 
-    if returnType == 'named':
-        result = gevFit(params=params, std_err=se, negloglike=nllh, AIC=aic)
-    elif returnType == 'tuple':
-        result = (params,se,nllh,aic)
-    elif returnType == 'DataSet': # return a dataset
-        pnames = ['location', 'Dlocation', 'scale', 'Dscale', 'shape', 'Dshape']
-        result=xarray.Dataset(dict(Parameters=('parameter', params),
-                                 StdErr=('parameter', se),
-                                 nll=float(nllh),
-                                 AIC=float(aic))).assign_coords(parameter=pnames)
-    else:
-        raise ValueError(f"Unknown  returnType={returnType}")
 
-    return result
+
 
 import scipy.stats
 def gev_fit_python(data,**kwargs):
@@ -133,7 +137,7 @@ def xarray_gev_python(ds,dim='time_ensemble', file=None, recreate_fit=False, ver
     params = xarray.apply_ufunc(gev_fit_python, ds, input_core_dims=[[dim]],
                                                    output_core_dims=[['parameter'] ],
                                                    vectorize=True, kwargs=kwargs)
-    pnames = ['location', 'Dlocation', 'scale', 'Dscale', 'shape', 'Dshape']
+    pnames = ['location', 'scale', 'shape','Dlocation', 'Dscale',  'Dshape']
 
 
     params = params.rename("Parameters")
@@ -166,7 +170,7 @@ def xarray_gev(ds, cov=None, shapeCov=False, dim='time_ensemble', file=None, rec
             print(f"Loaded existing data from {file}")
         return ds
 
-    kwargs['returnType'] = 'tuple'
+    #kwargs['returnType'] = 'tuple'
     kwargs['shapeCov'] = shapeCov
     if cov is None:
         params, std_err, nll, AIC = xarray.apply_ufunc(gev_fit, ds,  input_core_dims=[[dim]],
@@ -177,7 +181,7 @@ def xarray_gev(ds, cov=None, shapeCov=False, dim='time_ensemble', file=None, rec
                                                    output_core_dims=[['parameter'], ['parameter'], ['NegLog'], ['AIC']],
                                                    vectorize=True, kwargs=kwargs)
 
-    pnames = ['location', 'Dlocation', 'scale', 'Dscale', 'shape', 'Dshape']
+    pnames = ['location', 'scale','shape',  'Dlocation', 'Dscale', 'Dshape']
     # name variables and then combine into one dataset.
 
     params = params.rename("Parameters")

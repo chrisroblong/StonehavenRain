@@ -1,6 +1,6 @@
 """
-Compute seasonal-mean CET, edinburgh region & CMP average  from 
-  monthly-mean temperatures and precipiation. (No CET for precip!)
+Compute seasonal-mean CET, edinburgh region & CPM average  from
+  monthly-mean temperatures and precipitation. (No CET for precip!)
 
 """
 import edinburghRainLib

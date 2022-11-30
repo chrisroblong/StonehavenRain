@@ -2,7 +2,7 @@
 Plot Geography for Edinburgh extreme rainfall.
 Plots As follows:
 SE Scotland -- using 600m DEM data & showing counties; Edinburgh using 90m DEM data
-Plan of castle. + scalebar??
+Plan of castle. + scalebar
 """
 import matplotlib.pyplot as plt
 from matplotlib_scalebar.scalebar import ScaleBar
