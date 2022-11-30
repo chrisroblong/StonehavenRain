@@ -39,3 +39,4 @@ You need to install R on your computer and  modify this library to point to R.
     Values then got inserted (manually) into edinburghRainLib
 * create_counties -- Create county shape files from OS data. Used to generate high enough resolution  county data. 
 * radar_station_metadata.xlxs -- Radar station metadata
+* old_code -- folder containing old code. May not work! 
