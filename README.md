@@ -30,7 +30,7 @@ You need to install R on your computer and  modify this library to point to R.
 ## Main figures
 
 * plot_edinburgh_geography -- Plot edinburgh image, plan of castle and map of SE Scotland. 
-* plot_edinburgh_precip_dist -- Plot precipitation for 4th july 2021 and distributions of radar regional extremes data.
+* plot_edinburgh_precip_dist -- Plot precipitation for 4th July 2021 and distributions of radar regional extremes data.
 * plot_intensity_risk_ratios -- Plot intensity and probability risk ratios 
 
 ------
@@ -40,3 +40,6 @@ You need to install R on your computer and  modify this library to point to R.
 * create_counties -- Create county shape files from OS data. Used to generate high enough resolution  county data. 
 * radar_station_metadata.xlxs -- Radar station metadata
 * old_code -- folder containing old code. May not work! 
+
+## Dependencies
+  See requirements.txt

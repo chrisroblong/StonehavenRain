@@ -72,7 +72,7 @@ cmt = topog.elevation.plot(ax=ax_seScot, transform=ccrs.PlateCarree(), cmap='ter
 scalebar = ScaleBar(1,"m",**scalebarprops)
 ax_seScot.add_artist(scalebar)
 # if time == '2021-07-04T15:00':
-urb.plot(ax=ax_seScot, add_colorbar=False, transform=projLand, levels=[0.99, 1.01], colors='black',alpha=0.5)
+urb.plot(ax=ax_seScot, add_colorbar=False, transform=projLand, levels=[0.99, 1.01], colors='black',alpha=1)
 ax_seScot.plot(*edinburghRainLib.edinburgh_castle.values(), transform=projGB,
                marker='o', color='purple', ms=9, alpha=0.7)
 edinburghRainLib.std_decorators(ax_seScot,radarNames=True)
@@ -83,7 +83,7 @@ for name,coords in labels.items():
 # add an inset plot of the BI
 axBI = inset_axes(ax_seScot, width="39%", height="33%", loc="lower left",
                   axes_class=cartopy.mpl.geoaxes.GeoAxes, borderpad=0.,
-                  axes_kwargs=dict(map_projection=ccrs.PlateCarree()))
+                  axes_kwargs=dict(projection=ccrs.PlateCarree()))
 axBI.set_extent((-11, 2, 50, 61))
 axBI.tick_params(labelleft=False, labelbottom=False)
 axBI.coastlines()

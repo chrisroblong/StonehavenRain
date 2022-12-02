@@ -39,7 +39,7 @@ mc_dist = xarray.concat(mc_dist, dim='sample')
 #save the data
 mc_dist.to_netcdf(edinburghRainLib.dataDir/'radar_precip'/'bootstrap_reg_radar_params.nc')
 radar_fit.to_netcdf(edinburghRainLib.dataDir/'radar_precip'/'reg_radar_params.nc')
-radar_data_all.to_netcdf(edinburghRainLib/'radar_precip'/'reg_radar_rain.nc')
+radar_data_all.to_netcdf(edinburghRainLib.dataDir/'radar_precip'/'reg_radar_rain.nc')
 print("\nRadar fit and bootstrapped")
 
 # generate

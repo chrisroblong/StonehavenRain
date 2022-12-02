@@ -494,7 +494,7 @@ mc_shape_all_ir,mc_shape_all_pr = pr_ir_monte_carlo(mc_radar_fit,bootstrap_ratio
                       file_pattern = str(outdir_gev)+"/shape_",refresh=refresh)
 # get the expected CC rate which arises because Edinburgh Temperatures increase at about 90% of CET rates.
 # might need to re-compute here rather than in analyse_cpm code.
-qsat_fit = sm.load(edinburghRainLib.dataDir/'gev_fits'/'cet_qsat_fit.sav')
+qsat_fit = sm.load(outdir_gev/'cet_qsat_fit.sav')
 f=qsat_fit.get_prediction([1,t_today])
 cc_scale = float(100*(qsat_fit.params[1]/f.predicted_mean))
 cc_rng = 100*qsat_fit.conf_int()[1,:]/f.predicted_mean

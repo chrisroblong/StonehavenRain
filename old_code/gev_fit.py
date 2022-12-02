@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 import scipy.stats
 import numpy as np
 import xarray
-import pathlib
-#import dask
-import seaborn as sns
 import pandas as pd
 import edinburghRainLib
 

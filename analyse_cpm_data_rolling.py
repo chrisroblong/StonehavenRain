@@ -75,7 +75,7 @@ def confidence_ellipse(x, y, ax, n_std=3.0, facecolor='none', **kwargs):
     scale_x = np.sqrt(cov[0, 0]) * n_std
     mean_x = np.mean(x)
 
-    # calculating the stdandard deviation of y ...
+    # calculating the standard deviation of y ...
     scale_y = np.sqrt(cov[1, 1]) * n_std
     mean_y = np.mean(y)
 
@@ -102,11 +102,12 @@ outdir_gev = edinburghRainLib.dataDir / 'gev_fits_roll'
 outdir_gev.mkdir(parents=True, exist_ok=True)  # create the directory
 
 ## read in the data we need
-cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_tas.nc').tas
-cpm = xarray.load_dataset(edinburghRainLib.dataDir / 'cpm_reg_tas.nc').tas
+covariate_dir = edinburghRainLib.dataDir / "covariates"
+cet = xarray.load_dataset(covariate_dir/ 'cet_tas.nc').tas
+cpm = xarray.load_dataset(covariate_dir/ 'cpm_reg_tas.nc').tas
 
-ed_temp = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_tas.nc').tas
-ed_precip = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_pr.nc').pr
+ed_temp = xarray.load_dataset(covariate_dir / 'ed_reg_tas.nc').tas
+ed_precip = xarray.load_dataset(covariate_dir / 'ed_reg_pr.nc').pr
 ed_reg_hum=qsat(ed_temp)
 cpm_files=list((edinburghRainLib.dataDir/'CPM_data').glob("**/*.nc"))
 ed_extreme_precip = xarray.open_mfdataset(cpm_files).seasonalMax
@@ -131,10 +132,10 @@ cpm_ht = cpm_ht.assign(grid_longitude=ed_extreme_precip.grid_longitude,
                        grid_latitude=ed_extreme_precip.grid_latitude).ht
 msk = (cpm_ht > 0) & (cpm_ht < 200)
 
-# get in observed CET
+# get in observed seasonal CET
 obs_cet = commonLib.read_cet()
-t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('2005', '2020')).mean())
-t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time='2020'))
+t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('2012', '2021')).mean())
+#t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time='2020'))
 t_pi = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('1850', '1899')).mean())
 temp_p2k = 2 * 0.94 + t_pi # from Ed
 
@@ -297,10 +298,12 @@ commonLib.saveFig(fig_scatter)
 # use the fit information to compute the expected change in extreme rainfall
 f=linear_fit['qsat'].get_prediction([1,t_today])
 cc_scale = 100*(linear_fit['qsat'].params[1]/f.predicted_mean)
+
 # and the decline in precipit.
 f=linear_fit['Ed_Precip'].get_prediction([1,t_today])
 rain_change = 100*float(linear_fit['Ed_Precip'].params[1]/f.predicted_mean)
-
+# save the qsat fit
+linear_fit['qsat'].save(outdir_gev/'cet_qsat_fit.sav')
 ## and make plot for SI
 projRot=ccrs.RotatedPole(pole_longitude=177.5,pole_latitude=37.5)
 plot_kws=dict(projection=projRot)
@@ -387,7 +390,7 @@ for name,title in zip(['scatter','scatter_shape'],['Fixed shape','Covariate shap
     ax_scatters.append(ax)
 
 
-fig.colorbar(cm,ax=ax_scatters,orientation='horizontal',label='',fraction=0.075,extend='both',ticks=topog_levels)
+fig.colorbar(cm,ax=ax_scatters,orientation='horizontal',label='',fraction=0.075,extend='both',ticks=topog_levels,pad=0.1)
 
 
 #ax.legend()
@@ -396,8 +399,7 @@ fig.colorbar(cm,ax=ax_scatters,orientation='horizontal',label='',fraction=0.075,
 
 # plot qq-plots for covariate fits
 ## plot the fits for CPM data
-cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_tas.nc').tas
-#ed_extreme_precip = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_max_precip.nc').pr
+cet = xarray.load_dataset(covariate_dir / 'cet_tas.nc').tas
 ed=edinburghRainLib.rotated_coords['Edinburgh']
 ed_ext=ed_extreme_precip.sel(grid_latitude=ed[1],grid_longitude=ed[0],method='nearest',rolling=1).load() #
 ed_west_ext = ed_extreme_precip.sel(grid_latitude=ed[1],grid_longitude=ed[0]-0.25,method='nearest',rolling=1).load() #
@@ -432,6 +434,7 @@ for data,name in zip( [ed_ext,ed_west_ext],['r_gev_fit_ed','r_gev_fit_w_ed']):
     ax.yaxis.set_tick_params(labelleft=False)
     ax.set_title(name)
     label.plot(ax) # add label
+
 #fig.tight_layout()
 fig.show()
 commonLib.saveFig(fig)
