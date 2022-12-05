@@ -83,7 +83,7 @@ for name,coords in labels.items():
 # add an inset plot of the BI
 axBI = inset_axes(ax_seScot, width="39%", height="33%", loc="lower left",
                   axes_class=cartopy.mpl.geoaxes.GeoAxes, borderpad=0.,
-                  axes_kwargs=dict(projection=ccrs.PlateCarree()))
+                  axes_kwargs=dict(map_projection=ccrs.PlateCarree()))
 axBI.set_extent((-11, 2, 50, 61))
 axBI.tick_params(labelleft=False, labelbottom=False)
 axBI.coastlines()
