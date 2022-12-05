@@ -454,13 +454,12 @@ outdir_gev = edinburghRainLib.dataDir / 'gev_fits_roll'
 bs_file= outdir_gev/f'{rgn}_bootstrap.nc'
 mn_file= outdir_gev/f'{rgn}_mean.nc'
 mn_ratio_roll = xarray.load_dataarray(mn_file, decode_times=False)#
-#mn_ratio =mn_ratio_roll.sel(rolling=1)
+
 bootstrap_ratio = xarray.load_dataarray(bs_file, decode_times=False)#.sel(rolling=1)
 #get cases with covariate shape.
 bs_file_shape= outdir_gev/f'{rgn}_shape_bootstrap.nc'
 mn_file_shape= outdir_gev/f'{rgn}_shape_mean.nc'
 mn_ratio_shape_roll = xarray.load_dataarray(mn_file_shape, decode_times=False)
-#mn_ratio_shape = mn_ratio_shape_roll.sel(rolling=1)
 bootstrap_ratio_shape = xarray.load_dataarray(bs_file_shape, decode_times=False)#.sel(rolling=1)
 
 # get in observed CET and compute means for time periods.
@@ -489,7 +488,7 @@ dist_now_shape= xarray.Dataset(dict(Parameters=dist_now_shape))
 ## do the bootstrap calculations
 refresh=False # set True to  refresh the bootstrap calculations. If files do not exist then bootstrap will be done.
 mc_all_ir,mc_all_pr = pr_ir_monte_carlo(mc_radar_fit,bootstrap_ratio.sel(rolling=1),temperatures,temp_p2k,rain, rtn_period,
-                      file_pattern = str(outdir_gev)+"/shape_",refresh=refresh)
+                      file_pattern = str(outdir_gev)+"/",refresh=refresh)
 mc_shape_all_ir,mc_shape_all_pr = pr_ir_monte_carlo(mc_radar_fit,bootstrap_ratio_shape.sel(rolling=1),temperatures,temp_p2k,rain, rtn_period,
                       file_pattern = str(outdir_gev)+"/shape_",refresh=refresh)
 # get the expected CC rate which arises because Edinburgh Temperatures increase at about 90% of CET rates.
