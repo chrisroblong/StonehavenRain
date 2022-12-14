@@ -29,7 +29,7 @@ for k, v in edinburghRainLib.edinburgh_castle.items():
 labels={'Edinburgh':[330e3,677e3],
         'Firth of Forth':[329500 , 688e3],
         'Fife': [310999 , 690000],
-        'Scotish Borders':[315000,630000.],
+        'Scottish Borders':[315000,630000.],
         'F':[286000,676000.], # Falkirk
         "WL":[302e3,674e3], # West Lothian
         "ML":[331e3,659e3], # Mid Lothian

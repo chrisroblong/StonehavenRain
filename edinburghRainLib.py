@@ -398,13 +398,14 @@ def std_decorators(ax,showregions=True,radarNames=False):
 
 
     ax.plot(metadata.Easting,metadata.Northing,marker='h',color='orange',ms=10,linestyle='none',
-            transform=cartopy.crs.OSGB(approx=True)) #  radar stations location.
+            transform=cartopy.crs.OSGB(approx=True),clip_on=True) #  radar stations location.
     #ax.gridlines(draw_labels=False, x_inline=False, y_inline=False)
     if showregions:
         ax.add_feature(regions, edgecolor='red')
     if radarNames:
         for name,row in metadata.iterrows():
-            ax.annotate(name,(row.Easting+500,row.Northing+500),transform=cartopy.crs.OSGB(approx=True))
+            ax.annotate(name,(row.Easting+500,row.Northing+500),transform=cartopy.crs.OSGB(approx=True),
+                        annotation_clip=True)
 
     ax.add_feature(coastline)
     #ax.add_feature(nations, edgecolor='black')
