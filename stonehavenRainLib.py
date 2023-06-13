@@ -39,15 +39,8 @@ else: # don't know what to do so raise an error.
 outdir.mkdir(parents=True,exist_ok=True)
 horizontal_coords = ['projection_x_coordinate','projection_y_coordinate'] # for radar data.
 cpm_horizontal_coords= ['grid_latitude', 'grid_longitude'] # horizontal coords for CPM data.
-edinburgh_castle = dict(projection_x_coordinate=325166,
-           projection_y_coordinate=673477+50) # adjust the castle 50M north!
-
-
-edinburgh_botanics = dict(projection_x_coordinate=324770,
-                          projection_y_coordinate=675587)
-
-edinburgh_KB = dict(projection_x_coordinate=326495,
-                          projection_y_coordinate=670628)
+stonehaven_crash = dict(projection_x_coordinate=380567,
+           projection_y_coordinate=784629)
 
 # co-ords of relevant places on rotated grid. See comp_rotated_coords to actually generate them
 # note only to 2 sf (~ 1km) which is enough precision... Not computing these here
@@ -59,18 +52,21 @@ rotated_coords = dict(Edinburgh=(359.62, 3.45),
     Ringway=(360.14, 0.85))
 
 # sites we want to plot and the colors they are.
-sites=dict(castle=edinburgh_castle,botanics=edinburgh_botanics)#,KB=edinburgh_KB)
-edinburgh_region = dict()
-for k,v in edinburgh_castle.items(): # 50km around edinburgh
-    edinburgh_region[k]=slice(v-50e3,v+50e3)
+sites=dict(crash=stonehaven_crash)#,botanics=edinburgh_botanics,KB=edinburgh_KB)
+stonehaven_region = dict()
+for k,v in stonehaven_crash.items(): # 50km around stonehaven
+    stonehaven_region[k]=slice(v-50e3,v+50e3)
 
-colors = dict(castle='purple',botanics='green',KB='orange')
+colors = dict(crash='purple')#,botanics='green',KB='orange')
 try:
     import GSHHS_WDBII
     gshhs = GSHHS_WDBII.GSHHS_WDBII()
     coastline = gshhs.coastlines(scale='full') # so we can have high resoln coastlines.
 except ModuleNotFoundError:
     coastline = cartopy.feature.NaturalEarthFeature('physical','coastline','10m',edgecolor='black',facecolor='none')
+
+# load railway lines
+rail_lines = cartopy.feature.NaturalEarthFeature(category='cultural', name='railways', scale='10m', edgecolor='blue',facecolor='none')
 
 def get_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', region=None,
                    height_range=slice(0,200), mxMeanRain=1000.):
@@ -83,7 +79,7 @@ def get_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', region=No
     :return: Data masked for region requested & mxTime
     """
     if region is None:
-        region = edinburgh_region
+        region = stonehaven_region
 
     radar_precip = xarray.open_dataset(file).sel(**region)
     rseas = radar_precip.drop_vars('No_samples').resample(time='QS-Dec')
@@ -130,16 +126,16 @@ def gen_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', quantiles
     radar_data = rseasMskmax.groupby(indx).quantile(quantiles).rename(group='time_index', quantile='time_quant')  # .values
     ok_count=(~rseasMskmax.isnull()).groupby(indx).sum().rename(group='time_index')    # count non nan
     radar_data=radar_data[(ok_count > 25)] # want at least 25 values
-    ed_indx = indx.sel(edinburgh_castle, method='nearest').sel(time='2021')
+    ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2021')
     rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
-    ed_indx = indx.sel(edinburgh_castle, method='nearest').sel(time='2020')
+    ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2020')
     rainC2020 = radar_data.sel(time_index=ed_indx).squeeze()
     ds=xarray.Dataset(dict(radar=radar_data,critical2021=rainC2021,critical2020=rainC2020,rain_count=rain_count,indx=indx,mask=rseasMskmax))
     return ds
 
 try:
     import rioxarray # not available on jasmin
-    def read_90m_topog(region=edinburgh_region,resample=None):
+    def read_90m_topog(region=stonehaven_region,resample=None):
         """
         Read 90m DEM data from UoE regridded OSGB data.
         Fix various problems
@@ -397,7 +393,7 @@ def std_decorators(ax,showregions=True,radarNames=False):
     """
 
 
-    ax.plot(metadata.Easting,metadata.Northing,marker='h',color='orange',ms=10,linestyle='none',
+    ax.plot(metadata.Easting,metadata.Northing,marker='h',color='orange',ms=5,linestyle='none',
             transform=cartopy.crs.OSGB(approx=True),clip_on=True) #  radar stations location.
     #ax.gridlines(draw_labels=False, x_inline=False, y_inline=False)
     if showregions:
@@ -408,6 +404,7 @@ def std_decorators(ax,showregions=True,radarNames=False):
                         annotation_clip=True)
 
     ax.add_feature(coastline)
+    #ax.add_feature(rail_lines, edgecolor='blue')
     #ax.add_feature(nations, edgecolor='black')
     
 
