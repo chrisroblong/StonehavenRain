@@ -4,7 +4,7 @@
 # module load jaspy
 # and need current dir in python search path:
 # export PYTHONPATH=$PYTHONPATH:$PWD
-dirs="summary_5km_15Min summary_5km_1h summary_1km_15Min summary_1km_1h"
+dirs="summary_5km_1h"
 #dirs="summary_5km_15Min"
 Q='high-mem --mem=100000' # high mem q with a 100 GB of RAM
 time="4:00:00" # four hours should be enough

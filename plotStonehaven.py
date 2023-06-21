@@ -113,43 +113,68 @@ def dayhourly(date, month, year, rain):
 			print("Missing data at " + np.datetime_as_string(starttime, unit = 'ns'))
 			badtimes.append(starttime)
 			continue
+		except:
+			print("Other error at " + np.datetime_as_string(starttime, unit = 'ns'))
+			badtimes.append(starttime)
+			continue
 	starttimes = list(filter(lambda x: x not in badtimes, starttimes))
+	if starttimes == []:
+		print("Missing day!")
+		raise ValueError("Missing day")
 	hourly_rain = xr.concat(hourly_data, dim = 'time')
 	hourly_rain['time'] = starttimes
 	return hourly_rain
 
 def maxhourly(year):
-	days = range(0, 92)
+	startday, endday = 0, 92
+	days = range(startday, endday)
+	startdate, startmonth = daytodate(startday)
+	nextstartdate, nextstartmonth = daytodate(startday + 1)
 	daily_maxhourly = []
 	daily_maxhourlytimes = []
-	daysrain = getrainfalldata(0, '06', year)
-	nextdaysrain = getrainfalldata(1, '06', year)
+	baddays = []
+	daysrain = getrainfalldata(startdate, startmonth, year)
+	nextdaysrain = getrainfalldata(nextstartdate, nextstartmonth, year)
 	totaldata = xr.combine_by_coords(data_objects=[daysrain, nextdaysrain])
 	for day in days:
 		date, month = daytodate(day)
-		if day == 91:
-			dayshourly = dayhourly(date, month, year, totaldata)
-		else:
-			dayshourly = dayhourly(date, month, year, totaldata)
-		if day == 0:
-			dayshourly = dayshourly.to_array()
+		try:
+			if day == endday - 1:
+				dayshourly = dayhourly(date, month, year, totaldata)
+			else:
+				dayshourly = dayhourly(date, month, year, totaldata)
+			if day == startday:
+				dayshourly = dayshourly.to_array()
+		except ValueError("Missing day"):
+			baddays.append(day-startday)
+			if day == endday - 1:
+				break
+			daysrain = nextdaysrain
+			date, month = daytodate(day + 2)
+			if day < endday - 2:
+				nextdaysrain = getrainfalldata(date, month, year)
+			totaldata = xr.combine_by_coords(data_objects=[daysrain, nextdaysrain]).to_array()
 		daily_maxhourly.append(dayshourly.max("time"))
 		daily_maxhourlytimes.append(dayshourly.idxmax("time"))
-		if day == 91:
+		if day == endday - 1:
 			break
 		daysrain = nextdaysrain
 		date, month = daytodate(day + 2)
-		if day < 90:
+		if day < endday - 2:
 			nextdaysrain = getrainfalldata(date, month, year)
 			totaldata = xr.combine_by_coords(data_objects=[daysrain, nextdaysrain]).to_array()
-	maxhourly = xr.concat(daily_maxhourly, dim = 'timeno')
-	maxhourlytimes = xr.concat(daily_maxhourlytimes, dim = 'timeno')
-	maxhourly['timeno'] = range(92)
-	maxhourlytimes['timeno'] = range(92)
-	maxhourlyday = maxhourly.idxmax('timeno')
-	maxhourlytime = maxhourlytimes.sel(timeno=maxhourlyday).max('variable')
+	maxhourly = xr.concat(daily_maxhourly, dim = 'dayno')
+	maxhourlytimes = xr.concat(daily_maxhourlytimes, dim = 'dayno')
+	daynos = range(endday-startday)
+	daynos = list(filter(lambda x: x not in baddays, daynos))
+	maxhourly['dayno'] = daynos
+	maxhourlytimes['dayno'] = daynos
+	maxhourlyday = maxhourly.idxmax('dayno')
+	maxhourlytime = maxhourlytimes.sel(dayno=maxhourlyday).max('variable')
 	return maxhourlyday
 
-data = maxhourly(2020)
-print(data)
-map(data)
+data = xr.open_dataset("summary_5km_1h/metoffice-c-band-rain-radar_uk_2020-08_5km-composite_monthly.nc")
+monthlyMaxTime = data["monthlyMaxTime"]
+monthlyMaxDay = monthlyMaxTime.dt.dayofyear
+print(monthlyMaxDay)
+map(monthlyMaxDay)

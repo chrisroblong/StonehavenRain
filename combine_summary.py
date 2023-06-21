@@ -1,14 +1,13 @@
 #!/bin/env python
 """
-Combine summary files to produce 1 file for Edinburgh Region
+Combine summary files to produce 1 file for Stonehaven Region
 """
 import pathlib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import numpy as np
 import pandas as pd
 import argparse
-import edinburghRainLib
 import dask
 
 parser=argparse.ArgumentParser(description="combine processed radar data")
@@ -32,7 +31,7 @@ files_wanted = sorted([ file for file in files if '2004' not in file.name])
 if args.verbose:
     print("Combining ",files_wanted)
 
-ds=xarray.open_mfdataset(files_wanted,chunks=chunks,combine='nested').sel(**edinburghRainLib.edinburgh_region).load()
+ds=xarray.open_mfdataset(files_wanted,chunks=chunks,combine='nested').sel(**stonehavenRainLib.stonehaven_region).load()
 encoding=dict()
 
 if not args.nocompress:

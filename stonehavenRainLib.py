@@ -68,7 +68,7 @@ except ModuleNotFoundError:
 # load railway lines
 rail_lines = cartopy.feature.NaturalEarthFeature(category='cultural', name='railways', scale='10m', edgecolor='blue',facecolor='none')
 
-def get_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', region=None,
+def get_radar_data(file=dataDir / 'radar_precip/summary_5km_1h.nc', region=None,
                    height_range=slice(0,200), mxMeanRain=1000.):
     """
     read in radar data and mask it by heights and mean rain being reasonable.
