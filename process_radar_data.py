@@ -6,7 +6,7 @@ Process radar data on JASMIN. Generate monthly-means of rain, monthly extremes a
 
 """
 import pathlib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import numpy as np
 import pandas as pd
@@ -119,11 +119,11 @@ def write_data(ds, outFile, summary_prefix=''):
     """
     ds2 = ds.copy()  # as modifying things...
     try:
-        ds2.attrs['max_time'] = edinburghRainLib.time_convert(ds2.attrs['max_time'])
+        ds2.attrs['max_time'] = stonehavenRainLib.time_convert(ds2.attrs['max_time'])
     except KeyError: # no maxTime.,
         pass
     var = summary_prefix + "MaxTime"
-    ds2[var] = edinburghRainLib.time_convert(ds2[var])
+    ds2[var] = stonehavenRainLib.time_convert(ds2[var])
     # compress the ouput... (useful because most rain is zero...and quite a lot of the data is missing)
     encoding=dict()
     comp = dict(zlib=True)
@@ -201,7 +201,7 @@ test = args.test
 resoln=args.resolution
 outdir=args.outdir
 if outdir is None: # default
-    outdir=edinburghRainLib.outdir/f'summary_{resoln}'
+    outdir=stonehavenRainLib.outdir/f'summary_{resoln}'
 else:
     outdir = pathlib.Path(outdir)
 writeDaily=args.nodaily    
@@ -232,14 +232,14 @@ last = None
 dailyData = []
 dailyData2hr = []
 for year in args.year:
-    dataYr = edinburghRainLib.nimrodRootDir / f'uk-{resoln}/{year:04d}'
+    dataYr = stonehavenRainLib.nimrodRootDir / f'uk-{resoln}/{year:04d}'
     # initialise the list...
     files = sorted(list(dataYr.glob(f'*{year:02d}{glob_patt}[0-3][0-9]*-composite.dat.gz.tar')))
     for f in files:
         if test: # test mode
             print(f"Would read {f} but in test mode")
             continue
-        rain = edinburghRainLib.extract_nimrod_day(f, QCmax=400,check_date=True,region=region)
+        rain = stonehavenRainLib.extract_nimrod_day(f, QCmax=400,check_date=True,region=region)
         if (rain is None) or (len(np.unique(rain.time.dt.hour)) <= minhours): # want min hours hours of data
             print(f"Not enough data for {f} ")
             if rain is None:
