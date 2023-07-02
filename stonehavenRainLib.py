@@ -1,4 +1,4 @@
-"""
+"""ataDir = pathlib.
 Provides classes, variables and functions used across the project
 """
 import pathlib
@@ -90,18 +90,18 @@ def get_radar_data(file=dataDir / 'radar_precip/summary_5km_1h.nc', region=None,
         topog_grid = 55
     else:
         topog_grid = 11
-    topog990m = read_90m_topog(region=region, resample=topog_grid)
-    top_fit_grid = topog990m.interp_like(rseas.isel(time=0).squeeze())
+    #topog990m = read_90m_topog(region=region, resample=topog_grid)
+    #top_fit_grid = topog990m.interp_like(rseas.isel(time=0).squeeze())
 
-    htMsk = (top_fit_grid > height_range.start) & (top_fit_grid < height_range.stop)  # in ht range
+    #htMsk = (top_fit_grid > height_range.start) & (top_fit_grid < height_range.stop)  # in ht range
     # mask by seasonal sum < 1000.
-    mskRain = ((rseas.seasonalMean * (30 + 31 + 31) / 4.) < mxMeanRain) & htMsk
+    mskRain = ((rseas.seasonalMean * (30 + 31 + 31) / 4.) < mxMeanRain) #& htMsk
     rseasMskmax = xarray.where(mskRain, rseas.seasonalMax, np.nan)
     mxTime = rseas.seasonalMaxTime
 
     return rseasMskmax,mxTime
 
-def gen_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', quantiles=None,
+def gen_radar_data(file=dataDir / 'radar_precip/summary_5km_1h.nc', quantiles=None,
                    region=None, height_range=slice(0,200), discrete_hr=12):
     """
     generated flattened radar data.
@@ -126,11 +126,11 @@ def gen_radar_data(file=dataDir / 'radar_precip/summary_1km_15min.nc', quantiles
     radar_data = rseasMskmax.groupby(indx).quantile(quantiles).rename(group='time_index', quantile='time_quant')  # .values
     ok_count=(~rseasMskmax.isnull()).groupby(indx).sum().rename(group='time_index')    # count non nan
     radar_data=radar_data[(ok_count > 25)] # want at least 25 values
-    ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2021')
-    rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
+    #ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2021')
+    #rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
     ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2020')
     rainC2020 = radar_data.sel(time_index=ed_indx).squeeze()
-    ds=xarray.Dataset(dict(radar=radar_data,critical2021=rainC2021,critical2020=rainC2020,rain_count=rain_count,indx=indx,mask=rseasMskmax))
+    ds=xarray.Dataset(dict(radar=radar_data,critical2020=rainC2020,rain_count=rain_count,indx=indx,mask=rseasMskmax)) #critical2021=rainC2021
     return ds
 
 try:
