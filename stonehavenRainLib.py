@@ -90,12 +90,12 @@ def get_radar_data(file=dataDir / 'radar_precip/summary_5km_1h.nc', region=None,
         topog_grid = 55
     else:
         topog_grid = 11
-    #topog990m = read_90m_topog(region=region, resample=topog_grid)
-    #top_fit_grid = topog990m.interp_like(rseas.isel(time=0).squeeze())
+    topog990m = read_90m_topog(region=region, resample=topog_grid)
+    top_fit_grid = topog990m.interp_like(rseas.isel(time=0).squeeze())
 
-    #htMsk = (top_fit_grid > height_range.start) & (top_fit_grid < height_range.stop)  # in ht range
+    htMsk = (top_fit_grid > height_range.start) & (top_fit_grid < height_range.stop)  # in ht range
     # mask by seasonal sum < 1000.
-    mskRain = ((rseas.seasonalMean * (30 + 31 + 31) / 4.) < mxMeanRain) #& htMsk
+    mskRain = ((rseas.seasonalMean * (30 + 31 + 31) / 4.) < mxMeanRain) & htMsk
     rseasMskmax = xarray.where(mskRain, rseas.seasonalMax, np.nan)
     mxTime = rseas.seasonalMaxTime
 
