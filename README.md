@@ -16,7 +16,7 @@
 
 ## Libraries 
 
-* edinburghRainLib -- main library. Contains bits of code that appear general + various configuration info. 
+* stonehavenRainLib -- main library. Contains bits of code that appear general + various configuration info. 
     You will likely need to edit this file if you want to use this software.
 * gev_r -- code to support doing GEV fits using R + some derived calculations. 
 You need to install R on your computer and  modify this library to point to R. 
