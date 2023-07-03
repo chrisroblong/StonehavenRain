@@ -1,6 +1,6 @@
 """
 Compute gev fits to radar data and bootstrap estimates of the GEV fits.
-Also compute empirical fit (without bootstraping)
+Also compute empirical fit (without bootstrapping)
 
 """
 import edinburghRainLib

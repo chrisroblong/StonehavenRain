@@ -163,8 +163,8 @@ def maxhourly(year):
 		if day < endday - 2:
 			nextdaysrain = getrainfalldata(date, month, year)
 			totaldata = xr.combine_by_coords(data_objects=[daysrain, nextdaysrain]).to_array()
-	maxhourly = xr.concat(daily_maxhourly, dim = 'dayno')
-	maxhourlytimes = xr.concat(daily_maxhourlytimes, dim = 'dayno')
+	maxhourly = xr.concat(daily_maxhourly, dim='dayno')
+	maxhourlytimes = xr.concat(daily_maxhourlytimes, dim='dayno')
 	daynos = range(endday-startday)
 	daynos = list(filter(lambda x: x not in baddays, daynos))
 	maxhourly['dayno'] = daynos
