@@ -5,7 +5,7 @@ Plot distributions of extremes from 1km and 5km data for summer.
 
 import xarray
 import matplotlib.pyplot as plt
-import edinburghRainLib
+import stonehavenRainLib
 import commonLib
 import cartopy.crs as ccrs
 import scipy.stats
@@ -13,14 +13,14 @@ import numpy as np
 import pandas as pd
 
 def rgn(dist=50.):
-    edinburgh_region = dict()
-    for k, v in edinburghRainLib.edinburgh_castle.items():  # dist  around edinburgh
-        edinburgh_region[k] = slice(v - dist*1000, v + dist*1000.)
-    return edinburgh_region
+    stonehaven_region = dict()
+    for k, v in stonehavenRainLib.stonehaven_crash.items():  # dist  around edinburgh
+        stonehaven_region[k] = slice(v - dist*1000, v + dist*1000.)
+    return stonehaven_region
 
 def rgn_dist(ds,dist=50.):
     distance = 0.0
-    for k, v in  edinburghRainLib.edinburgh_castle.items():  # iterate over coords.
+    for k, v in  stonehavenRainLib.stonehaven_crash.items():  # iterate over coords.
         distance = distance+(ds[k]-v)**2
     distance = np.sqrt(distance)
     L = (distance <= dist*1e3)
@@ -47,7 +47,7 @@ if read_data:
     print("Read monthly summary data")
 
 def comp_crit_value(ds):
-    return ds.sel(method='nearest',time='2021-06',**edinburghRainLib.edinburgh_castle)
+    return ds.sel(method='nearest',time='2021-06',**stonehavenRainLib.stonehaven_crash)
 crit_values = {'5km':comp_crit_value(seas_max_5km),
                 '1km_15min':comp_crit_value(seas_max_1km_15min)}
 fig,axes = plt.subplots(nrows=1,ncols=2,num='Reg_Clim_max',clear=True,figsize=[11,5])
@@ -128,8 +128,8 @@ commonLib.saveFig(figpp)
 fig_ts,ax=plt.subplots(nrows=1,ncols=1,num='edinburgh_ts',figsize=[10,4],clear=True)
 fig_scatter,ax_scatter=plt.subplots(nrows=1,ncols=1,num='edinburgh_scatter',figsize=[6,6],clear=True) # plot scatter plot
 ax2=ax.twinx()
-for name,site in  edinburghRainLib.sites.items():
-    color=  edinburghRainLib.colors[name]
+for name,site in  stonehavenRainLib.sites.items():
+    color=  stonehavenRainLib.colors[name]
     ts_1hr = seas_max_5km.sel(method='nearest',**site).sel(time=(seas_max_5km.time.dt.month==6))
     ts_15min = seas_max_1km_15min.sel(method='nearest', **site).sel(time=(seas_max_5km.time.dt.month == 6))
     ts_1hr.plot(ax=ax,color=color,label=name,linestyle='dashed')

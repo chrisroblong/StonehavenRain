@@ -7,7 +7,7 @@ Needs matplotlib >=3.5.1(well 3.4 has a bug with alpha as an array which 3.5.1 d
 """
 
 import matplotlib.pyplot as plt
-import edinburghRainLib
+import stonehavenRainLib
 import pathlib
 import iris.cube
 import iris.fileformats
@@ -18,21 +18,21 @@ import cartopy.feature as cfeature
 import xarray
 import commonLib
 import numpy as np
-edinburgh_region = dict()
-for k,v in edinburghRainLib.edinburgh_castle.items(): # 100km around edinburgh
-    edinburgh_region[k]=slice(v-100e3,v+100e3)
+stonehaven_region = dict()
+for k,v in stonehavenRainLib.stonehaven_crash.items(): # 100km around edinburgh
+    stonehaven_region[k]=slice(v-100e3,v+100e3)
 
 read_data = False
 if read_data:
-    file= edinburghRainLib.nimrodRootDir/'uk-1km/2021/metoffice-c-band-rain-radar_uk_20210704_1km-composite.dat.gz.tar'
-    rainAll=edinburghRainLib.extract_nimrod_day(file,QCmax=400.)
-    #era_5 = xarray.open_dataset(edinburghRainLib.dataDir/'UK_ERA5_data_2021_07_03to05.nc')
+    file= stonehavenRainLib.nimrodRootDir/'uk-1km/2021/metoffice-c-band-rain-radar_uk_20210704_1km-composite.dat.gz.tar'
+    rainAll=stonehavenRainLib.extract_nimrod_day(file,QCmax=400.)
+    #era_5 = xarray.open_dataset(stonehavenRainLib.dataDir/'UK_ERA5_data_2021_07_03to05.nc')
     time_sel = ['2021-07-04T14','2021-07-04T15','2021-07-04T16']
     #msl = era_5.msl.sel(time=time_sel,longitude=slice(-15,0),latitude=slice(59,53))/100.
     #era_5_rain = era_5.tp.sel(time=time_sel, longitude=slice(-15,0),latitude=slice(57,53))*1000
-    rain = rainAll.sel(time=time_sel,**edinburgh_region)
+    rain = rainAll.sel(time=time_sel,**stonehaven_region)
     # get bathymetry/topography data
-    topog = xarray.load_dataset(edinburghRainLib.dataDir/'GEBCO_topog_bathy_scotland.nc')
+    topog = xarray.load_dataset(stonehavenRainLib.dataDir/'GEBCO_topog_bathy_scotland.nc')
 
 
 ## make plots
@@ -46,8 +46,8 @@ label_scot = commonLib.plotLabel()
 rn_levels=[1,2,5,10,20,50,100]
 slp_levels=np.linspace(1003,1006,7)
 label = commonLib.plotLabel()
-rgn = [edinburgh_region['projection_x_coordinate'].start,edinburgh_region['projection_x_coordinate'].stop,
-              edinburgh_region['projection_y_coordinate'].start,edinburgh_region['projection_y_coordinate'].stop]
+rgn = [stonehaven_region['projection_x_coordinate'].start,stonehaven_region['projection_x_coordinate'].stop,
+              stonehaven_region['projection_y_coordinate'].start,stonehaven_region['projection_y_coordinate'].stop]
 for indx,ax in enumerate(ax_scot.flatten()):
     ax.set_extent(rgn,crs=projection)
 
@@ -66,8 +66,8 @@ for indx,ax in enumerate(ax_scot.flatten()):
 
     #c=msl.isel(time=indx).plot.contour(ax=ax,levels=slp_levels,transform=ccrs.PlateCarree(),colors='grey',linestyles=['solid','dashed'])
     #ax.clabel(c)
-    edinburghRainLib.std_decorators(ax)
-    ax.plot(*list(edinburghRainLib.edinburgh_botanics.values()), marker='o', ms=6, color=edinburghRainLib.colors['botanics'],
+    stonehavenRainLib.std_decorators(ax)
+    ax.plot(*list(stonehavenRainLib.edinburgh_botanics.values()), marker='o', ms=6, color=stonehavenRainLib.colors['botanics'],
             transform=projection,alpha=0.7)
 
 figure_scot.colorbar(cm,orientation='horizontal',ax=ax_scot,fraction=0.08,pad=0.05,aspect=40)

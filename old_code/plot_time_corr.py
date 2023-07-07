@@ -4,7 +4,7 @@ Do for all 4 seasons.
 """
 import xarray
 
-import edinburghRainLib
+import stonehavenRainLib
 import commonLib
 import numpy as np
 import  matplotlib.pyplot as plt
@@ -23,7 +23,7 @@ def prob_same_event(file,time_sep=6.,time=None):
         monthlyDS=monthlyDS.sel(time=time)
     ddseas = monthlyDS.resample(time='QS-Dec').map(commonLib.time_process,
                                                    varPrefix='monthly')
-    ed = ddseas.MaxTime.sel(method='nearest', **commonLib.edinburgh_castle)
+    ed = ddseas.MaxTime.sel(method='nearest', **commonLib.stonehaven_crash)
     dt = np.abs(ed - ddseas.MaxTime) / np.timedelta64(1,'h')
     p=(dt < time_sep).groupby('time.month').mean()
     return  p
@@ -44,8 +44,8 @@ fig, axes = plt.subplots(nrows=1, ncols=2, clear=True, sharex=True, sharey=True,
 
 
 
-ext = [edinburghRainLib.edinburgh_region['projection_x_coordinate'].start,edinburghRainLib.edinburgh_region['projection_x_coordinate'].stop,
-       edinburghRainLib.edinburgh_region['projection_y_coordinate'].start,edinburghRainLib.edinburgh_region['projection_y_coordinate'].stop]
+ext = [stonehavenRainLib.stonehaven_region['projection_x_coordinate'].start,stonehavenRainLib.stonehaven_region['projection_x_coordinate'].stop,
+       stonehavenRainLib.stonehaven_region['projection_y_coordinate'].start,stonehavenRainLib.stonehaven_region['projection_y_coordinate'].stop]
 dist = [50,100,150]
 for ax,title,var in zip(axes.flatten(),['1km_15min','5km'],[p_1km_15min,p_5km]):
 
@@ -57,7 +57,7 @@ for ax,title,var in zip(axes.flatten(),['1km_15min','5km'],[p_1km_15min,p_5km]):
     ##cl = var.sel(month=6).plot.contour(ax=ax, colors='black', levels=levels, transform=proj, add_colorbar=False)
     ax.set_title(f"{title}")
 
-    edinburghRainLib.std_decorators(ax)  # put std stuff on axis
+    stonehavenRainLib.std_decorators(ax)  # put std stuff on axis
 fig.colorbar(cm,ax=axes,**kw_cbar)
 fig.show()
 commonLib.saveFig(fig)

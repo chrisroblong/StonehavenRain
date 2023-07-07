@@ -5,7 +5,7 @@ Then downscale data by 7.5%/K summer CET warming and also add on 2K warming and 
 """
 import matplotlib.pyplot as plt
 
-import edinburghRainLib
+import stonehavenRainLib
 import commonLib
 import xarray
 import numpy as np
@@ -16,7 +16,7 @@ import numpy.random
 
 def rgn_dist(ds,dist=50.):
     distance = 0.0
-    for k, v in  edinburghRainLib.edinburgh_castle.items():  # iterate over coords.
+    for k, v in  stonehavenRainLib.stonehaven_crash.items():  # iterate over coords.
         distance = distance+(ds[k]-v)**2
     distance = np.sqrt(distance)
     L = (distance <= dist*1e3)
@@ -33,7 +33,7 @@ def comp_seas_max(file,time=None):
         seas_max = seas_max.sel(time=time)
     return seas_max
 def comp_crit_value(ds):
-    return ds.sel(method='nearest',time='2021-06',**edinburghRainLib.edinburgh_castle)
+    return ds.sel(method='nearest',time='2021-06',**stonehavenRainLib.stonehaven_crash)
 
 def fit(data,source_dist,nboot=None,guess={},rng=None):
     """

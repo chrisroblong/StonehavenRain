@@ -2,7 +2,7 @@
 Analyse the radar data
 """
 import commonLib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
@@ -10,15 +10,15 @@ import gev_r # so we can fit gev using R
 
 
 recreate_fit  =False # if true create radar fit data *even* if file exists
-file = edinburghRainLib.dataDir/'radar_precip/summary_1km_15min.nc'
+file = stonehavenRainLib.dataDir/'radar_precip/summary_1km_15min.nc'
 
-radar_fit_dir = edinburghRainLib.dataDir/'radar_fits'
+radar_fit_dir = stonehavenRainLib.dataDir/'radar_fits'
 radar_fit_dir.mkdir(exist_ok=True) # create data for radar data
 radar_fit_file = radar_fit_dir/(file.stem+"_fit.nc")
 
 ## get in the topography
 
-ed_rgn = {k:slice(v-50e3,v+50e3) for k,v in edinburghRainLib.edinburgh_castle.items()}
+ed_rgn = {k:slice(v-50e3,v+50e3) for k,v in stonehavenRainLib.stonehaven_crash.items()}
 radar_precip=xarray.open_dataset(file).sel(**ed_rgn)
 radar_time = 'Rx15min'
 if file.name.endswith('15Min.nc'): # 15min data.
@@ -29,7 +29,7 @@ if '5km' in file.name:
 else:
     topog_grid=11
 
-topogSS = edinburghRainLib.read_90m_topog(ed_rgn,resample=topog_grid)
+topogSS = stonehavenRainLib.read_90m_topog(ed_rgn,resample=topog_grid)
 top_fit_grid = topogSS.interp_like(radar_precip.monthlyMax.isel(time=0).squeeze())
 msk=(top_fit_grid > 0 ) & (top_fit_grid < 200)
 
@@ -47,11 +47,11 @@ fig,axes = plt.subplots(nrows=1,ncols=2,num='Radar_QC',clear=True,subplot_kw=dic
 mean.median('time').plot(robust=True,ax=axes[0],cbar_kwargs=cbar_kwrds,levels=[1,1.5,2,2.5,3,3.5,4,4.5,5,10,20])
 mx_seas_rain.median('time').plot(robust=True,ax=axes[1],cbar_kwargs=cbar_kwrds)
 rgn = []
-for v in edinburghRainLib.edinburgh_castle.values():
+for v in stonehavenRainLib.stonehaven_crash.values():
     rgn.extend([v-50e3,v+50e3])
 for ax,title in zip(axes,['Monthly Mean Summer Rainfall (mm/day)',f'Summer Mean Monthly {radar_time}']):
     ax.set_extent(rgn,crs=projGB)
-    edinburghRainLib.std_decorators(ax,showregions=True)
+    stonehavenRainLib.std_decorators(ax,showregions=True)
     c=top_fit_grid.plot.contour(ax=ax,levels=[200],colors='black',transform=ccrs.PlateCarree())
     ax.set_title(title)
 
@@ -72,7 +72,7 @@ for ax,title in zip(axes[1],['AIC','nll']):
     ax.set_extent(rgn,crs=projGB)
     fit[title].plot(robust=True,cbar_kwargs=cbar_kwrds,ax=ax)
 for ax, title in zip(axes.flatten(), ['location', 'scale','AIC','nll']): #std stuff
-    edinburghRainLib.std_decorators(ax,showregions=True)
+    stonehavenRainLib.std_decorators(ax,showregions=True)
     c=top_fit_grid.plot.contour(ax=ax,levels=[200],colors='black',transform=ccrs.PlateCarree())
     ax.set_title(title)
 
@@ -83,7 +83,7 @@ fig_params.show()
 ## and plot it
 rgn = []
 rgn_dict={}
-for k,v in edinburghRainLib.edinburgh_castle.items():
+for k,v in stonehavenRainLib.stonehaven_crash.items():
     val=[v-50e3,v+50e3]
     rgn.extend(val)
     rgn_dict[k]=slice(val[0],val[1])
@@ -93,7 +93,7 @@ topog_lev = [-75,-50, -25, 0, 25, 50, 75, 100, 150, 200, 300, 400, 500]
 fig, ax = plt.subplots(subplot_kw=dict(projection=projGB),clear=True,num='topog')
 ax.set_extent(rgn,crs=projGB)
 cm=topog.sel(**rgn_dict).plot(ax=ax,robust=True,cmap='terrain',levels=topog_lev,add_colorbar=False)
-edinburghRainLib.std_decorators(ax)
+stonehavenRainLib.std_decorators(ax)
 fig.colorbar(cm,ax=ax,orientation='horizontal',
              label='Height/Baythmetry from ASL (m)',fraction=0.1,pad=0.1,aspect=30,ticks=topog_lev,spacing='proportional')
 fig.show()

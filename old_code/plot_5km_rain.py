@@ -4,7 +4,7 @@ plot some diagnosticvs from processed radar data
 import pandas as pd
 import xarray
 import matplotlib.pyplot as plt
-import edinburghRainLib
+import stonehavenRainLib
 import cartopy.crs as ccrs
 import scipy.stats
 import numpy as np
@@ -14,12 +14,12 @@ if read_data:
     print("Reading data")
     if gen_data:
         print("Generating data -- slow...")
-        ds=xarray.open_mfdataset("summary_5km/*monthly.nc",chunks=dict(time=24,projection_y_coordinate=40,projection_x_coordinate=40),combine='nested').sel(**commonLib.edinburgh_region).load()
+        ds=xarray.open_mfdataset("summary_5km/*monthly.nc",chunks=dict(time=24,projection_y_coordinate=40,projection_x_coordinate=40),combine='nested').sel(**commonLib.stonehaven_region).load()
         ds.to_netcdf("Edinburgh_extremes.nc")
     else:
         ds = xarray.load_dataset("Edinburgh_extremes.nc")
     print("Read monthly summary data")
-    seas_max=ds.monthlyMax.sel(**commonLib.edinburgh_region).resample(time='QS-Dec').max().load()
+    seas_max=ds.monthlyMax.sel(**commonLib.stonehaven_region).resample(time='QS-Dec').max().load()
     timeseries=dict()
     sites = commonLib.sites.copy()
     for name,loc in sites.items():
@@ -46,8 +46,8 @@ cbar_kwargs=dict(orientation='horizontal',pad=0.1,label='mm/hr')
 mn.mean('time').plot(ax=ax,robust=True,cmap=cmap, cbar_kwargs=cbar_kwargs)
 ax.coastlines()
 commonLib.std_decorators(ax)
-ext = [commonLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
-       commonLib.edinburgh_region['projection_y_coordinate'].start,commonLib.edinburgh_region['projection_y_coordinate'].stop]
+ext = [commonLib.stonehaven_region['projection_x_coordinate'].start,commonLib.stonehaven_region['projection_x_coordinate'].stop,
+       commonLib.stonehaven_region['projection_y_coordinate'].start,commonLib.stonehaven_region['projection_y_coordinate'].stop]
 ax.set_extent(ext,crs=proj)
 
 fig.tight_layout()

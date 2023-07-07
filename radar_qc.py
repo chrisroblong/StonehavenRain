@@ -6,7 +6,7 @@ Generated figure to be  used in SI.
 import scipy.stats
 
 import commonLib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
@@ -18,9 +18,9 @@ import pandas as pd
 
 
 
-file = edinburghRainLib.dataDir/'radar_precip/summary_1km_15min.nc'
-ed_rgn = {k:slice(v-50e3,v+50e3) for k,v in edinburghRainLib.edinburgh_castle.items()}
-radar = edinburghRainLib.gen_radar_data(region=ed_rgn)
+file = stonehavenRainLib.dataDir/'radar_precip/summary_1km_15min.nc'
+ed_rgn = {k:slice(v-50e3,v+50e3) for k,v in stonehavenRainLib.stonehaven_crash.items()}
+radar = stonehavenRainLib.gen_radar_data(region=ed_rgn)
 radar_precip=xarray.open_dataset(file).sel(**ed_rgn)
 radar_time = 'Rx15min'
 topog_grid=11
@@ -33,7 +33,7 @@ mx_seas_rain = radar_precip.monthlyMax.sel(time=summer).load()
 mx_SummerRain =mx_seas_rain.resample(time='QS-Jun').max().dropna('time') # max rain in a season
 
 ## get in the 90m topography
-topogSS = edinburghRainLib.read_90m_topog(ed_rgn,resample=topog_grid)
+topogSS = stonehavenRainLib.read_90m_topog(ed_rgn,resample=topog_grid)
 top_fit_grid = topogSS.interp_like(radar_precip.monthlyMax.isel(time=0).squeeze())
 
 
@@ -51,13 +51,13 @@ ax_max = fig.add_subplot(gs[0,1],projection=projGB)
 SummerRain.mean('time').plot(robust=True,ax=ax_summer,cbar_kwargs=cbar_kwrds,cmap=cmap)
 mx_SummerRain.mean('time').plot(robust=True,ax=ax_max,cbar_kwargs=cbar_kwrds,cmap=cmap)
 rgn = []
-for v in edinburghRainLib.edinburgh_castle.values():
+for v in stonehavenRainLib.stonehaven_crash.values():
     rgn.extend([v-50e3,v+50e3])
 
 for ax,title in zip([ax_summer,ax_max],['Mean JJA Rain (mm)',f'Mean JJA {radar_time} (mm/hr)']):
     ax.set_extent(rgn,crs=projGB)
-    edinburghRainLib.std_decorators(ax,showregions=True)
-    ax.plot(*edinburghRainLib.edinburgh_castle.values(), transform=projGB,
+    stonehavenRainLib.std_decorators(ax,showregions=True)
+    ax.plot(*stonehavenRainLib.stonehaven_crash.values(), transform=projGB,
             marker='o', color='purple', ms=9, alpha=0.7)
     c=top_fit_grid.plot.contour(ax=ax,levels=[200,400],colors='black',linewidths=2,linestyles=['solid','dashed'])
     ax.set_title(title)

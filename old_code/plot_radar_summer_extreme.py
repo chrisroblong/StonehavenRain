@@ -8,7 +8,7 @@ Some dodgy data that will need finding and (ignoring)
 see https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-extremes which should suggest some reasonable values
 """
 
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import matplotlib.pyplot as plt
 import numpy
@@ -28,7 +28,7 @@ levels=[]
 
 rgn=[]
 sel_rgn=dict()
-for key,value in edinburghRainLib.edinburgh_castle.items():
+for key,value in stonehavenRainLib.stonehaven_crash.items():
     r=[value-50e3,value+50e3]
     rgn.append(r)
     sel_rgn[key]=slice(r[0],r[1])
@@ -39,7 +39,7 @@ for ax,var,title in zip(axes.flatten(),
     var.sel(**sel_rgn).plot(ax=ax, robust=True, transform=proj)
     ax.set_extent(rgn,crs=proj)
     ax.set_title(f"{title} Summer Max Hourly Rainfall")
-    edinburghRainLib.std_decorators(ax)
+    stonehavenRainLib.std_decorators(ax)
 
 fig.show()
 
@@ -56,7 +56,7 @@ for ax,var,title in zip(axes.flatten(),
     #ax.set_extent([5e4,5e5,5e5,1.1e6],crs=proj)
     ax.set_extent([-4,-2.5,55.5,56.5],crs=ccrs.PlateCarree())
     ax.set_title(f"{title} Summer Max Hourly Rainfall")
-    edinburghRainLib.std_decorators(ax)
+    stonehavenRainLib.std_decorators(ax)
 
 fig.show()
 

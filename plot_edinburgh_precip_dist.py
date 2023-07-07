@@ -5,7 +5,7 @@ Top row: Rain/topog @ 15:00 4th July; Rain/topog @ 16:00 on 4th July; Rain/Topog
 Bottom Row:  Max 1km rain for summer 2021; distribution (from broader region)
 """
 import matplotlib.pyplot as plt
-import edinburghRainLib
+import stonehavenRainLib
 import commonLib
 import gev_r
 import cartopy.crs as ccrs
@@ -19,7 +19,7 @@ kw_colorbar=dict(orientation='horizontal',fraction=0.1,pad=0.1,aspect=30) # keyw
 # first get the data.
 readData = True ## needed first time code is run.
 bootstrap=False # if want the bootstraping done for uncertainties in the radar data fit. If False then data will be read in from cached files
-ed_rgn = edinburghRainLib.edinburgh_region
+ed_rgn = stonehavenRainLib.stonehaven_region
 rgn= []
 for k,v in ed_rgn.items():
     rgn.extend([v.start,v.stop])
@@ -30,22 +30,22 @@ if readData:
     # get the following datasets
     # 600m topography.
     # rainfall for 4th July 2021 -- 5 minute 1km radar & 15 minute 5km radar.
-    topog = xarray.load_dataset(edinburghRainLib.dataDir / 'GEBCO_topog_bathy_scotland.nc')
-    file1km= edinburghRainLib.nimrodRootDir/'uk-1km/2021/'/\
+    topog = xarray.load_dataset(stonehavenRainLib.dataDir / 'GEBCO_topog_bathy_scotland.nc')
+    file1km= stonehavenRainLib.nimrodRootDir/'uk-1km/2021/'/\
           'metoffice-c-band-rain-radar_uk_20210704_1km-composite.dat.gz.tar'
     print("Loading radar data for 2021-07-04")
-    rain1km=edinburghRainLib.extract_nimrod_day(file1km,QCmax=400.,region=ed_rgn)
+    rain1km=stonehavenRainLib.extract_nimrod_day(file1km,QCmax=400.,region=ed_rgn)
     print("Extracting radar data")
 
-    mc_dist = xarray.load_dataset(edinburghRainLib.dataDir/'radar_precip'/'bootstrap_reg_radar_params.nc')
-    radar_fit = xarray.load_dataset(edinburghRainLib.dataDir/'radar_precip'/'reg_radar_params.nc')
-    radar_data_all= xarray.load_dataset(edinburghRainLib.dataDir/'radar_precip'/'reg_radar_rain.nc')
+    mc_dist = xarray.load_dataset(stonehavenRainLib.dataDir/'radar_precip'/'bootstrap_reg_radar_params.nc')
+    radar_fit = xarray.load_dataset(stonehavenRainLib.dataDir/'radar_precip'/'reg_radar_params.nc')
+    radar_data_all= xarray.load_dataset(stonehavenRainLib.dataDir/'radar_precip'/'reg_radar_rain.nc')
     e_dist = emp_dist.empDist(radar_data_all.radar.sel(time_quant=qt))
     emp_rp = 1.0/e_dist.sf(rain)
     # get in the monthly max data and work out the rain at the Castle in July 2021 and Aug 2022
-    ds = xarray.load_dataset(edinburghRainLib.dataDir / 'radar_precip' / 'summary_1km_15Min.nc')
+    ds = xarray.load_dataset(stonehavenRainLib.dataDir / 'radar_precip' / 'summary_1km_15Min.nc')
     castle_rain = ds.monthlyMax.sel(time=(ds.monthlyMax.time.dt.season == 'JJA')).\
-        sel(time=['2020-08-31','2021-07-31'],**edinburghRainLib.edinburgh_castle,method='nearest').load()
+        sel(time=['2020-08-31','2021-07-31'],**stonehavenRainLib.stonehaven_crash,method='nearest').load()
 
     print("read data")
 
@@ -70,12 +70,12 @@ for indx,time in enumerate(['2021-07-04T15:00','2021-07-04T16:00','2021-07-04T17
     ax.set_extent(rgn,crs=projGB)
     cmt=topog.elevation.plot(ax=ax, transform=ccrs.PlateCarree(), add_colorbar=False, cmap='terrain',
                          levels=topog_lev)
-    ax.plot(*edinburghRainLib.edinburgh_castle.values(), transform=projGB,
+    ax.plot(*stonehavenRainLib.stonehaven_crash.values(), transform=projGB,
             marker='o', color='purple', ms=9, alpha=0.7)
     r=rain1km.sel(time=time)
     r=xarray.where(r > 1,r,np.nan) # remove light  rain.
     cmr=r.plot(ax=ax,transform=projGB,add_colorbar=False,cmap='Blues',levels=rn_levels)
-    edinburghRainLib.std_decorators(ax)
+    stonehavenRainLib.std_decorators(ax)
     ax.set_title(f"Rain at {time[-5:]} ")
     scalebar = ScaleBar(1, "m", **scalebarprops)
     ax.add_artist(scalebar)
@@ -88,9 +88,9 @@ ax=fig.add_subplot(2,3,4)
 axes.append(ax)
 time_rng=slice('2021-07-04T15:00','2021-07-04T19:00')
 trans=dict(botanics='RBGE',castle='Ed. Castle')
-for name,site in edinburghRainLib.sites.items():
+for name,site in stonehavenRainLib.sites.items():
     ts=rain1km.sel(**site,method='nearest').sel(time=time_rng)
-    color = edinburghRainLib.colors[name]
+    color = stonehavenRainLib.colors[name]
     total_rain = float(ts.resample(time='1h').mean().sum()) # total rain over the period.
     label = trans[name]+f" {total_rain:3.0f} mm"
     ts.plot.step(ax=ax,color=color,linewidth=2,label=label)
@@ -101,13 +101,13 @@ ax.legend(fontsize='small')
 
 ed_narrow= dict()
 rr=[]
-for k,v in edinburghRainLib.edinburgh_castle.items(): # 20x20km around edinburgh
+for k,v in stonehavenRainLib.stonehaven_crash.items(): # 20x20km around edinburgh
     ed_narrow[k]=slice(v-15e3,v+15e3)
     rr.extend([v-10e3,v+10e3])
 # subplot for max.
 ax=fig.add_subplot(2,3,5,projection=projGB)
 axes.append(ax)
-ax.plot(edinburghRainLib.edinburgh_castle.values())
+ax.plot(stonehavenRainLib.stonehaven_crash.values())
 ax.set_extent(rr,crs=projGB)
 topog.elevation.plot(ax=ax, transform=ccrs.PlateCarree(), add_colorbar=False, cmap='terrain',
                          levels=topog_lev)
@@ -115,9 +115,9 @@ rn15min =rain1km.sel(**ed_narrow).rolling(time=3).mean().max('time') #max 15 min
 rn15min = xarray.where(rn15min > 10,rn15min,np.nan)
 cr15=rn15min.plot(ax=ax,levels=rn_levels,cmap='Blues',add_colorbar=False)
 ax.set_title('15 Min Max (mm/hr)')
-edinburghRainLib.std_decorators(ax)
-for name, site in edinburghRainLib.sites.items():
-    color=edinburghRainLib.colors[name]
+stonehavenRainLib.std_decorators(ax)
+for name, site in stonehavenRainLib.sites.items():
+    color=stonehavenRainLib.colors[name]
     ax.plot(*site.values(), transform=projGB,
             marker='o', color=color, ms=8, alpha=0.7)
 scalebar = ScaleBar(1, "m", **scalebarprops)
@@ -142,7 +142,7 @@ ax.set_title("Regional Return Period")
 for v in [10,100]:
     ax.axhline(v,linestyle='dashed')
 # add on the appropriate value for 2021  & 2020
-color=edinburghRainLib.colors['castle']
+color=stonehavenRainLib.colors['castle']
 value = float(radar_data.critical2021)
 value2020 = float(radar_data.critical2020)
 ax.axvline(value,color=color,linestyle='solid')

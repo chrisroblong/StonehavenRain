@@ -7,17 +7,17 @@ import scipy.stats
 import matplotlib.pyplot as plt
 import gev_r # so we have R up and running!
 import commonLib
-import edinburghRainLib
+import stonehavenRainLib
 import statsmodels.graphics.gofplots
 import numpy as np
 import pandas as pd
-ed_rgn = edinburghRainLib.edinburgh_region
+ed_rgn = stonehavenRainLib.stonehaven_region
 #import gev_r
 dist=scipy.stats.genextreme
 rgn= []
 for k,v in ed_rgn.items():
     rgn.extend([v.start,v.stop])
-radar = edinburghRainLib.gen_radar_data()
+radar = stonehavenRainLib.gen_radar_data()
 radar_data = radar.radar
 #radar_data, edRain, rainCount,rain_indx =
 
@@ -76,9 +76,9 @@ def qsat(temperature):
 
 ## read in the data we need
 
-cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_cpm.nc').tas
+cet = xarray.load_dataset(stonehavenRainLib.dataDir / 'cet_cpm.nc').tas
 ed_extreme_precip = xarray.load_dataset(
-    edinburghRainLib.dataDir / 'ed_reg_max_precip.nc').pr  ##.isel(grid_longitude=slice(10,20),grid_latitude=slice(10,20))
+    stonehavenRainLib.dataDir / 'ed_reg_max_precip.nc').pr  ##.isel(grid_longitude=slice(10,20),grid_latitude=slice(10,20))
 
 ed_ext=ed_extreme_precip.sel(grid_latitude=3.45,grid_longitude=359.62,method='nearest').load()
 df_data = [ed_ext.values.flatten()]
@@ -101,6 +101,6 @@ print("Fit data")
 # and plot it.
 robjects.r('plot(result,type="qq")')
 # and save it
-path=edinburghRainLib.fig_dir/'rplot_qq.png'
+path=stonehavenRainLib.fig_dir/'rplot_qq.png'
 path = r'../figures/rplot_qq.png'
 robjects.r(f'savePlot(filename="{str(path)}",type="png")')

@@ -6,15 +6,15 @@ import numpy as np
 import xarray
 import rioxarray
 import cartopy.crs as ccrs
-import edinburghRainLib
+import stonehavenRainLib
 import commonLib
 import GSHHS_WDBII
 
 gshhs = GSHHS_WDBII.GSHHS_WDBII()
 coastline = gshhs.coastlines(scale='full')
 
-topog =xarray.load_dataset(edinburghRainLib.dataDir/'GEBCO_topog_bathy_scotland.nc')
-land=rioxarray.open_rasterio(edinburghRainLib.dataDir/r"u2018_clc2018_v2020_20u1_raster100m\DATA\U2018_CLC2018_V2020_20u1.tif",
+topog =xarray.load_dataset(stonehavenRainLib.dataDir/'GEBCO_topog_bathy_scotland.nc')
+land=rioxarray.open_rasterio(stonehavenRainLib.dataDir/r"u2018_clc2018_v2020_20u1_raster100m\DATA\U2018_CLC2018_V2020_20u1.tif",
                              chunks='auto',masked=True)# get in the Corraine Land Cover dataset
 land = land.sel(x=slice(3.4e6,3.6e6),y=slice(3.8e6,3.6e6))
 land = land.where(land >0)
@@ -24,7 +24,7 @@ proj = ccrs.epsg(3035) # for land cover
 projectionOS = ccrs.OSGB() # for GB grid
 rgn_far=[]
 rgn_close=[]
-for r in edinburghRainLib.edinburgh_castle.values():
+for r in stonehavenRainLib.stonehaven_crash.values():
     rgn_far.extend([r-50e3,r+50e3]) # within 50 km
     rgn_close.extend([r - 7.5e3, r + 7.5e3]) # within 7.5km
 
@@ -35,8 +35,8 @@ for ax,rgn,title in zip(axes.flatten(),[rgn_far,rgn_close],['SE Scotland','City 
     ax.set_extent(rgn,crs=projectionOS)
     cm=topog.elevation.plot(robust=True,ax=ax,transform=ccrs.PlateCarree(),levels=topog_lev,cmap='terrain',add_colorbar=False)
     urb.plot(ax=ax,add_colorbar=False,transform=proj,levels=[0.99,1.01],colors='black',alpha=0.5)
-    edinburghRainLib.std_decorators(ax)
-    ax.plot(*edinburghRainLib.edinburgh_castle.values(),transform=projectionOS,marker='o',color='purple',ms=6,alpha=0.7)
+    stonehavenRainLib.std_decorators(ax)
+    ax.plot(*stonehavenRainLib.stonehaven_crash.values(),transform=projectionOS,marker='o',color='purple',ms=6,alpha=0.7)
     ax.set_title(title)
     if len(dl) == 1:
         dl.update(left='y')

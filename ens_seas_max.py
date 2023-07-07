@@ -9,7 +9,7 @@ and time of seasonal extreme for data.
 """
 
 import pathlib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import numpy as np
 import pandas as pd
@@ -18,7 +18,7 @@ import resource # so we can see memory usage
 import warnings
 
 import pathlib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import numpy as np
 import pandas as pd

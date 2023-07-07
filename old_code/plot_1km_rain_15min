@@ -5,7 +5,7 @@ plot some diagnostics from processed 1km 15 min  radar data
 import pandas as pd
 import xarray
 import matplotlib.pyplot as plt
-import edinburghRainLib
+import stonehavenRainLib
 import cartopy.crs as ccrs
 import scipy.stats
 import numpy as np
@@ -18,21 +18,21 @@ if read_data:
     if gen_data:
         print("Generating data -- slow...")
         dask.config.set({"array.slicing.split_large_chunks": True})
-        ds=xarray.open_mfdataset("summary_1km_15min/*monthly.nc",chunks=dict(time=24,projection_y_coordinate=200,projection_x_coordinate=200),combine='nested').sel(**commonLib.edinburgh_region).load()
+        ds=xarray.open_mfdataset("summary_1km_15min/*monthly.nc",chunks=dict(time=24,projection_y_coordinate=200,projection_x_coordinate=200),combine='nested').sel(**commonLib.stonehaven_region).load()
         ds.to_netcdf("Edinburgh_extremes_1km_15min.nc")
     else:
         ds = xarray.load_dataset("Edinburgh_extremes_1km_15min.nc")
     print("Read monthly summary data")
-    seas_max=ds.monthlyMax.sel(**edinburghRainLib.edinburgh_region).resample(time='QS-Dec').max().load()
+    seas_max=ds.monthlyMax.sel(**stonehavenRainLib.stonehaven_region).resample(time='QS-Dec').max().load()
     timeseries=dict()
-    for name,loc in edinburghRainLib.sites.items():
+    for name,loc in stonehavenRainLib.sites.items():
         timeseries[name]=ds.monthlyMax.sel(method='nearest',**loc).resample(time='QS-Dec').max().load()
 
 
 ## make some plots for summer. 
 fig,ax = plt.subplots(nrows=1,ncols=1,num='ed_ts_1km_15min',clear=True,figsize=[8,5])
 for name, ts in timeseries.items():
-    col=edinburghRainLib.colors[name]
+    col=stonehavenRainLib.colors[name]
     ts.sel(time=(ts.time.dt.month==6)).plot.line(color=col,ax=ax,label=name)
 ax.legend()
 ax.set_title("Seasonal Max 15min Rainfall (mm/hr) 1km")
@@ -48,9 +48,9 @@ mn = seas_max.sel(time=(seas_max.time.dt.month == 6))
 cbar_kwargs=dict(orientation='horizontal',pad=0.1,label='mm/hr')
 mn.mean('time').plot(ax=ax,robust=True,cmap=cmap, cbar_kwargs=cbar_kwargs)
 ax.coastlines()
-edinburghRainLib.std_decorators(ax)
-ext = [edinburghRainLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
-       edinburghRainLib.edinburgh_region['projection_y_coordinate'].start,commonLib.edinburgh_region['projection_y_coordinate'].stop]
+stonehavenRainLib.std_decorators(ax)
+ext = [stonehavenRainLib.stonehaven_region['projection_x_coordinate'].start,commonLib.stonehaven_region['projection_x_coordinate'].stop,
+       stonehavenRainLib.stonehaven_region['projection_y_coordinate'].start,commonLib.stonehaven_region['projection_y_coordinate'].stop]
 ax.set_extent(ext,crs=proj)
 
 fig.tight_layout()

@@ -1,7 +1,7 @@
 # plot the july 4th 2021 extremes near Edinburgh from 1km and 5km data
 import matplotlib.pyplot as plt
 import xarray
-import edinburghRainLib
+import stonehavenRainLib
 import pathlib
 import cartopy.crs as ccrs
 import numpy as np
@@ -22,7 +22,7 @@ rgn = dict(projection_x_coordinate=slice(5e4,5e5),
 edinburgh = dict(projection_x_coordinate=325847,
            projection_y_coordinate=674007)
 
-edinburgh_castle = dict(projection_x_coordinate=325166,
+stonehaven_crash = dict(projection_x_coordinate=325166,
            projection_y_coordinate=673477)
 
 
@@ -93,8 +93,8 @@ fig, axes = plt.subplots(nrows=1, ncols=2, clear=True, sharex=True, sharey=True,
                          num=f'UKradar{year}_{month:02d}_{day:02d}', figsize=[11, 7],
                          subplot_kw=dict(projection=proj))
 
-ext = [commonLib.edinburgh_region['projection_x_coordinate'].start,commonLib.edinburgh_region['projection_x_coordinate'].stop,
-       commonLib.edinburgh_region['projection_y_coordinate'].start,commonLib.edinburgh_region['projection_y_coordinate'].stop]
+ext = [commonLib.stonehaven_region['projection_x_coordinate'].start,commonLib.stonehaven_region['projection_x_coordinate'].stop,
+       commonLib.stonehaven_region['projection_y_coordinate'].start,commonLib.stonehaven_region['projection_y_coordinate'].stop]
 
 for ax,key,var,levels in zip(axes.flatten(),['1km 15min','5km hr'],[rain15m,rain1h],
                                 [levels_15m,levels_1h]):

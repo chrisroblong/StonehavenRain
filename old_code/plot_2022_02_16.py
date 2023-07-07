@@ -1,7 +1,7 @@
 # plot the 2022-02-16 1km data for the UK
 import matplotlib.pyplot as plt
 import xarray
-import edinburghRainLib
+import stonehavenRainLib
 import pathlib
 import cartopy.crs as ccrs
 import numpy as np
@@ -21,7 +21,7 @@ rgn=None
 
 
 # sites we want to plot and the colors they are.
-sites=dict(edinburgh=commonLib.edinburgh_castle)
+sites=dict(edinburgh=commonLib.stonehaven_crash)
 colors=dict(edinburgh='black')
 #nimrodDir= pathlib.Path(f"/badc/ukmo-nimrod/data/composite/uk-{resoln}")
 nimrodDir = commonLib.dataDir/'raw_data'

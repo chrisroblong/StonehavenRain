@@ -15,7 +15,7 @@ This code will generate the fits if data does not exist or recreate_fit is True.
 import pathlib
 
 import commonLib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
@@ -98,21 +98,21 @@ def qsat(temperature):
 
 
 # where all the processed data goes.
-outdir_gev = edinburghRainLib.dataDir / 'gev_fits_roll'
+outdir_gev = stonehavenRainLib.dataDir / 'gev_fits_roll'
 outdir_gev.mkdir(parents=True, exist_ok=True)  # create the directory
 
 ## read in the data we need
-covariate_dir = edinburghRainLib.dataDir / "covariates"
+covariate_dir = stonehavenRainLib.dataDir / "covariates"
 cet = xarray.load_dataset(covariate_dir/ 'cet_tas.nc').tas
 cpm = xarray.load_dataset(covariate_dir/ 'cpm_reg_tas.nc').tas
 
 ed_temp = xarray.load_dataset(covariate_dir / 'ed_reg_tas.nc').tas
 ed_precip = xarray.load_dataset(covariate_dir / 'ed_reg_pr.nc').pr
 ed_reg_hum=qsat(ed_temp)
-cpm_files=list((edinburghRainLib.dataDir/'CPM_data').glob("**/*.nc"))
+cpm_files=list((stonehavenRainLib.dataDir/'CPM_data').glob("**/*.nc"))
 ed_extreme_precip = xarray.open_mfdataset(cpm_files).seasonalMax
 # now extract roughly 100x100 km box centred on Edinburgh and only for summer
-ed_rot = edinburghRainLib.rotated_coords['Edinburgh']
+ed_rot = stonehavenRainLib.rotated_coords['Edinburgh']
 ed_rgn_rot=dict()
 for c,name in zip(ed_rot,['grid_longitude','grid_latitude']):
     ed_rgn_rot[name]= slice(c-0.5,c+0.5)
@@ -122,7 +122,7 @@ ed_extreme_precip= ed_extreme_precip.sel(**ed_rgn_rot).load()
 
 
 # get in the topographic info for the CPM. Note coords differ slightly from ed_extreme prob due to FP changes.
-cpm_ht = xarray.load_dataset(edinburghRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
+cpm_ht = xarray.load_dataset(stonehavenRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
 cpm_ht = cpm_ht.sel(
     longitude=slice(ed_extreme_precip.grid_longitude.min() - 0.01, ed_extreme_precip.grid_longitude.max() + 0.01),
     latitude=slice(ed_extreme_precip.grid_latitude.min() - 0.01, ed_extreme_precip.grid_latitude.max() + 0.01))
@@ -182,7 +182,7 @@ def comp_bootstrap(ratio_Dparam,cpm_ht,direct=None,filename_start=None,refresh=F
     if refresh or (not bs_file.exists()):
         print("Making mean and boostrap of params")
         L = (cpm_ht > 0) & (cpm_ht < 200)
-        ratio_Dparam_flatten = ratio_Dparam.where(L).stack(horizontal=edinburghRainLib.cpm_horizontal_coords)
+        ratio_Dparam_flatten = ratio_Dparam.where(L).stack(horizontal=stonehavenRainLib.cpm_horizontal_coords)
         ratio_Dparam_flatten = ratio_Dparam_flatten.where(np.isfinite(ratio_Dparam_flatten), drop=True)
         nCPM = ratio_Dparam_flatten.sel(parameter='Dlocation').sel(rolling=1).size
         mn_ratio = ratio_Dparam_flatten.mean('horizontal')
@@ -243,7 +243,7 @@ ed_precip_summer = comp_summer(ed_precip)
 cet_summer = comp_summer(cet)
 obs_cet_summer = comp_summer(obs_cet.sel(time=slice('1850',None)))
 ed_qsat_summer = comp_summer(ed_qsat)
-median_max_Rx1hr=ed_extreme_precip.where(msk,np.nan).median(edinburghRainLib.cpm_horizontal_coords)
+median_max_Rx1hr=ed_extreme_precip.where(msk,np.nan).median(stonehavenRainLib.cpm_horizontal_coords)
 fig_scatter,axes=plt.subplots(nrows=2,ncols=2,num='cet_scatter',figsize=[8,5],clear=True)
 
 def plot_regress(x,y,ax):
@@ -308,7 +308,7 @@ linear_fit['qsat'].save(outdir_gev/'cet_qsat_fit.sav')
 projRot=ccrs.RotatedPole(pole_longitude=177.5,pole_latitude=37.5)
 plot_kws=dict(projection=projRot)
 rgn= []
-for k,v in edinburghRainLib.edinburgh_region.items():
+for k,v in stonehavenRainLib.stonehaven_region.items():
     rgn.extend([v.start,v.stop])
 
 kw_cbar=dict(orientation='horizontal',label='',fraction=0.1,pad=0.15,extend='both')
@@ -327,8 +327,8 @@ for p in ['location','scale']:
     params_today.sel(parameter=p,rolling=1).plot(ax=ax,robust=True,cbar_kwargs=kw_cbar,cmap='Blues')
     c=cpm_ht.plot.contour(levels=[200,400],colors=['black'],linewidths=2,linestyles=['solid','dashed'],ax=ax)
     ax.set_title(p.capitalize())
-    edinburghRainLib.std_decorators(ax)
-    ax.plot(*edinburghRainLib.edinburgh_castle.values(), transform=ccrs.OSGB(),
+    stonehavenRainLib.std_decorators(ax)
+    ax.plot(*stonehavenRainLib.stonehaven_crash.values(), transform=ccrs.OSGB(),
             marker='o', color='purple', ms=9, alpha=0.7)
     label.plot(ax)
 # scatter plot
@@ -358,7 +358,7 @@ def scatter_dloc_scale(ax,ratio_Dparam,ratio_mean,ratio_bootstrap,cpm_ht,topog_l
     # Only keep hts where between 0 and 200.
     L = (cpm_ht > 0) & (cpm_ht < 200)
     rrm=rr.where(L,np.nan)
-    rrm=rrm.stack(horizontal=edinburghRainLib.cpm_horizontal_coords)
+    rrm=rrm.stack(horizontal=stonehavenRainLib.cpm_horizontal_coords)
     rrm=rrm.where(np.isfinite(rrm),drop=True)
     e2=confidence_ellipse(rrm.sel(parameter='Dlocation'),rrm.sel(parameter='Dscale'),ax,n_std=2,
                          edgecolor='black',linewidth=4)
@@ -400,7 +400,7 @@ fig.colorbar(cm,ax=ax_scatters,orientation='horizontal',label='',fraction=0.075,
 # plot qq-plots for covariate fits
 ## plot the fits for CPM data
 cet = xarray.load_dataset(covariate_dir / 'cet_tas.nc').tas
-ed=edinburghRainLib.rotated_coords['Edinburgh']
+ed=stonehavenRainLib.rotated_coords['Edinburgh']
 ed_ext=ed_extreme_precip.sel(grid_latitude=ed[1],grid_longitude=ed[0],method='nearest',rolling=1).load() #
 ed_west_ext = ed_extreme_precip.sel(grid_latitude=ed[1],grid_longitude=ed[0]-0.25,method='nearest',rolling=1).load() #
 ed_north_ext=ed_extreme_precip.sel(grid_latitude=ed[1]+0.25,grid_longitude=ed[0],method='nearest',rolling=1).load() #
@@ -446,15 +446,15 @@ L = (cpm_ht > 0) & (cpm_ht < 200)
 with np.printoptions(precision=0):
 
     print("All pts")
-    print("No varn             ", fit_nocov.AIC.mean(edinburghRainLib.cpm_horizontal_coords).values)
+    print("No varn             ", fit_nocov.AIC.mean(stonehavenRainLib.cpm_horizontal_coords).values)
     for k in xfit.keys():
-        print("d locn & scale       ", k,xfit[k].AIC.mean(edinburghRainLib.cpm_horizontal_coords).values)
-        print("d locn, scale& shape ", k, xfit_shape[k].AIC.mean(edinburghRainLib.cpm_horizontal_coords).values)
+        print("d locn & scale       ", k,xfit[k].AIC.mean(stonehavenRainLib.cpm_horizontal_coords).values)
+        print("d locn, scale& shape ", k, xfit_shape[k].AIC.mean(stonehavenRainLib.cpm_horizontal_coords).values)
     print("Low pts")
-    print("No varn             ", fit_nocov.AIC.where(L).mean(edinburghRainLib.cpm_horizontal_coords).values)
+    print("No varn             ", fit_nocov.AIC.where(L).mean(stonehavenRainLib.cpm_horizontal_coords).values)
     for k in xfit.keys():
-        print("d locn & scale       ", k,xfit[k].AIC.where(L).mean(edinburghRainLib.cpm_horizontal_coords).values)
-        print("d locn, scale& shape ", k, xfit_shape[k].where(L).AIC.mean(edinburghRainLib.cpm_horizontal_coords).values)
+        print("d locn & scale       ", k,xfit[k].AIC.where(L).mean(stonehavenRainLib.cpm_horizontal_coords).values)
+        print("d locn, scale& shape ", k, xfit_shape[k].where(L).AIC.mean(stonehavenRainLib.cpm_horizontal_coords).values)
 
 
 

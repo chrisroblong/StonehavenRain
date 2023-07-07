@@ -12,7 +12,7 @@ This code will generate the fits if data does not exist or recreate_fit is True.
 """
 
 import commonLib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
@@ -95,21 +95,21 @@ def qsat(temperature):
 
 
 
-outdir_gev = edinburghRainLib.dataDir / 'gev_fits'
+outdir_gev = stonehavenRainLib.dataDir / 'gev_fits'
 outdir_gev.mkdir(parents=True, exist_ok=True)  # create the directory
 
 ## read in the data we need
-cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_tas.nc').tas
-cpm = xarray.load_dataset(edinburghRainLib.dataDir / 'cpm_reg_tas.nc').tas
+cet = xarray.load_dataset(stonehavenRainLib.dataDir / 'cet_tas.nc').tas
+cpm = xarray.load_dataset(stonehavenRainLib.dataDir / 'cpm_reg_tas.nc').tas
 
-ed_temp = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_tas.nc').tas
-ed_precip = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_pr.nc').pr
+ed_temp = xarray.load_dataset(stonehavenRainLib.dataDir / 'ed_reg_tas.nc').tas
+ed_precip = xarray.load_dataset(stonehavenRainLib.dataDir / 'ed_reg_pr.nc').pr
 ed_reg_hum=qsat(ed_temp)
 ed_extreme_precip = xarray.load_dataset(
-    edinburghRainLib.dataDir / 'ed_reg_max_precip.nc').pr  ##.isel(grid_longitude=slice(10,20),grid_latitude=slice(10,20))
+    stonehavenRainLib.dataDir / 'ed_reg_max_precip.nc').pr  ##.isel(grid_longitude=slice(10,20),grid_latitude=slice(10,20))
 
 # get in the topographic info for the CPM. Note coords differ slightly from ed_extreme prob due to FP changes.
-cpm_ht = xarray.load_dataset(edinburghRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
+cpm_ht = xarray.load_dataset(stonehavenRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
 cpm_ht = cpm_ht.sel(
     longitude=slice(ed_extreme_precip.grid_longitude.min() - 0.01, ed_extreme_precip.grid_longitude.max() + 0.01),
     latitude=slice(ed_extreme_precip.grid_latitude.min() - 0.01, ed_extreme_precip.grid_latitude.max() + 0.01))
@@ -148,17 +148,17 @@ D=xfit[rgn].Parameters.sel(parameter=['Dlocation','Dscale'])#.where(msk)
 params_today = gev_r.param_at_cov(xfit[rgn].Parameters,t_today)
 ratio_Dparam = D/params_today.sel(parameter=['location','scale']).assign_coords(parameter=['Dlocation','Dscale'])
 # and want to save the scaling ratios so they can be applied to the precipitation data.
-ratio_Dparam.to_netcdf(edinburghRainLib.dataDir/'gev_fits'/f'{rgn}_sens_gev_params.nc')
-xfit[rgn].to_netcdf(edinburghRainLib.dataDir/'gev_fits'/f'{rgn}_gev_params.nc')
+ratio_Dparam.to_netcdf(stonehavenRainLib.dataDir/'gev_fits'/f'{rgn}_sens_gev_params.nc')
+xfit[rgn].to_netcdf(stonehavenRainLib.dataDir/'gev_fits'/f'{rgn}_gev_params.nc')
 # let's (if wanted) make the mean and bootstrap data.
-bs_file= edinburghRainLib.dataDir/'gev_fits'/f'{rgn}_bootstrap_scale.nc'
-mn_file= edinburghRainLib.dataDir/'gev_fits'/f'{rgn}_mean_scale.nc'
+bs_file= stonehavenRainLib.dataDir/'gev_fits'/f'{rgn}_bootstrap_scale.nc'
+mn_file= stonehavenRainLib.dataDir/'gev_fits'/f'{rgn}_mean_scale.nc'
 if refresh or (not bs_file.exists()):
     print("Making mean and boostrap of params")
     fract_sample = 1e-2 # how many samples to take each bs -- crude hack for auto-correlation
     nboot = 1000 # how many bootstrap samples to take
     L = (cpm_ht > 0) & (cpm_ht < 200)
-    ratio_Dparam_flatten = ratio_Dparam.where(L).stack(horizontal=edinburghRainLib.cpm_horizontal_coords)
+    ratio_Dparam_flatten = ratio_Dparam.where(L).stack(horizontal=stonehavenRainLib.cpm_horizontal_coords)
     ratio_Dparam_flatten = ratio_Dparam_flatten.where(np.isfinite(ratio_Dparam_flatten), drop=True)
     nCPM=ratio_Dparam_flatten.sel(parameter='Dlocation').size
     mn_ratio = ratio_Dparam_flatten.mean('horizontal')
@@ -203,7 +203,7 @@ ed_precip_summer = comp_summer(ed_precip)
 cet_summer = comp_summer(cet)
 obs_cet_summer = comp_summer(obs_cet.sel(time=slice('1850',None)))
 ed_qsat_summer = comp_summer(ed_qsat)
-median_max_Rx15min=ed_extreme_precip.where(msk,np.nan).median(edinburghRainLib.cpm_horizontal_coords)
+median_max_Rx15min=ed_extreme_precip.where(msk,np.nan).median(stonehavenRainLib.cpm_horizontal_coords)
 fig_scatter,axes=plt.subplots(nrows=2,ncols=2,num='cet_scatter',figsize=[8,5],clear=True)
 
 def plot_regress(x,y,ax):
@@ -261,7 +261,7 @@ commonLib.saveFig(fig_scatter)
 f=linear_fit['qsat'].get_prediction([1,t_today])
 cc_scale = 100*(linear_fit['qsat'].params[1]/f.predicted_mean)
 # save the qsat fit
-linear_fit['qsat'].save(edinburghRainLib.dataDir/'gev_fits'/'cet_qsat_fit.sav')
+linear_fit['qsat'].save(stonehavenRainLib.dataDir/'gev_fits'/'cet_qsat_fit.sav')
 # and the decline in precipit.
 f=linear_fit['Ed_Precip'].get_prediction([1,t_today])
 rain_change = 100*float(linear_fit['Ed_Precip'].params[1]/f.predicted_mean)
@@ -270,7 +270,7 @@ rain_change = 100*float(linear_fit['Ed_Precip'].params[1]/f.predicted_mean)
 projRot=ccrs.RotatedPole(pole_longitude=177.5,pole_latitude=37.5)
 plot_kws=dict(projection=projRot)
 rgn= []
-for k,v in edinburghRainLib.edinburgh_region.items():
+for k,v in stonehavenRainLib.stonehaven_region.items():
     rgn.extend([v.start,v.stop])
 
 kw_cbar=dict(orientation='horizontal',label='',fraction=0.1,pad=0.15,extend='both')
@@ -289,8 +289,8 @@ for p in ['location','scale']:
     params_today.sel(parameter=p).plot(ax=ax,robust=True,cbar_kwargs=kw_cbar,cmap='Blues')
     c=cpm_ht.plot.contour(levels=[200,400],colors=['black'],linewidths=2,linestyles=['solid','dashed'],ax=ax)
     ax.set_title(p.capitalize())
-    edinburghRainLib.std_decorators(ax)
-    ax.plot(*edinburghRainLib.edinburgh_castle.values(), transform=ccrs.OSGB(),
+    stonehavenRainLib.std_decorators(ax)
+    ax.plot(*stonehavenRainLib.stonehaven_crash.values(), transform=ccrs.OSGB(),
             marker='o', color='purple', ms=9, alpha=0.7)
     label.plot(ax)
 # scatter plot
@@ -310,7 +310,7 @@ e=confidence_ellipse(bootstrap_ratio.sel(parameter='Dlocation').values,
 # Only keep hts where between 0 and 200.
 L = (cpm_ht > 0) & (cpm_ht < 200)
 rr=rr.where(L,np.nan)
-rr=rr.stack(horizontal=edinburghRainLib.cpm_horizontal_coords)
+rr=rr.stack(horizontal=stonehavenRainLib.cpm_horizontal_coords)
 rr=rr.where(np.isfinite(rr),drop=True)
 e2=confidence_ellipse(rr.sel(parameter='Dlocation'),rr.sel(parameter='Dscale'),ax,n_std=2,
                      edgecolor='black',linewidth=4)
@@ -325,9 +325,9 @@ label.plot(ax)
 
 # plot qq-plots for covariate fits
 ## plot the fits for CPM data
-cet = xarray.load_dataset(edinburghRainLib.dataDir / 'cet_tas.nc').tas
-ed_extreme_precip = xarray.load_dataset(edinburghRainLib.dataDir / 'ed_reg_max_precip.nc').pr
-ed=edinburghRainLib.rotated_coords['Edinburgh']
+cet = xarray.load_dataset(stonehavenRainLib.dataDir / 'cet_tas.nc').tas
+ed_extreme_precip = xarray.load_dataset(stonehavenRainLib.dataDir / 'ed_reg_max_precip.nc').pr
+ed=stonehavenRainLib.rotated_coords['Edinburgh']
 ed_ext=ed_extreme_precip.sel(grid_latitude=ed[1],grid_longitude=ed[0],method='nearest').load() #
 ed_west_ext = ed_extreme_precip.sel(grid_latitude=ed[1],grid_longitude=ed[0]-0.25,method='nearest').load() #
 ed_north_ext=ed_extreme_precip.sel(grid_latitude=ed[1]+0.25,grid_longitude=ed[0],method='nearest').load() #

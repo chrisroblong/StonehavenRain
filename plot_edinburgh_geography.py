@@ -7,7 +7,7 @@ Plan of castle. + scalebar
 import matplotlib.pyplot as plt
 from matplotlib_scalebar.scalebar import ScaleBar
 import rioxarray
-import edinburghRainLib
+import stonehavenRainLib
 import commonLib
 import cartopy.crs as ccrs
 import numpy as np
@@ -15,14 +15,14 @@ import xarray
 import cartopy.mpl
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
-ed_rgn = edinburghRainLib.edinburgh_region
+ed_rgn = stonehavenRainLib.stonehaven_region
 rgn= []
 for k,v in ed_rgn.items():
     rgn.extend([v.start,v.stop])
 
 ed_detail = []
 ed_detail_sel = dict()
-for k, v in edinburghRainLib.edinburgh_castle.items():
+for k, v in stonehavenRainLib.stonehaven_crash.items():
     ed_detail.extend([v - 1e3, v + 1e3])
     ed_detail_sel[k] = slice(v - 1e3, v + 1e3)
 
@@ -39,17 +39,17 @@ labels={'Edinburgh':[330e3,677e3],
         "NL":[277e3,662e3],# North Lanarkshire
         "S":[276e3,697e3]
         }
-#castle_img = plt.imread(edinburghRainLib.dataDir/'images'/'Castle_from_Princes_Street,_Edinburgh.jpg') # from https://commons.wikimedia.org/wiki/File:Castle_from_Princes_Street,_Edinburgh.JPG
+#castle_img = plt.imread(stonehavenRainLib.dataDir/'images'/'Castle_from_Princes_Street,_Edinburgh.jpg') # from https://commons.wikimedia.org/wiki/File:Castle_from_Princes_Street,_Edinburgh.JPG
 
-castle_img = plt.imread(edinburghRainLib.dataDir/'images'/'Edinburgh_castle_jessica.jpg') # from Jessica.
-castle_plan = plt.imread(edinburghRainLib.dataDir/'images'/'Edinburgh_Castle_Plan.png')
+castle_img = plt.imread(stonehavenRainLib.dataDir/'images'/'stonehaven_crash_jessica.jpg') # from Jessica.
+castle_plan = plt.imread(stonehavenRainLib.dataDir/'images'/'stonehaven_crash_Plan.png')
 topog_lev = [-50, -25, 0, 25, 50, 75, 100, 150, 200, 300, 400, 500,750]
 kw_colorbar=dict(orientation='vertical',fraction=0.2,pad=0.05,aspect=30,label='Height (m)',ticks=topog_lev) # keywords for colorbars.
 textprops = dict(backgroundcolor='grey',alpha=0.5,bbox=dict(pad=0)) # text props for plotting
 scalebarprops=dict(frameon=False)
-topog = xarray.load_dataset(edinburghRainLib.dataDir / 'GEBCO_topog_bathy_scotland.nc')
+topog = xarray.load_dataset(stonehavenRainLib.dataDir / 'GEBCO_topog_bathy_scotland.nc')
 land =rioxarray.open_rasterio(
-        edinburghRainLib.dataDir / r"u2018_clc2018_v2020_20u1_raster100m\DATA\U2018_CLC2018_V2020_20u1.tif",
+        stonehavenRainLib.dataDir / r"u2018_clc2018_v2020_20u1_raster100m\DATA\U2018_CLC2018_V2020_20u1.tif",
         chunks='auto', masked=True)  # get in the Corraine Land Cover dataset
 land = land.reindex(y=land.y[::-1]).sel(x=slice(3.4e6, 3.6e6), y=slice(3.6e6, 3.8e6))
 land = land.where(land > 0).load()
@@ -57,7 +57,7 @@ land = land.where(land > 0).load()
 urb = xarray.where(land.isin([1, 2, 3, 4, 5, 6]), 1,
                    np.nan)  # cts Urban Fabric, discont urban fabric, ports & airports. Excluding Industrial & Commerical units as pulls out windfarms...
 noUrb = xarray.where((land > 6) & (land < 44),1, np.nan)
-topog90m = edinburghRainLib.read_90m_topog(region=ed_detail_sel)
+topog90m = stonehavenRainLib.read_90m_topog(region=ed_detail_sel)
 projLand = ccrs.epsg(3035)  # for land cover
 projGB = ccrs.OSGB() # OS GB grid.
 projRot = ccrs.RotatedPole(pole_longitude=177.5,pole_latitude=37.5) # for rotated grid (cpm)
@@ -73,9 +73,9 @@ scalebar = ScaleBar(1,"m",**scalebarprops)
 ax_seScot.add_artist(scalebar)
 # if time == '2021-07-04T15:00':
 urb.plot(ax=ax_seScot, add_colorbar=False, transform=projLand, levels=[0.99, 1.01], colors='black',alpha=1)
-ax_seScot.plot(*edinburghRainLib.edinburgh_castle.values(), transform=projGB,
+ax_seScot.plot(*stonehavenRainLib.stonehaven_crash.values(), transform=projGB,
                marker='o', color='purple', ms=9, alpha=0.7)
-edinburghRainLib.std_decorators(ax_seScot,radarNames=True)
+stonehavenRainLib.std_decorators(ax_seScot,radarNames=True)
 ax_seScot.set_title(f"SE Scotland")
 # put labels on
 for name,coords in labels.items():
@@ -87,8 +87,8 @@ axBI = inset_axes(ax_seScot, width="39%", height="33%", loc="lower left",
 axBI.set_extent((-11, 2, 50, 61))
 axBI.tick_params(labelleft=False, labelbottom=False)
 axBI.coastlines()
-axBI.plot(*edinburghRainLib.edinburgh_castle.values(),
-          marker='o',color=edinburghRainLib.colors['castle'],ms=5,transform=projGB)
+axBI.plot(*stonehavenRainLib.stonehaven_crash.values(),
+          marker='o',color=stonehavenRainLib.colors['castle'],ms=5,transform=projGB)
 
 
 

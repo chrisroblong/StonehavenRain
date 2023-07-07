@@ -6,7 +6,7 @@ import scipy.stats
 import numpy as np
 import xarray
 import pandas as pd
-import edinburghRainLib
+import stonehavenRainLib
 
 def gev_fit(x,**kwargs):
     """
@@ -28,7 +28,7 @@ def xarray_gev(ds,**kwargs):
 #    client = dask.distributed.Client(n_workers=8, threads_per_worker=2, memory_limit='1GB')
 #    print(client)
 generate =False
-files = list((edinburghRainLib.dataDir/"FullSlices/").glob("full_summer_slice*.nc"))
+files = list((stonehavenRainLib.dataDir/"FullSlices/").glob("full_summer_slice*.nc"))
 fits = dict()
 data_set = dict()
 for file in files:
@@ -41,7 +41,7 @@ for file in files:
     # rest time to the multi-index, unstack the multi-time and then rename time2 (as dim and var) to time
     # and then store it.
     data_set[file] = ds
-    gevFile = edinburghRainLib.outdir / (file.stem + '_gev_fit.nc')
+    gevFile = stonehavenRainLib.outdir / (file.stem + '_gev_fit.nc')
     if generate: # generate the fit -- very slow.
         print("Processing ",file)
         print("ds.pr.shape",ds.pr.shape)
@@ -106,9 +106,9 @@ def qsat(temperature):
     return es
 
 
-sim_cpm=xarray.load_dataset(edinburghRainLib.dataDir/'cpm_reg_ts.nc')
-sim_cet=xarray.load_dataset(edinburghRainLib.dataDir/'cet_cpm.nc')
-sim_ed=xarray.load_dataset(edinburghRainLib.dataDir/'ed_reg_ts.nc')
+sim_cpm=xarray.load_dataset(stonehavenRainLib.dataDir/'cpm_reg_ts.nc')
+sim_cet=xarray.load_dataset(stonehavenRainLib.dataDir/'cet_cpm.nc')
+sim_ed=xarray.load_dataset(stonehavenRainLib.dataDir/'ed_reg_ts.nc')
 
 sat_hum= qsat(sim_cpm)
 #sat_hum = sim_cet

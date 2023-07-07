@@ -16,7 +16,7 @@
 
 ## Libraries 
 
-* edinburghRainLib -- main library. Contains bits of code that appear general + various configuration info. 
+* stonehavenRainLib -- main library. Contains bits of code that appear general + various configuration info. 
     You will likely need to edit this file if you want to use this software.
 * gev_r -- code to support doing GEV fits using R + some derived calculations. 
 You need to install R on your computer and  modify this library to point to R. 
@@ -36,7 +36,7 @@ You need to install R on your computer and  modify this library to point to R.
 ------
 ## Additional Code
 * comp_rotated_coords --compute co-ordinates for CET locations. Done as JASMIN does not have the library. 
-    Values then got inserted (manually) into edinburghRainLib
+    Values then got inserted (manually) into stonehavenRainLib
 * create_counties -- Create county shape files from OS data. Used to generate high enough resolution  county data. 
 * radar_station_metadata.xlxs -- Radar station metadata
 * old_code -- folder containing old code. May not work! 

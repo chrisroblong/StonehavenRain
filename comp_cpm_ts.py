@@ -3,7 +3,7 @@ Compute seasonal-mean CET, edinburgh region & CPM average  from
   monthly-mean temperatures and precipitation. (No CET for precip!)
 
 """
-import edinburghRainLib
+import stonehavenRainLib
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import xarray
@@ -25,7 +25,7 @@ fig=plt.figure(num='test_cet',clear=True)
 ax=fig.add_subplot(111,projection=proj)
 ax.set_extent([-5,2, 50,57],crs=proj)
 # plot in rotated coords
-for key,coords in edinburghRainLib.rotated_coords.items():
+for key,coords in stonehavenRainLib.rotated_coords.items():
     ax.plot(coords[0],coords[1],marker='x',color='red',transform=projRot)
 
 ax.coastlines()
@@ -33,8 +33,8 @@ fig.show()
 
 ## now to read the ensemble data.
 
-ed=edinburghRainLib.rotated_coords['Edinburgh']
-edinburgh_region = dict(grid_longitude=slice(ed[0]-0.5,ed[0]+0.5),
+ed=stonehavenRainLib.rotated_coords['Edinburgh']
+stonehaven_region = dict(grid_longitude=slice(ed[0]-0.5,ed[0]+0.5),
                         grid_latitude=slice(ed[1]-0.5,ed[1]+0.5))
 
 
@@ -43,7 +43,7 @@ for var in ['tas','pr']:
     cpm_list=[]
     ed_list=[]
     cet_list=[]
-    for p in edinburghRainLib.cpmDir.glob('[0-9][0-9]'):
+    for p in stonehavenRainLib.cpmDir.glob('[0-9][0-9]'):
         pth=p/var/'mon/latest'
         pth_rain = p/'pr/mon/latest'
         ncfiles=list(pth.glob('*.nc'))
@@ -55,7 +55,7 @@ for var in ['tas','pr']:
         # not too bad performance! The extra args come from the xarray doc.
         cet=0.0
         for key,wt in wts.items():
-            coords=edinburghRainLib.rotated_coords[key]
+            coords=stonehavenRainLib.rotated_coords[key]
             ts = da.sel(method='nearest',tolerance=0.1,
                              grid_longitude=coords[0],
                              grid_latitude=coords[1]).load()
@@ -63,9 +63,9 @@ for var in ['tas','pr']:
         
         
         cet_list.append(cet)
-        ed_ts=da.sel(**edinburgh_region).mean(edinburghRainLib.cpm_horizontal_coords).load()
+        ed_ts=da.sel(**stonehaven_region).mean(stonehavenRainLib.cpm_horizontal_coords).load()
         ed_list.append(ed_ts)
-        cpm_ts=da.mean(edinburghRainLib.cpm_horizontal_coords).load()
+        cpm_ts=da.mean(stonehavenRainLib.cpm_horizontal_coords).load()
         cpm_list.append(cpm_ts)
         print(f"Done with {p} for {var}") # end loop over ensemble members
         

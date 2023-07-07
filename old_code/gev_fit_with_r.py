@@ -4,7 +4,7 @@ Code as stands is very prototype and needs a faily major clean/rewrite.
 TODO: Redo code.
 """
 import commonLib
-import edinburghRainLib
+import stonehavenRainLib
 import xarray
 import scipy.stats
 import matplotlib.pyplot as plt
@@ -156,7 +156,7 @@ def param_cov(params,cov):
     return params_c
 
 refresh=False # if True then regenerate fits **even** if data exists...
-outdir_gev = edinburghRainLib.dataDir/'gev_fits'
+outdir_gev = stonehavenRainLib.dataDir/'gev_fits'
 outdir_gev.mkdir(parents=True,exist_ok=True) # create the directory
 
 utils = rpackages.importr('utils')
@@ -172,11 +172,11 @@ for package in packnames:
 
 
 ## Do the fit
-cet = xarray.load_dataset(edinburghRainLib.dataDir/'cet_cpm.nc').tas
-cpm = xarray.load_dataset(edinburghRainLib.dataDir/'cpm_reg_ts.nc').tas
+cet = xarray.load_dataset(stonehavenRainLib.dataDir/'cet_cpm.nc').tas
+cpm = xarray.load_dataset(stonehavenRainLib.dataDir/'cpm_reg_ts.nc').tas
 hum= qsat(cpm) # compute humidity
-ed= xarray.load_dataset(edinburghRainLib.dataDir/'ed_reg_ts.nc').tas
-ed_extreme_precip = xarray.load_dataset(edinburghRainLib.dataDir/'ed_reg_max_precip.nc').pr##.isel(grid_longitude=slice(10,20),grid_latitude=slice(10,20))
+ed= xarray.load_dataset(stonehavenRainLib.dataDir/'ed_reg_ts.nc').tas
+ed_extreme_precip = xarray.load_dataset(stonehavenRainLib.dataDir/'ed_reg_max_precip.nc').pr##.isel(grid_longitude=slice(10,20),grid_latitude=slice(10,20))
 stack_dims= ['time','ensemble_member']
 
 xfit=dict()
@@ -193,7 +193,7 @@ for ts,title in zip([cet,cpm,ed,hum],['CETtop','CPM_region','Edinburgh_region','
     print(f"Done {title}")
 
 ## get in the topographic info for the CPM. Note values differ slightly..
-cpm_ht = xarray.load_dataset(edinburghRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
+cpm_ht = xarray.load_dataset(stonehavenRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
 cpm_ht = cpm_ht.sel(longitude=slice(ed_extreme_precip.grid_longitude.min()-0.01, ed_extreme_precip.grid_longitude.max()+0.01),
                     latitude=slice(ed_extreme_precip.grid_latitude.min()-0.01, ed_extreme_precip.grid_latitude.max()+0.01))
 cpm_ht = cpm_ht.rename(longitude='grid_longitude', latitude='grid_latitude')
@@ -245,13 +245,13 @@ reg = [float(fit.grid_longitude.min()),float(fit.grid_longitude.max()),
         float(fit.grid_latitude.min()),float(fit.grid_latitude.max())
        ]
 
-ed_castle=edinburghRainLib.edinburgh_castle.values()
+ed_castle=stonehavenRainLib.stonehaven_crash.values()
 
 
 for ax in axes.flatten():
     ax.set_extent(reg,crs=projRot)
     ax.plot(*ed_castle, transform=projOS, color='black', marker='o', ms=12,alpha=0.5)
-    edinburghRainLib.std_decorators(ax)
+    stonehavenRainLib.std_decorators(ax)
 fig.tight_layout()
 fig.show()
 

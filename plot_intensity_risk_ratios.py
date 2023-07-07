@@ -8,7 +8,7 @@ import commonLib
 import gev_r
 import xarray
 import matplotlib.pyplot as plt
-import edinburghRainLib
+import stonehavenRainLib
 import scipy.stats
 import numpy as np
 import statsmodels.api as sm
@@ -428,21 +428,21 @@ def plot_result(all_ir,all_pr,mc_all_ir,mc_all_pr,temperatures,cc_scale,cc_rng,m
 
 # now to do the work!
 
-file = edinburghRainLib.dataDir / 'radar_precip/summary_1km_15min.nc'
+file = stonehavenRainLib.dataDir / 'radar_precip/summary_1km_15min.nc'
 radar_time = 'Rx15min'
-out_dir = edinburghRainLib.dataDir / 'ratios_roll' / (
+out_dir = stonehavenRainLib.dataDir / 'ratios_roll' / (
     "".join(file.stem.split('_')[1:3]))  # where derived results get written
 out_dir.mkdir(parents=True, exist_ok=True)
 
 # read in the bootstrapped radar data fits
-mc_radar_fit = xarray.load_dataset(edinburghRainLib.dataDir / 'radar_precip' / 'bootstrap_reg_radar_params.nc')
+mc_radar_fit = xarray.load_dataset(stonehavenRainLib.dataDir / 'radar_precip' / 'bootstrap_reg_radar_params.nc')
 # and the best estimate fit
-radar_fit = xarray.load_dataset(edinburghRainLib.dataDir / 'radar_precip' / 'reg_radar_params.nc')
+radar_fit = xarray.load_dataset(stonehavenRainLib.dataDir / 'radar_precip' / 'reg_radar_params.nc')
 # and the actual radar data -- as quantile in each assumed independant extreme region
-radar = xarray.load_dataset(edinburghRainLib.dataDir / 'radar_precip' / 'reg_radar_rain.nc')
+radar = xarray.load_dataset(stonehavenRainLib.dataDir / 'radar_precip' / 'reg_radar_rain.nc')
 ##radar_data = radar.radar
 # read in monthlyMax radar and find values for Edinburgh castle for 2020 and 2021. Add to radar dataSet.
-ts = xarray.open_dataset(file).monthlyMax.sel(**edinburghRainLib.edinburgh_castle, method='nearest')
+ts = xarray.open_dataset(file).monthlyMax.sel(**stonehavenRainLib.stonehaven_crash, method='nearest')
 castle2021 = float(ts.sel(time='2021-07'))
 castle2020 = float(ts.sel(time='2020-08'))
 radar['castle2020']=castle2020
@@ -450,7 +450,7 @@ radar['castle2021']=castle2021
 rgn = 'CET' # want CET covariate.
 ## get in the data -- only want the rolling =1 cases = no rolling!
 
-outdir_gev = edinburghRainLib.dataDir / 'gev_fits_roll'
+outdir_gev = stonehavenRainLib.dataDir / 'gev_fits_roll'
 bs_file= outdir_gev/f'{rgn}_bootstrap.nc'
 mn_file= outdir_gev/f'{rgn}_mean.nc'
 mn_ratio_roll = xarray.load_dataarray(mn_file, decode_times=False)#
