@@ -33,6 +33,10 @@ elif 'GEOS-' in machine.upper() :
     dataDir = pathlib.Path(r'C:\Users\stett2\OneDrive - University of Edinburgh\data\EdinburghRainfall')
     nimrodRootDir = dataDir/'nimrod_data'
     outdir = dataDir/'output_data'
+elif 'Chris' in machine:
+    dataDir = pathlib.Path(r'C:\Users\chris\PycharmProjects\StonehavenRain')
+    nimrodRootDir = dataDir/'nimrod_data'
+    outdir = dataDir/'output_data'
 else: # don't know what to do so raise an error.
     raise Exception(f"On platform {machine} no idea where data lives")
 # create the outdir

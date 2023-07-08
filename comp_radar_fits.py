@@ -10,7 +10,7 @@ import numpy as np
 from old_code import emp_dist
 
 time=slice('2005','2020')
-file = stonehavenRainLib.dataDir / 'radar_precip/summary_1km_15min.nc'
+file = stonehavenRainLib.dataDir / 'radar_precip/summary_5km_1h.nc'
 radar_data_all= stonehavenRainLib.gen_radar_data(file=file).sel(time=time)
 
 radar_fit = gev_r.xarray_gev(radar_data_all.radar, dim='time_index')
