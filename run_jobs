@@ -10,8 +10,8 @@ years="2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017 201
 #years="2004 2005 2006 2016" # years need to run again...
 TIME="1:00:00"
 RESOLN="5km"
-Q='short-serial'
-#Q='high-mem --mem=100000' # high mem q with a 100 GB of RAM
+#Q='short-serial'
+Q='high-mem --mem=100000' # high mem q with a 100 GB of RAM
 # for 1km data takes about 4 hours to process a year.
 for year in $years
 do

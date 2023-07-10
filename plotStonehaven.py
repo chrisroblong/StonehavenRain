@@ -173,8 +173,5 @@ def maxhourly(year):
 	maxhourlytime = maxhourlytimes.sel(dayno=maxhourlyday).max('variable')
 	return maxhourlyday
 
-data = xr.open_dataset("summary_5km_1h/metoffice-c-band-rain-radar_uk_2020-08_5km-composite_monthly.nc")
-monthlyMaxTime = data["monthlyMaxTime"]
-monthlyMaxDay = monthlyMaxTime.dt.dayofyear
-print(monthlyMaxDay)
-map(monthlyMaxDay)
+
+animatestonehavenmorning(timechunk(st_time,16))
