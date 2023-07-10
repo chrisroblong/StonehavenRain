@@ -9,7 +9,7 @@ import xarray
 import numpy as np
 from old_code import emp_dist
 
-time=slice('2005','2020')
+time=slice('2005','2022')
 file = stonehavenRainLib.dataDir / 'radar_precip/summary_5km_1h.nc'
 radar_data_all= stonehavenRainLib.gen_radar_data(file=file).sel(time=time)
 

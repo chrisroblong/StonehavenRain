@@ -10,7 +10,7 @@ import numpy as np
 import collections
 
 os.environ[
-    'R_HOME'] = r'C:\Users\stett2\AppData\Local\Microsoft\AppV\Client\Integration\FC689017-A9BB-4A9B-B971-6AC52117BA03\Root'  # where R is...
+    'R_HOME'] = r'C:\Users\chris\anaconda3\envs\StonehavenRainenv\Lib\R'  # where R is...
 # will need adjusting depending on where R got installed
 import rpy2
 import rpy2.robjects as robjects
