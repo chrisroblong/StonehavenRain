@@ -44,7 +44,7 @@ if readData:
     emp_rp = 1.0/e_dist.sf(rain)
     # get in the monthly max data and work out the rain at the Castle in July 2021 and Aug 2022
     ds = xarray.load_dataset(stonehavenRainLib.dataDir / 'radar_precip' / 'summary_1km_15Min.nc')
-    castle_rain = ds.monthlyMax.sel(time=(ds.monthlyMax.time.dt.season == 'JJA')).\
+    crash_rain = ds.monthlyMax.sel(time=(ds.monthlyMax.time.dt.season == 'JJA')).\
         sel(time=['2020-08-31','2021-07-31'],**stonehavenRainLib.stonehaven_crash,method='nearest').load()
 
     print("read data")
@@ -142,14 +142,14 @@ ax.set_title("Regional Return Period")
 for v in [10,100]:
     ax.axhline(v,linestyle='dashed')
 # add on the appropriate value for 2021  & 2020
-color=stonehavenRainLib.colors['castle']
+color=stonehavenRainLib.colors['crash']
 value = float(radar_data.critical2021)
 value2020 = float(radar_data.critical2020)
 ax.axvline(value,color=color,linestyle='solid')
 ax.axvline(value2020,color=color,linestyle='dashed')
 # plot the actual castle rainfall for 2020 and 2021.
 for yr,linestyle in zip(['2020','2021'],['dashed','solid']):
-    value = castle_rain.sel(time=yr)
+    value = crash_rain.sel(time=yr)
     ax.axvline(value,color='red',linestyle=linestyle)
 ax.set_xlim(30,150.)
 ax.set_ylim(5,1000)
