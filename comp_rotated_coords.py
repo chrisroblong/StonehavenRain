@@ -1,7 +1,7 @@
 """
-Compute co-ords on **rotated** grid using cordex library
+Compute co-ords on **rotated** grid using pyproj library
 """
-import cordex
+import pyproj
 import numpy as np
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
@@ -18,10 +18,13 @@ coords=dict(Edinburgh=(-3.1833,55.95),
             Stonehaven=(-2.32, 56.95)
             )
 
+proj_rotated = pyproj.Proj(proj='ob_tran', o_lon_p=pole_long, o_lat_p=pole_lat)
+
 coords_rotated = dict()
 
 for name,c in coords.items():
-    rot_lon,rot_lat = cordex.rotated_coord_transform(c[0],c[1],pole_long,pole_lat,direction='geo2rot')
+    lon, lat = c[0], c[1]
+    rot_lon, rot_lat = proj_rotated(lon, lat, inverse=False)
     rot_lon += 360.
     print(f"{name}: {rot_lon:4.2f} {rot_lat:4.2f}")
     # need co-ords around 360 for matching the model..
