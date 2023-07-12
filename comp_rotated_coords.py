@@ -18,7 +18,7 @@ coords=dict(Edinburgh=(-3.1833,55.95),
             Stonehaven=(-2.32, 56.95)
             )
 
-proj_rotated = pyproj.Proj(proj='ob_tran', o_lon_p=pole_long, o_lat_p=pole_lat)
+proj_rotated = pyproj.Proj(proj='ob_tran', o_lon_p=pole_long, o_lat_p=pole_lat, o_proj='latlon')
 
 coords_rotated = dict()
 
