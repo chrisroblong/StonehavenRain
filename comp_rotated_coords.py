@@ -14,7 +14,8 @@ coords=dict(Edinburgh=(-3.1833,55.95),
             Rothampsted=(-0.35, 51.8),
             Malvern=(-2.317, 52.117),
             Squires_Gate=(-3.033, 53.767),
-            Ringway=(-2.267, 53.35)
+            Ringway=(-2.267, 53.35),
+            Stonehaven=(-2.32, 56.95)
             )
 
 coords_rotated = dict()
