@@ -1,7 +1,7 @@
 """
 Compute co-ords on **rotated** grid using pyproj library
 """
-import pyproj
+
 import numpy as np
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
@@ -18,17 +18,30 @@ coords=dict(Edinburgh=(-3.1833,55.95),
             Stonehaven=(-2.32, 56.95)
             )
 
-proj_rotated = pyproj.Proj(proj='ob_tran', o_lon_p=pole_long, o_lat_p=pole_lat, o_proj='latlon')
+original_crs = ccrs.PlateCarree()
+target_crs = ccrs.RotatedPole(pole_longitude=pole_long, pole_latitude=pole_lat)
 
 coords_rotated = dict()
 
-for name,c in coords.items():
-    lon, lat = c[0], c[1]
-    rot_lon, rot_lat = proj_rotated(lon, lat, inverse=False)
-    rot_lon += 360.
-    print(f"{name}: {rot_lon:4.2f} {rot_lat:4.2f}")
-    # need co-ords around 360 for matching the model..
-    coords_rotated[name]=[round(t,2) for t in (rot_lon,rot_lat)] # store to 2sf
+# Define the original coordinates (lon, lat)
+lon = np.array([-3.1833, -0.35, -2.317, -3.033, -2.267, -2.32])
+lat = np.array([55.95, 51.8, 52.117, 53.767, 53.35, 56.95])
+
+# Transform the coordinates
+lon_rot, lat_rot, _ = target_crs.transform_points(original_crs, lon, lat).T
+
+lon_rot = np.add(lon_rot, 360)
+
+# Print the rotated coordinates
+for lon_r, lat_r in zip(lon_rot, lat_rot):
+    print(f"Rotated: {lon_r:.2f}, {lat_r:.2f}")
+
+#for name,c in coords.items():
+#    lon, lat = c[0], c[1]
+#    rot_lon += 360.
+#    print(f"{name}: {rot_lon:4.2f} {rot_lat:4.2f}")
+#    # need co-ords around 360 for matching the model..
+#    coords_rotated[name]=[round(t,2) for t in (rot_lon,rot_lat)] # store to 2sf
 
 # now plot things so can check..
 projRot=ccrs.RotatedPole(pole_longitude=pole_long,pole_latitude=pole_lat)
