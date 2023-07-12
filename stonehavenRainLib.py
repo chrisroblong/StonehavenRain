@@ -34,7 +34,7 @@ elif 'GEOS-' in machine.upper() :
     nimrodRootDir = dataDir/'nimrod_data'
     outdir = dataDir/'output_data'
 elif 'Chris' in machine:
-    dataDir = pathlib.Path(r'C:\Users\chris\PycharmProjects\StonehavenRain')
+    dataDir = pathlib.Path(r'C:\Users\chris\PycharmProjects\StonehavenRain\data')
     nimrodRootDir = dataDir/'nimrod_data'
     outdir = dataDir/'output_data'
 else: # don't know what to do so raise an error.
@@ -72,7 +72,7 @@ except ModuleNotFoundError:
 # load railway lines
 rail_lines = cartopy.feature.NaturalEarthFeature(category='cultural', name='railways', scale='10m', edgecolor='blue',facecolor='none')
 
-def get_radar_data(file=dataDir / 'radar_precip/summary_5km_1h.nc', region=None,
+def get_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', region=None,
                    height_range=slice(0,200), mxMeanRain=1000.):
     """
     read in radar data and mask it by heights and mean rain being reasonable.
@@ -132,8 +132,9 @@ def gen_radar_data(file=dataDir / 'radar_precip/summary_5km_1h.nc', quantiles=No
     radar_data=radar_data[(ok_count > 25)] # want at least 25 values
     #ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2021')
     #rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
-    ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2020')
-    rainC2020 = radar_data.sel(time_index=ed_indx).squeeze()
+    #ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2020') #TODO: FIX
+    #rainC2020 = radar_data.sel(time_index=ed_indx).squeeze()
+    rainC2020 = 20.0
     ds=xarray.Dataset(dict(radar=radar_data,critical2020=rainC2020,rain_count=rain_count,indx=indx,mask=rseasMskmax)) #critical2021=rainC2021
     return ds
 
