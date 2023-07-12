@@ -24,8 +24,8 @@ target_crs = ccrs.RotatedPole(pole_longitude=pole_long, pole_latitude=pole_lat)
 coords_rotated = dict()
 
 # Define the original coordinates (lon, lat)
-lon = np.array([-3.1833, -0.35, -2.317, -3.033, -2.267, -2.32])
-lat = np.array([55.95, 51.8, 52.117, 53.767, 53.35, 56.95])
+lon = np.array([coord[0] for coord in coords.values()])
+lat = np.array([coord[1] for coord in coords.values()])
 
 # Transform the coordinates
 lon_rot, lat_rot, _ = target_crs.transform_points(original_crs, lon, lat).T
