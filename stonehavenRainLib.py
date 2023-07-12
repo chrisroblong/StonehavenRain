@@ -105,7 +105,7 @@ def get_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', region=None,
 
     return rseasMskmax,mxTime
 
-def gen_radar_data(file=dataDir / 'radar_precip/summary_5km_1h.nc', quantiles=None,
+def gen_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', quantiles=None,
                    region=None, height_range=slice(0,200), discrete_hr=12):
     """
     generated flattened radar data.

@@ -23,7 +23,7 @@ ed_rp = 1.0/emp_rn.sf(ed_v)
 print(f"Crash Rain  {ed_v:3.1f} (mm/hr) Emp. RP {ed_rp:3.0f} Years")
 # now to sample...
 mc_dist=[]
-n_monte_carlo=10
+n_monte_carlo=1000
 nRadar = radar_data_all.radar.shape[0]
 print(f"Monte Carlo Sampling {n_monte_carlo} times")
 rng = np.random.default_rng()
