@@ -33,7 +33,7 @@ fig.show()
 
 ## now to read the ensemble data.
 
-ed=stonehavenRainLib.rotated_coords['Edinburgh']
+ed=stonehavenRainLib.rotated_coords['Stonehaven']
 stonehaven_region = dict(grid_longitude=slice(ed[0]-0.5,ed[0]+0.5),
                         grid_latitude=slice(ed[1]-0.5,ed[1]+0.5))
 
