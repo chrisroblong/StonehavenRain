@@ -69,8 +69,7 @@ try:
 except ModuleNotFoundError:
     coastline = cartopy.feature.NaturalEarthFeature('physical','coastline','10m',edgecolor='black',facecolor='none')
 
-# load railway lines
-rail_lines = cartopy.feature.NaturalEarthFeature(category='cultural', name='railways', scale='10m', edgecolor='blue',facecolor='none')
+
 
 def get_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', region=None,
                    height_range=slice(0,200), mxMeanRain=1000.):
@@ -409,7 +408,6 @@ def std_decorators(ax,showregions=True,radarNames=False):
                         annotation_clip=True)
 
     ax.add_feature(coastline)
-    #ax.add_feature(rail_lines, edgecolor='blue')
     #ax.add_feature(nations, edgecolor='black')
     
 
