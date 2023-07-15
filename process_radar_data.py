@@ -280,7 +280,7 @@ for year in args.year:
 
         # end of start again stuff
         # deal with 2hour data.
-        if (last is not None) and  ((time-pd.to_datetime(last.time)).seconds== 3600):
+        if (last is not None) and  ((time-pd.to_datetime(last.time)).seconds == 3600):
             rain2hr = two_hr_mean(last.combine_first(rain)).isel(time=slice(1, None))
         else:  # nothing to merge so just use the 24 hours we have
             rain2hr = two_hr_mean(rain)

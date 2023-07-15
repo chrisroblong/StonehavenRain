@@ -47,7 +47,7 @@ for lon_r, lat_r in zip(lon_rot, lat_rot):
 projRot=ccrs.RotatedPole(pole_longitude=pole_long,pole_latitude=pole_lat)
 proj=ccrs.PlateCarree()
 
-fig=plt.figure(num='test_rotasted',clear=True)
+fig=plt.figure(num='test_rotated',clear=True)
 ax=fig.add_subplot(111,projection=proj)
 ax.set_extent([-5,2, 50,57],crs=proj)
 # plot in rotated coords
