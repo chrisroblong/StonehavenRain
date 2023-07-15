@@ -50,10 +50,17 @@ def save(radar_data_all, prefix=""):
     print("\nRadar fit and bootstrapped")
 
 
-time=slice('2005','2022')
+def no2020(radar_data_all):
+    time_to_remove = np.datetime64('2020-06-01')
+    return radar_data_all.sel(time=radar_data_all.time != time_to_remove)
+
+
+time = slice('2005','2022')
 file = stonehavenRainLib.dataDir / 'transfer_dir/summary_5km_1h.nc'
-radar_data_all= stonehavenRainLib.gen_radar_data(file=file).sel(time=time)
-no2020radar_data_all = radar_data_all.drop(time='2020-06-01')
+radar_data_all = stonehavenRainLib.gen_radar_data(file=file).sel(time=time)
+no2020radar_data_all = no2020(radar_data_all)
+print(radar_data_all)
+print(no2020radar_data_all)
 save(radar_data_all)
 save(no2020radar_data_all, "no2020")
 print_emp_val(file)
