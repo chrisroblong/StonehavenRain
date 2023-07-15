@@ -3,7 +3,7 @@ module load jaspy #load jaspy environment
 export PYTHONPATH=$PYTHONPATH:$PWD
 mkdir -p output # where output is going
 # run processing jobs for CPM ensemble
-rgn="358.5 360.5 2.5 4.5" # region = +/- 1 degree of Edinburgh
+rgn="359 361 3.5 5.5" # region = +/- 1 degree of Edinburgh
 TIME='12:00:00' # time job will be in the Q
 Q='short-serial' # Q for job
 for dir in /badc/ukcp18/data/land-cpm/uk/2.2km/rcp85/*/pr/1hr/latest
