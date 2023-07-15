@@ -53,7 +53,8 @@ rotated_coords = dict(Edinburgh=(359.62, 3.45),
     Rothampsted=(361.33, -0.68),
     Malvern= (360.11, -0.38),
     Squires_Gate=(359.68, 1.27),
-    Ringway=(360.14, 0.85))
+    Ringway=(360.14, 0.85),
+    Stonehaven=(360.10, 4.45))
 
 # sites we want to plot and the colors they are.
 sites=dict(crash=stonehaven_crash)#,botanics=edinburgh_botanics,KB=edinburgh_KB)
