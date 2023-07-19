@@ -1,0 +1,932 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage{graphics}
+\usepackage{fullpage,epsf,graphicx}%, amstext,url} 
+
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\thispagestyle{empty}
+
+%
+%	This is a basic LaTeX Template for the TP/MP MSc Dissertation report
+
+\parindent=0pt          %  Switch off indent of paragraphs 
+\parskip=5pt            %  Put 5pt between each paragraph  
+
+%	This section generates a title page
+%       Edit only the sections indicated to put in the project title, and submission date
+
+\vspace*{0.1\textheight}
+
+\begin{center}
+        \huge{\bfseries Title of my Dissertation}\\ % Replace with the title of your dissertation!
+\end{center}
+
+\medskip
+
+\begin{center}
+        \Large{Katrina Ross}\\  % Author of dissertation - replace with your name!
+        \medskip
+        \large{August 18, 2023}  % Submission date
+\end{center}
+
+%%% If necessary, reduce the number 0.4 below so the University Crest
+%%% and the words below it fit on the page.
+%%% Don't let the crest, or the wording below it, flow onto the next page!
+
+\vspace*{0.4\textheight}
+
+\begin{center}
+        \includegraphics[width=35mm]{crest.pdf}
+\end{center}
+
+\medskip
+
+\begin{center}
+
+%%%
+%%% Change Theoretical to Mathematical if appropriate
+%%%
+\large{
+  MSc in Theoretical Physics\\[0.8ex]
+  The University of Edinburgh\\[0.8ex]
+  2023}
+
+\end{center}
+
+\newpage
+
+
+\pagenumbering{roman}
+
+\begin{abstract}
+This is where you summarise the contents of your dissertation. It should be
+at least 100 words, but not more than 250 words.
+\end{abstract}
+
+\pagenumbering{roman}
+
+\begin{center}
+\textbf{Declaration}
+\end{center}
+
+I declare that this dissertation was composed entirely by myself.
+
+Chapters 2 and 3 provide an introduction to the subject area and a
+description of previous work on this topic. They do not contain
+original research.
+
+Chapter~4 describes work that was carried out entirely by me. The results of
+this chapter have been obtained previously by Professor Anne T Matta of the
+University of Kinlochteuchter, but the methods used here are different
+in some important (or minor) ways.
+
+Chapters 4 through 6 contain my original work. The work described in
+Chapter~4 was carried out in collaboration with Professor Carole Ann O'Malley
+and her PhD student Jack O'Bean. Chapter~5 presents original work done
+entirely by me.
+
+\bigskip
+
+State whether calculations were done using Mathematica, Maple, MATLAB,
+SymPy, etc, with (or without) gamma-matrix manipulation code, master
+integrals, the Super-Duper software package, etc. In other words, you
+should refer to any software that you used during your project. For
+example, Monte Carlo simulation packages, hydrodynamics packages,
+measurement code, fitting code, tensor algebra and/or calculus packages,
+Feynman diagram evaluation packages, etc.
+
+State whether any software you used was written by you from scratch,
+by your supervisor (or by whoever), or if it's a standard package.
+
+\newpage
+
+\begin{center}
+\textbf{Personal Statement}
+\end{center}
+
+\emph{You \textbf{\emph{must}} include a Personal Statement in your
+  dissertation. This should describe what you did during the project,
+  and when you did it. Give an account of problems you faced and how
+  you attempted to overcome them. The examples below are based on
+  personal statements from MSc and MPhys projects in previous years,
+  with (mostly-obvious) changes to make them anonymous. }
+
+\subsubsection*{Example~1: an analytical project}
+
+The project began with an introduction to the spinor-helicity
+formalism in four dimensions, with my main source material being
+H. Elvang's “Scattering Amplitudes in Gauge Theory and Gravity” [1]. I
+read the first chapter, and acquainted myself with the formalism,
+and how it worked in a practical sense.
+
+Once I felt more comfortable with it, we moved onto the
+six-dimensional spinor-helicity formalism paper, where I spent some
+time gaining as strong an understanding of how the formalism worked,
+and proving identities.
+
+The next stage was to learn about the generalised unitarity procedure,
+with the end goal being to use it to calculate coefficients for some
+one loop integral, likely involving massive particles. Learning how
+this worked took some time, and proved to be some of the most
+difficult material for me to understand.
+
+It wasn't until later that we began to consider applying what I had
+learned to a Kaluza-Klein reduction, which ended up being the main
+focus of the project. It mixed well with the general theme of
+“extra-dimensional theory” the project began with, and allowed me to
+apply all that I'd learned and prepared for so far.  The vast majority
+of my remaining time was spent calculating coefficients for the scalar
+box contribution to the gluon-gluon to two-Kaluza-Klein-particle
+amplitude, overcoming a number of problems and errors, to finally have
+human-readable, and presentable results.
+
+During the course of the project, I met with my supervisor every week,
+in order to discuss my progress and the direction I would head
+next. Toward the end, the frequency of our meetings increased
+somewhat, as I began to finish my calculations.
+
+I started writing this dissertation in mid-July, and I spent the first
+three weeks of August working on it full-time.
+
+Overall, I feel that the project was a success, and I found it to be
+extremely enjoyable throughout.
+
+
+\subsubsection*{Example~2: a computational project}
+
+I spent the first 2 weeks of the project reading the material
+surrounding my project - mainly [1] and [2]. I also began to plan out
+how I would implement the algorithms in C++, in doing this I gained an
+understanding of what the main goals of the first half of my project
+would be and how they could be achieved. I identified which Monte
+Carlo observables would be useful to measure in these simulations.
+
+For the next 3 weeks I implemented the standard Atlantic City
+algorithm and debugged my code whilst developing analysis tools in
+python. I compared the results from my simulations to the results from
+[3] (for the Random Osculator) and [4] for the EvenMoreRandom
+Osculator. Having obtained positive results for the Random Osculator I
+started reading up on Heaviside Articulation. I examined how to
+integrate a Heaviside Articulator into the simulation in order to
+produce the most efficient simulation - the solution I decided on was
+to use a package called HeaviArt[5].
+
+Following this I began to integrate the Heaviside Articulator into my
+code and test it against the regular algorithm. In addition to this I
+ran longer simulations to verify my findings without Articulation.
+
+In mid July I finished implementing Heaviside Articulation into my
+code and began looking into how to quantify any improvement in speed
+gained by this algorithm. As July progressed I started looking into
+how to integrate the EvenMoreRandom Osculator into my code - this was
+the most complicated part of the project, as discussed in the body of
+this report. Despite much effort on my part, I couldn't get the
+results produced by the new algorithm to agree with the old
+ones. Following further study of the literature, and long discussions
+with Jack O'Bean, it turned out that the original form of Heaviside
+Articulation didn't applied to the EvenMoreRandom Osculator. With the
+help of Jack and my supervisor, I then developed the new version
+described in this report. I also did analytical calculations of the
+four-point blue function to two orders higher than had
+been published previously in the literature.
+
+For the final parts of the summer I worked mainly on perfecting the
+algorithm for the Random Osculator and implementing the EvenMoreRandom
+Osculators algorithm with the improved Heaviside Articulation. The
+final results were encouraging, but more work is clearly needed. To
+this end, I have been awarded a studentship by the British University
+of Lifelong Learning to extend this work during my PhD Studies at
+the non-existent Scottish Highlands Institute of Technology in
+Inveroxter.
+
+I started writing this dissertation in mid-July, and I spent the first
+three weeks of August working on it full-time.
+
+
+\subsubsection{Example~3: a more mathematical project}
+
+My first two weeks of work on the project consisted of building up a
+working knowledge of the algebraic structures and techniques which
+would be used in the main calculations which were to be carried out,
+in particular carefully reading up on the 11-dimensional case [1, 2],
+the general structure of the Spencer complex of the Poincar\'e
+superalgebra, the Clifford and exterior algebras over a Lorentzian
+vector space in general finite dimension and the relationship between
+them, the spin group, the Lorentz algebra $so(V$) and their vector and
+spinor representations. As a toy calculation, I computed the first two
+Spencer cohomology groups of the Poincar\'e algebra and its relevant
+subalgebras in order to find its filtered (sub)deformations, finding
+that these are given by a space of algebraic curvature operators. This
+calculation is vastly simplified compared to the superalgebra
+calculation owing to the lack of spinor structure.
+
+In the following two weeks, I turned to the particular case of 5
+dimensions, initially study- ing the quaternionic structure of the
+relevant Clifford algebra, its spinor representation and symplectic
+Majorana spinors. I read up on complex and quaternionic structures and
+representations, proved various identities for products of higher-rank
+gamma matrices found in [5] and derived the Fierz identity and various
+other useful identities involving quantities defined in terms of the
+Majorana spinors. I made an initial attempt to solve the relevant
+cocycle conditions, initially finding that the space of solutions was
+given by 3-forms (or Hodge-dually 2-forms), but from the known spinor
+connection in D = 5 supergravity we knew that there was a problem with
+the solution. Working with my supervisor to fix the errors in this
+calculation, finding the most efficient way of setting it out and
+writing up the work done so far and some of the background material
+took up the following two to three weeks.  Next, I moved on to
+figuring out the fundamentals of the geometric part of the project,
+understanding spin structures on manifolds, the spin lift of the
+Levi-Civita connection, the spinorial Lie derivative and the
+definition of the superconnection. I derived the flatness conditions
+for the curvature of the superconnection and showed that these
+conditions are sufficient to cause the Killing superalgebra to close
+and form a Lie superalgebra. This work, along with further writeup,
+took another two weeks.
+
+The final weeks of the project were spent learning about Lorentzian
+and Riemannian symmetric spaces, finding all of the the maximally
+supersymmetric backgrounds, on the way learning a little about the
+supersymmetric solutions of 5-dimensional supergravity, and finally
+finishing the dissertation.
+
+
+
+
+\newpage
+
+\begin{center}
+%\vspace*{2in}
+% an acknowledgements section is completely optional but if you decide
+% not to include it you should still include an empty {titlepage}
+% environment as this initialises things like section and page numbering.
+\textbf{Acknowledgements}
+\end{center}
+
+\emph{Put your acknowledgements here. Thanking your supervisor for
+his/her help is standard practice, but it's not compulsory \ldots}
+
+I'd like to thank my supervisor Professor Carole Ann O'Malley for
+making this project possible, and her PhD student Jack O'Bean for his
+patience and his detailed functional explanations of how classical
+symmetries can be broken by quantum effects. Thanks also to Wally Bee
+and Ken Garoo of the University of Woolloomooloo for sending me
+their higher-order hopping-parameter expansions.
+
+Finally, none of this would have been possible without financial
+support from Paterson's Lane Education Committee.
+
+\bigskip
+
+This document has its origins in the dissertation template for the MSc
+in High Performance Computing, which is apparently descended from a
+template developed by Professor Charles Duncan for MSc students in
+Meteorology. His acknowledgement follows:
+
+\emph{This template has been produced with help from many former
+  students who have shown different ways of doing things. Please make
+  suggestions for further improvements.}
+
+Some parts of this template were lifted unashamedly from the Edinburgh
+MPhys project report guide, with little or no modification. I have no
+idea who wrote the first version of that\ldots
+
+You don't have to use \LaTeX\ for your dissertation. You can use
+Microsoft Word, Apple Pages, LibreOffice or similar, but it's
+\emph{much} easier to typeset equations in \LaTeX, and references look
+after themselves. Whatever you use, your dissertation should have the
+general structure of this template, and it should look similar --
+especially the front page.
+
+\tableofcontents
+\listoftables
+\listoffigures
+
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+The Introduction should contain a description of your project and the
+problem you are trying to solve. It should start off at a level that
+should be understandable by anyone with a degree in physics, but it
+can become more technical later
+
+Where appropriate you should include references to work that has
+already been done on your topic and anything else which lets you set
+your work in context.
+
+One of the things you will need to do is to ensure that you have a
+suitable list of references.  To do this you should see \cite{ref:lam}
+or some other suitable reference.  Note the format of the citation used
+here is the style favoured in this School.  Here is another
+reference \cite{ref:bloggs} for good measure.
+
+Alternatively, you can use \BibTeX. See later for some details on this.
+
+You will also want to make sure you have no spelling or grammatical
+mistakes. To help identify speling mistukes you can use the commands
+\emph{aspell}, \emph{ispell} or \emph{spell} on most Linux/Unix
+computers. See the appropriate manual pages. Remember that spelling
+mistakes are not the only errors which can occur. Spelling checkers
+will not find errors which are, in fact, valid words such as
+\emph{there} for {\em their}, nor will they find repeated repeated
+words which sometimes occur if your concentration is broken when
+typing. \textbf{There is no substitute for thorough proof reading!}
+
+Your dissertation should be no longer than 15,000 words. In terms of
+pages, 30 pages are ok. 50 pages are fine. But it shouldn't be
+much longer than that.
+
+
+\chapter{Background theory and/or theory}
+
+\section{The easy bits}
+This is just to show how to break things into sections.
+
+Many paragraphs in this demonstration document are here to provide some
+padding so that sections last for more than one page to illustrate what
+happens on subsequent pages. Note that the page numbering style is usually
+different on the first page of a new chapter than on subsequent pages.
+
+Here is a padding paragraph.  Rhubarb.  More rhubarb.  Yet more
+rhubarb.  Rhubarb.  More rhubarb.  Yet more rhubarb.  Rhubarb.  More
+rhubarb.  Yet more rhubarb.  Rhubarb.  More rhubarb.  Yet more
+rhubarb.  Rhubarb.  More rhubarb.  Yet more rhubarb.  Rhubarb.  More
+rhubarb.  Yet more rhubarb.  Rhubarb.  More rhubarb.  Yet more
+rhubarb.  Rhubarb.  More rhubarb.  Yet more rhubarb.  Rhubarb.  More
+rhubarb.  Yet more rhubarb.  Rhubarb. More rhubarb.  Yet more rhubarb.
+Rhubarb.  More rhubarb.  Yet more rhubarb.  Rhubarb.  More rhubarb.
+Yet more rhubarb. Rhubarb. More rhubarb.  Yet more rhubarb.  Rhubarb.
+More rhubarb. Yet more rhubarb.  Rhubarb.  More rhubarb.  Yet more
+rhubarb. Rhubarb.  More rhubarb.  Yet more rhubarb.  Rhubarb.  More
+rhubarb.  Yet more rhubarb.  Rhubarb. Yet more rhubarb.
+Too much rhubarb. No more rhubarb!
+
+\section{The more difficult bits}
+Some bits are hard.
+
+You might want to include an equation here:
+
+\begin{equation}
+  \delta N_{\nu} = (\delta N_{\nu})_{ex} + (\delta N_{\nu})_{au} 
+  \label{equation:delsplit}
+  % note that the label is optional, but it allows you to refer to this
+  % equation later.
+\end{equation}
+
+
+Here is another padding paragraph.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Far too many
+bananas.
+
+\subsection{Hard bits}
+You might want to include another equation or three here:
+
+\begin{equation}
+  \delta N_{\nu} = (\delta N_{\nu})_{ex} + (\delta N_{\nu})_{au} 
+  \label{equation:delsplit2}
+  % note that the label is optional but allows you to refer to this
+  % equation later.
+\end{equation}
+
+Almost the same equation again.
+
+\begin{equation}
+  \delta P_{\nu} = (\delta P_{\nu})_{ex} + (\delta Q_{\nu})_{au} 
+  \label{equation:delsplit3}
+  % note that the label is optional but allows you to refer to this
+  % equation later.
+\end{equation}
+
+You should use a different label for each equation.
+
+Here is a padding paragraph.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas.  Bananas.  More
+bananas.  Yet more bananas.  Bananas.  More bananas.  Yet more
+bananas.  Bananas.  More bananas.  Yet more bananas. And another
+equation.
+
+\begin{equation}
+  \delta Q_{\nu} = (\delta L_{\nu})_{ex} + (\delta X_{\nu})_{au} 
+  \label{equation:delsplit4}
+  % note that the label is optional but allows you to refer to this
+  % equation later.
+\end{equation}
+
+Here is a pudding paragraph.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Apple crumble.  More apple crumble.
+Yet more apple crumble.  Apple crumble.  More apple crumble.
+Yet more apple crumble.  Apple crumble.  More apple crumble.
+Yet more apple crumble.  Apple crumble.  More apple crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Yet more rhubarb crumble.  Rhubarb crumble.  More rhubarb crumble.
+Way too much rhubarb crumble.
+
+\subsection{Even harder bits}
+
+You might sometimes want to include equations without numbering them.
+\[
+  E=mc^{2}
+\]
+And this might be one of the places where you might want to refer to
+equation (\ref{equation:delsplit}). You will usually need to use the
+\LaTeX\ command twice to make cross-references like this work properly.
+The cross-reference information is stored in the \emph{.aux} file so
+don't delete it.
+
+\subsubsection{Numbering}
+You can keep subdividing but eventually you get to a level where
+numbering stops. This text is in a subsubsection which is not numbered
+by default.
+
+
+\paragraph{More on numbering:}
+
+This text is in a paragraph which is also not numbered by default and
+the ``title'' of the paragraph is not on a separate line.
+If you want to increase the depth to which sections are numbered you
+should see the section on setting the secnumdepth counter in the manual. 
+
+
+\chapter{Design and/or development (of my project)}
+
+This section should be written in standard scientific
+language. Standard techniques in your research field should not be
+written out in detail. In computational projects this section should
+be used to explain the algorithms used and the layout of the
+computational code. A copy of the actual code may be given in the
+appendices if appropriate.
+
+This section should emphasise the philosophy of the approach used and
+detail novel techniques. However please note: this section should not
+be a blow-by-blow account of what you did throughout the project. It
+should not contain large detailed sections about things you tried and
+found to be completely wrong! However, if you find that a technique
+that was expected to work failed, that is a valid result and should be
+included.
+
+Here logical structure is particularly important, and you may find
+that to maintain good structure you may have to present the
+explorations/calculations/computations/whatever in a different order
+from the one in which you carried them out.
+
+
+You might sometimes want to include multiple equations in one place
+\begin{eqnarray}
+  E &=& ma^{2} \\
+  E &=& mb^{2} \\
+  E &=& mc^{2}
+\end{eqnarray}
+You might want to include multiple equations in one place without
+numbering them
+\begin{eqnarray*}
+  E &=& ma^{2} \\
+  E &=& mb^{2} \\
+  E &=& mc^{2}
+\end{eqnarray*}
+You might want to include multiple equations in one place without
+numbering \emph{all} of them
+\begin{eqnarray}
+  E &=& ma^{2} \nonumber \\
+  E &=& mb^{2} \nonumber \\
+  E &=& mc^{2}
+\end{eqnarray}
+
+You might also want to include diagrams.  The example shows the use of
+the special command which allows existing pdf files to be included.
+You would normally keep your figures separate from the text.  These
+pictures might be images or pdf output from some program.
+
+Here, I created a figure which is centred and stretched to 30\% of the
+width of the page \verb+{0.30\hsize}+ and with the height stretched by
+the same amount \verb+{!}+ to preserve the aspect ratio. If you omit
+the extension (ie .eps, .ps or .pdf) on the file name then \LaTeX\ will
+pick up the postscript copy whereas pdflatex will automatically pick
+up the PDF version.
+
+
+\begin{figure}
+
+\begin{center}
+  \resizebox{0.30\hsize}{!}{\includegraphics{crest.pdf}}
+\end{center}
+
+\caption{The coloured version of the University crest. The caption should explain exactly in some detail what is displayed in the table.}
+\label{fig:eucrest}
+
+\end{figure}
+
+You should find the file crest.pdf on this wiki.
+
+% note that labels do not need to include a description of the object
+% they are labelling but it can be helpful, eg \label{fig:figurename}.
+
+You can use a label on a figure to refer to it later. The university
+crest is in Figure~(\ref{fig:eucrest}). Note that you should not use
+phrases like ``the figure above'' or ``the following figure'' since
+\LaTeX\ may move the figure relative to the text if it cannot be fitted
+onto the current page. The figure on the next page is an example.
+
+\begin{figure}
+
+\begin{center}
+  \resizebox{0.75\hsize}{!}{\includegraphics{rhubarbtruss.pdf}}
+\end{center}
+
+\caption{Ach, I thought we'd thrown out all the rhubarb. Who was she
+  anyway?}
+\label{fig:rhubarbtruss}
+
+\end{figure}
+
+
+\chapter{Another Chapter Title}
+\section{Number of Chapters}
+
+You may vary the number of chapters. The Introduction and Background
+Theory chapter are essential, although you may choose a different
+title for the latter. These two introductory chapters are usually
+followed by a chapter on what you did yourself, with a title such as
+Design and Development, although you can choose any title you
+wish. After that, you might to have another chapter, or you may go
+straight to the Results and Conclusions chapter.
+
+After the Introduction, you are free to use any chapter titles you wish.
+
+
+
+
+\chapter{Results and Analysis}
+
+This section should detail the obtained results in a clear,
+easy-to-follow manner. It is important to make clear what are original
+results and what are repeats of previous calculations or computations.
+Remember that long tables of numbers are just as boring to read as
+they are to type-in!
+
+Use graphs to present your results wherever practicable.
+
+Results or computations should be presented with uncertainties
+(errors), both statistical and systematic where applicable.
+
+Be selective in what you include: half a dozen \emph{e.g.}~tables that
+contain wrong data you collected while you forgot to switch on the
+computer are not relevant and may mask the correct results.
+
+
+\section{Some results}
+Here are some results.
+
+\subsection{More results}
+When showing results you are likely to use tables and graphs. You can
+create tables easily in \LaTeX.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{||l|c|l||}
+\hline
+\textbf{File names} & \textbf{Satellite} & \textbf{Resolution}\\
+\hline
+  worldr            &  Meteosat          &   5km\\
+  worldg            &  Meteosat          &   5km\\
+  worldb            &  Meteosat          &   5km\\
+\hline
+\end{tabular}
+\end{center}
+\caption{This is a simple table. More complicated tables can have
+  headings which pass over more than one column. The caption should
+  explain exactly in some detail what is displayed in the table.}
+\label{simple_table}
+\end{table}
+
+If you want to produce fancier tables than shown in Table \ref{simple_table}
+refer to the \LaTeX\ manual or ask Madame La Google.
+
+One of the simplest ways to produce simple graphs is to use gnuplot
+which produces \LaTeX\  output. Graph~(\ref{fig:gnu}) was produced using
+gnuplot with output designated as \LaTeX\  so that a \LaTeX\  output file is
+produced which you can include directly or keep separate and refer to
+using the \emph{include} command.
+
+Another approach is to draw simple figures using \emph{xfig} which allows
+you to export diagrams in \LaTeX\  picture format so that the diagram can
+be included directly.
+
+Perhaps the most robust way to include graphs is to convert them to
+PostScript or PDF and include them in the same was as was done in
+Figure~\ref{fig:eucrest} for the University Crest. You can usually do
+this with most packages, including Microsoft ones; one trick for
+producing PostScript is to print to a dummy PostScript printer.
+
+% in practice you would probably keep this in a separate file and use
+% the \include{filename} command to insert it here.
+
+\begin{figure}
+% GNUPLOT: LaTeX picture
+\setlength{\unitlength}{0.240900pt}
+\ifx\plotpoint\undefined\newsavebox{\plotpoint}\fi
+\sbox{\plotpoint}{\rule[-0.200pt]{0.400pt}{0.400pt}}%
+\begin{picture}(1500,1200)(0,0)
+\font\gnuplot=cmr10 at 10pt
+\gnuplot
+\sbox{\plotpoint}{\rule[-0.200pt]{0.400pt}{0.400pt}}%
+\put(220.0,113.0){\rule[-0.200pt]{292.934pt}{0.400pt}}
+\put(220.0,113.0){\rule[-0.200pt]{0.400pt}{245.477pt}}
+\put(220.0,113.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(198,113){\makebox(0,0)[r]{$0$}}
+\put(1416.0,113.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(220.0,317.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(198,317){\makebox(0,0)[r]{$0.2$}}
+\put(1416.0,317.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(220.0,521.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(198,521){\makebox(0,0)[r]{$0.4$}}
+\put(1416.0,521.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(220.0,724.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(198,724){\makebox(0,0)[r]{$0.6$}}
+\put(1416.0,724.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(220.0,928.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(198,928){\makebox(0,0)[r]{$0.8$}}
+\put(1416.0,928.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(220.0,1132.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(198,1132){\makebox(0,0)[r]{$1$}}
+\put(1416.0,1132.0){\rule[-0.200pt]{4.818pt}{0.400pt}}
+\put(220.0,113.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(220,68){\makebox(0,0){$0$}}
+\put(220.0,1112.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(414.0,113.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(414,68){\makebox(0,0){$1$}}
+\put(414.0,1112.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(607.0,113.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(607,68){\makebox(0,0){$2$}}
+\put(607.0,1112.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(801.0,113.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(801,68){\makebox(0,0){$3$}}
+\put(801.0,1112.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(995.0,113.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(995,68){\makebox(0,0){$4$}}
+\put(995.0,1112.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1188.0,113.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1188,68){\makebox(0,0){$5$}}
+\put(1188.0,1112.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1382.0,113.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(1382,68){\makebox(0,0){$6$}}
+\put(1382.0,1112.0){\rule[-0.200pt]{0.400pt}{4.818pt}}
+\put(220.0,113.0){\rule[-0.200pt]{292.934pt}{0.400pt}}
+\put(1436.0,113.0){\rule[-0.200pt]{0.400pt}{245.477pt}}
+\put(220.0,1132.0){\rule[-0.200pt]{292.934pt}{0.400pt}}
+\put(45,622){\makebox(0,0){\shortstack{This is\\the\\$y$ axis}}}
+\put(828,23){\makebox(0,0){This is the $x$ axis}}
+\put(828,1177){\makebox(0,0){This is a plot of $y=\sin(x)$}}
+\put(220.0,113.0){\rule[-0.200pt]{0.400pt}{245.477pt}}
+\sbox{\plotpoint}{\rule[-0.500pt]{1.000pt}{1.000pt}}%
+\put(1306,1067){\makebox(0,0)[r]{sin(x)}}
+\multiput(1328,1067)(20.756,0.000){4}{\usebox{\plotpoint}}
+\put(1394,1067){\usebox{\plotpoint}}
+\put(220,113){\usebox{\plotpoint}}
+\multiput(220,113)(3.768,20.411){4}{\usebox{\plotpoint}}
+\multiput(232,178)(4.132,20.340){3}{\usebox{\plotpoint}}
+\multiput(245,242)(3.825,20.400){3}{\usebox{\plotpoint}}
+\multiput(257,306)(3.884,20.389){3}{\usebox{\plotpoint}}
+\multiput(269,369)(3.944,20.377){3}{\usebox{\plotpoint}}
+\multiput(281,431)(4.326,20.300){3}{\usebox{\plotpoint}}
+\multiput(294,492)(4.137,20.339){3}{\usebox{\plotpoint}}
+\multiput(306,551)(4.276,20.310){3}{\usebox{\plotpoint}}
+\multiput(318,608)(4.693,20.218){3}{\usebox{\plotpoint}}
+\multiput(331,664)(4.583,20.243){2}{\usebox{\plotpoint}}
+\multiput(343,717)(4.754,20.204){3}{\usebox{\plotpoint}}
+\multiput(355,768)(5.034,20.136){2}{\usebox{\plotpoint}}
+\multiput(367,816)(5.760,19.940){2}{\usebox{\plotpoint}}
+\multiput(380,861)(5.579,19.992){3}{\usebox{\plotpoint}}
+\put(398.00,923.50){\usebox{\plotpoint}}
+\multiput(404,943)(7.049,19.522){2}{\usebox{\plotpoint}}
+\multiput(417,979)(7.288,19.434){2}{\usebox{\plotpoint}}
+\put(433.18,1021.10){\usebox{\plotpoint}}
+\multiput(441,1040)(8.982,18.712){2}{\usebox{\plotpoint}}
+\put(460.41,1076.97){\usebox{\plotpoint}}
+\put(471.84,1094.28){\usebox{\plotpoint}}
+\put(484.84,1110.41){\usebox{\plotpoint}}
+\put(500.42,1124.01){\usebox{\plotpoint}}
+\multiput(503,1126)(19.159,7.983){0}{\usebox{\plotpoint}}
+\put(519.48,1131.37){\usebox{\plotpoint}}
+\multiput(527,1132)(20.136,-5.034){0}{\usebox{\plotpoint}}
+\put(539.74,1128.60){\usebox{\plotpoint}}
+\put(557.04,1117.38){\usebox{\plotpoint}}
+\put(570.79,1101.95){\usebox{\plotpoint}}
+\put(582.44,1084.80){\usebox{\plotpoint}}
+\put(593.09,1066.99){\usebox{\plotpoint}}
+\multiput(601,1053)(8.430,-18.967){2}{\usebox{\plotpoint}}
+\put(619.18,1010.54){\usebox{\plotpoint}}
+\multiput(625,996)(7.413,-19.387){2}{\usebox{\plotpoint}}
+\multiput(638,962)(6.403,-19.743){2}{\usebox{\plotpoint}}
+\multiput(650,925)(5.830,-19.920){2}{\usebox{\plotpoint}}
+\multiput(662,884)(5.461,-20.024){2}{\usebox{\plotpoint}}
+\multiput(674,840)(5.533,-20.004){2}{\usebox{\plotpoint}}
+\multiput(687,793)(4.937,-20.160){3}{\usebox{\plotpoint}}
+\multiput(699,744)(4.667,-20.224){2}{\usebox{\plotpoint}}
+\multiput(711,692)(4.858,-20.179){3}{\usebox{\plotpoint}}
+\multiput(724,638)(4.276,-20.310){3}{\usebox{\plotpoint}}
+\multiput(736,581)(4.205,-20.325){3}{\usebox{\plotpoint}}
+\multiput(748,523)(4.070,-20.352){3}{\usebox{\plotpoint}}
+\multiput(760,463)(4.326,-20.300){3}{\usebox{\plotpoint}}
+\multiput(773,402)(3.884,-20.389){3}{\usebox{\plotpoint}}
+\multiput(785,339)(3.884,-20.389){3}{\usebox{\plotpoint}}
+\multiput(797,276)(4.070,-20.352){3}{\usebox{\plotpoint}}
+\multiput(810,211)(3.825,-20.400){3}{\usebox{\plotpoint}}
+\multiput(822,147)(3.607,-20.440){2}{\usebox{\plotpoint}}
+\put(828,113){\usebox{\plotpoint}}
+\end{picture}
+\caption{Simple Gnuplot example. The caption should tell the reader
+  what is plotted against what, and explain in some detail the various
+  sets of curves of data points. It shouldn't just say ``plot of
+  results for the purple function in green gauge'' without further explanation.}
+\label{fig:gnu}
+\end{figure}
+
+\section{Discussion of your results}
+
+This section should give a picture of what you have taken out of your
+project and how you can put it into context.
+
+This section should summarise the results obtained, detail conclusions
+reached, suggest future work, and changes that you would make if you
+repeated the project.
+
+\chapter{Conclusions}
+
+This is the place to put your conclusions about your work. You can
+split it into different sections if appropriate. You may want to include
+a section of future work which could be carried out to continue your
+research.
+
+The conclusion section should be at least one page long, preferably 2
+pages, but not much longer.
+
+\appendix
+% the appendix command just changes heading styles for appendices.
+
+\chapter{Stuff that's too detailed}
+
+Appendices should contain all the material which is considered too
+detailed to be included in the main body of the text, but which is
+important enough to be included in the thesis.
+
+Perhaps this is a good place to mention \BibTeX.
+
+You can do references in the simple way explained in the introduction,
+or you can use \BibTeX.
+
+
+\section{\BibTeX}
+\label{sec:bibtex}
+
+It is convenient to use \BibTeX\ to compile your bibliography.  First
+you need to create a .bib file e.g.  you may call it ref.bib Then you
+can put all your references into the file with entries such as
+\begin{verbatim}
+@Book{ob:bornwolf,
+     author = "Born, M and Wolf, E",
+     title  = "Principles of Optics",
+     publisher = "Cambridge University Press",
+     year = 1999,
+     edition = {7th},
+}
+
+@Article{jr:ashkin,
+Author = {A. Ashkin and J.M. Dziedzic and J.E. Bjorkholm and S. Chu},
+Title = "Observation of a single beam gradient force optical tap for 
+dielectric particles",
+Journal = "Optics Letters",
+Volume = 11,
+Pages = "288-290",
+Year = 1986}
+
+@INPROCEEDINGS{seger,
+ author = {J. Seger and H.J. Brockman},
+ title = {What is bet-hedging?},
+ editors={P.H. Harvey and L. Partridge},
+ booktitle = {Oxford Surveys in Evolutionary Biology},
+ year={1987},
+ page={18},
+ publisher={Oxford University Press},
+ place={Oxford}}
+\end{verbatim}
+for a book, an article in a journal or an article in a proceedings volume
+respectively.
+
+Inside your \LaTeX\ file
+you should include 
+\begin{verbatim}
+\bibliographystyle{unsrt}                      
+and
+\bibliography{ref}
+\end{verbatim}
+The first command determines the reference style, here plain and 
+unsorted. With this referencing style 
+a numerical referencing system (which is now the most
+common in physics literature) is used and the numbering of references
+will be the order in which they appear in the document. Alternatively, 
+you could use
+a customised `style file' but there is no real need.  The second
+command just inputs your .bib file Note that only the references cited
+in the text will appear in the bibliography so you can have spare
+references in your .bib file.
+
+
+You use the name you have given to an entry (e.g.
+for the book example above the name is ob:bornwolf)
+to cite the relevant article
+by using the cite command in your \LaTeX\ file e.g. 
+\begin{verbatim}
+\cite{ob:bornwolf}
+\end{verbatim}
+
+
+\section{Producing your documents using \texttt{pdflatex}}
+
+To use pdflatex your figures need to be in pdf format.  You can convert almost any image file to pdf using \texttt{convert}.  e.g. \texttt{convert myfigure.png myfigure.pdf}.
+
+The first time you should type:
+\begin{verbatim}
+  pdflatex ProjectReport
+  bibtex ProjectReport
+  pdflatex ProjectReport
+  pdflatex ProjectReport
+\end{verbatim} 
+This first time you run\texttt{pdflatex} it will produce a
+\texttt{ProjectReport.aux}.  The \BibTeX\ command reads in the
+bibliography file and makes the files \texttt{ProjectReport.bbl} and
+\texttt{ProjectReport.blg} files.  These files are read in the next
+\texttt{pdflatex} command, but you'll still have ``undefined
+cross-reference'' errors which are sorted out by the last
+\texttt{pdflatex} command.
+
+Subsequently, you should only need to do one (or two)
+\texttt{pdflatex}s, or \texttt{pdfbibtex} followed by
+\texttt{pdflatex} twice if you change any references.
+
+\vspace{5mm} You may also use plain \texttt{latex} instead of
+\texttt{pdflatex}.  This requires you to use postscript graphics
+instead of pdf.
+
+
+
+
+\chapter{Stuff that won't be read by anyone}
+
+Some people include in their thesis a lot of detail, particularly lots
+of tables containing raw results, figures of intermediate results, or
+computer code which no-one will ever read. You should be careful that
+anything like this you include should contain some element of
+uniqueness which justifies its inclusion.
+
+\begin{thebibliography}{100}
+
+\bibitem{ref:lam} L~Lamport. \emph{1986 \LaTeX\  User's Guide and Reference Manual.} Addison Wesley, pp~242.
+
+\bibitem{ref:bloggs} F~Bloggs. \emph{1993 \LaTeX\  Users do it in Environments.} International~Journal of Silly Findings, Volume 22, pp~23-29.
+
+\bibitem{ref:no-one} P~Thrower. \emph{2019 Too Much Rhubarb Crumble.} Dessertation Review Letters, Volume 2, pp~1-20.
+
+\bibitem{ref:the-early-ones} H~McDonald, S~Simpson, S~Ross and K~Green. \emph{The Ones That Got Away.} Unclear Physics, Volume 1, pp~1-68.
+
+
+
+\end{thebibliography}
+
+
+\end{document}
+
