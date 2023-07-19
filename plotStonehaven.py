@@ -181,7 +181,6 @@ def plot_return_period(radar_data_all, mc_rp, rp, crash_rain, qt=0.95):
 	fig, ax = plt.subplots()
 	radar_data = radar_data_all.sel(time_quant=qt)  # want media
 	mc_rp_median = mc_rp.sel(time_quant=qt)
-	print(mc_rp.sel(time_quant=0.5))
 	ax.fill_between(mc_rp_median.Rx15min, mc_rp_median.isel(quantile=0), y2=mc_rp_median.isel(quantile=1), color='grey')
 	rp.sel(time_quant=qt).plot(color='red', ax=ax, linewidth=3)
 	# ax.plot(rain,emp_rp,linewidth=3,color='green')
@@ -204,14 +203,15 @@ def plot_return_period(radar_data_all, mc_rp, rp, crash_rain, qt=0.95):
 	plt.show()
 
 
-q = [0.05, 0.95]  # quantiles for fit between
-rain = np.linspace(0, 100.) # rain values wanted for rp's etc
-radar_data_all = xr.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'reg_radar_rain.nc')
-mc_dist = xr.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'bootstrap_reg_radar_params.nc')
-radar_fit = xr.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'reg_radar_params.nc')
-ds = xr.load_dataset(stonehavenRainLib.dataDir / 'transfer_dir' / 'summary_5km_1h.nc')
-crash_rain = ds.monthlyMax.sel(time=(ds.monthlyMax.time.dt.season == 'JJA')). \
-	sel(time=['2020-08-31', '2021-07-31'], **stonehavenRainLib.stonehaven_crash, method='nearest').load()
-rp = 1. / gev_r.xarray_sf(rain,radar_fit.Parameters, 'Rx15min' )
-mc_rp = (1. / gev_r.xarray_sf(rain, mc_dist.Parameters, 'Rx15min')).quantile(q, 'sample')
-plot_return_period(radar_data_all=radar_data_all, mc_rp=mc_rp, rp=rp, crash_rain=crash_rain)
+def run_return_plot():
+	q = [0.05, 0.95]  # quantiles for fit between
+	rain = np.linspace(0, 100.) # rain values wanted for rp's etc
+	radar_data_all = xr.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'reg_radar_rain.nc')
+	mc_dist = xr.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'bootstrap_reg_radar_params.nc')
+	radar_fit = xr.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'reg_radar_params.nc')
+	ds = xr.load_dataset(stonehavenRainLib.dataDir / 'transfer_dir' / 'summary_5km_1h.nc')
+	crash_rain = ds.monthlyMax.sel(time=(ds.monthlyMax.time.dt.season == 'JJA')). \
+		sel(time=['2020-08-31', '2021-07-31'], **stonehavenRainLib.stonehaven_crash, method='nearest').load()
+	rp = 1. / gev_r.xarray_sf(rain,radar_fit.Parameters, 'Rx15min')
+	mc_rp = (1. / (gev_r.xarray_sf(rain, mc_dist.Parameters, 'Rx15min')+0.00001)).quantile(q, 'sample') # avoid div by 0
+	plot_return_period(radar_data_all=radar_data_all, mc_rp=mc_rp, rp=rp, crash_rain=crash_rain)
