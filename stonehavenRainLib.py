@@ -130,12 +130,12 @@ def gen_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', quantiles=No
     radar_data = rseasMskmax.groupby(indx).quantile(quantiles).rename(group='time_index', quantile='time_quant')  # .values
     ok_count=(~rseasMskmax.isnull()).groupby(indx).sum().rename(group='time_index')    # count non nan
     radar_data=radar_data[(ok_count > 25)] # want at least 25 values
-    #ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2021')
-    #rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
-    #ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2020') #TODO: FIX
-    #rainC2020 = radar_data.sel(time_index=ed_indx).squeeze()
+    ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2021')
+    rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
+    ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2020')
+    rainC2020 = radar_data.sel(time_index=ed_indx).squeeze()
     #rainC2020 = 20.0
-    ds=xarray.Dataset(dict(radar=radar_data,rain_count=rain_count,indx=indx,mask=rseasMskmax)) #critical2021=rainC2021,,critical2020=rainC2020
+    ds=xarray.Dataset(dict(radar=radar_data,rain_count=rain_count,indx=indx,mask=rseasMskmax, critical2020=rainC2020, critical2021=rainC2021))
     return ds
 
 try:
