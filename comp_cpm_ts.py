@@ -63,8 +63,8 @@ for var in ['tas','pr']:
         
         
         cet_list.append(cet)
-        ed_ts=da.sel(**stonehaven_region).mean(stonehavenRainLib.cpm_horizontal_coords).load()
-        ed_list.append(ed_ts)
+        st_ts=da.sel(**stonehaven_region).mean(stonehavenRainLib.cpm_horizontal_coords).load()
+        ed_list.append(st_ts)
         cpm_ts=da.mean(stonehavenRainLib.cpm_horizontal_coords).load()
         cpm_list.append(cpm_ts)
         print(f"Done with {p} for {var}") # end loop over ensemble members
