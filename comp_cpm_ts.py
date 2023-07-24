@@ -28,7 +28,7 @@ for key, coords in stonehavenRainLib.rotated_coords.items():
 ax.coastlines()
 fig.show()
 
-## now to read the ensemble data.
+# now to read the ensemble data.
 
 st = stonehavenRainLib.rotated_coords['Stonehaven']
 stonehaven_region = dict(grid_longitude=slice(st[0] - 0.5, st[0] + 0.5),
@@ -58,6 +58,7 @@ for var in ['tas', 'pr']:
             cet += (ts * wt)
 
         cet_list.append(cet)
+        print(da)
         st_ts = da.sel(**stonehaven_region).mean(stonehavenRainLib.cpm_horizontal_coords).load()
         st_list.append(st_ts)
         cpm_ts = da.mean(stonehavenRainLib.cpm_horizontal_coords).load()
