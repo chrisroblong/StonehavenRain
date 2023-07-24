@@ -205,9 +205,11 @@ def comp_bootstrap(ratio_Dparam,cpm_ht,direct=None,filename_start=None,refresh=F
         mn_ratio = xarray.load_dataarray(mn_file, decode_times=False)
         bootstrap_ratio = xarray.load_dataarray(bs_file, decode_times=False)
     return mn_ratio,bootstrap_ratio
-rgn='CET'
+
+
+rgn = 'CET'
 fit_var = xfit[rgn]
-fit_var_shape  = xfit_shape[rgn]
+fit_var_shape = xfit_shape[rgn]
 
 
 D=fit_var.Parameters.sel(parameter=['Dlocation','Dscale','Dshape'])#.where(msk)
