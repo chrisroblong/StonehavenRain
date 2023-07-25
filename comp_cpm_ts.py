@@ -15,6 +15,9 @@ wts = dict(
     Ringway=1.0 / 6
 )
 
+
+'''
+plot not working
 projRot = ccrs.RotatedPole(pole_longitude=177.5, pole_latitude=37.5)
 proj = ccrs.PlateCarree()
 
@@ -27,6 +30,7 @@ for key, coords in stonehavenRainLib.rotated_coords.items():
 
 ax.coastlines()
 fig.show()
+'''
 
 # now to read the ensemble data.
 
@@ -58,7 +62,6 @@ for var in ['tas', 'pr']:
             cet += (ts * wt)
 
         cet_list.append(cet)
-        print(da)
         st_ts = da.sel(**stonehaven_region).mean(stonehavenRainLib.cpm_horizontal_coords).load()
         st_list.append(st_ts)
         cpm_ts = da.mean(stonehavenRainLib.cpm_horizontal_coords).load()
