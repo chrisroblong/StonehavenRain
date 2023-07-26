@@ -15,8 +15,8 @@ do echo "Processing $dir"
    do 
        echo $range
        r1=$(echo $range| awk '{print $1}')
-       cmd="./ens_seas_max.py  $dir/pr_*_1hr_*.nc --region $rgn -o $outdir/CPM_pr_seas_max$ens --monitor --verbose --rolling 2 4 8 --range $range"
-       echo "./ens_seas_max.py  $dir/pr_\*_1hr_\*.nc --region $rgn -o $outdir/CPM_pr_seas_max$ens --monitor --verbose --rolling 2 4 8 --range $range"
+       cmd="./ens_seas_max.py  $dir/pr_*_1hr_*.nc --region $rgn -o $outdir/coarsen_CPM_pr_seas_max$ens --monitor --verbose --rolling 2 4 8 --range $range"
+       echo "./ens_seas_max.py  $dir/pr_\*_1hr_\*.nc --region $rgn -o $outdir/coarsen_CPM_pr_seas_max$ens --monitor --verbose --rolling 2 4 8 --range $range --coarsen 2"
        outfile=output/"ens_seas_max_"$ens"_"$r1".out"
        echo sbatch -p $Q -t $TIME -o $outfile
        sbatch -p $Q -t $TIME -o  $outfile $cmd
