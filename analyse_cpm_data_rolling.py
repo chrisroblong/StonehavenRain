@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import matplotlib.colors
-import patch_mpl_mosaic # patch plt.subplot_mosaic.
+#import patch_mpl_mosaic # patch plt.subplot_mosaic.
 import gev_r # needs to be imported before any r done as sets up r-environment
 import rpy2
 import rpy2.robjects as robjects
@@ -102,14 +102,14 @@ outdir_gev = stonehavenRainLib.dataDir / 'gev_fits_roll'
 outdir_gev.mkdir(parents=True, exist_ok=True)  # create the directory
 
 ## read in the data we need
-covariate_dir = stonehavenRainLib.dataDir / "covariates"
+covariate_dir = stonehavenRainLib.dataDir / "transfer_dir/cpm_fits"
 cet = xarray.load_dataset(covariate_dir/ 'cet_tas.nc').tas
 cpm = xarray.load_dataset(covariate_dir/ 'cpm_reg_tas.nc').tas
 
-ed_temp = xarray.load_dataset(covariate_dir / 'ed_reg_tas.nc').tas
-ed_precip = xarray.load_dataset(covariate_dir / 'ed_reg_pr.nc').pr
+ed_temp = xarray.load_dataset(covariate_dir / 'st_reg_tas.nc').tas
+ed_precip = xarray.load_dataset(covariate_dir / 'st_reg_pr.nc').pr
 ed_reg_hum=qsat(ed_temp)
-cpm_files=list((stonehavenRainLib.dataDir/'CPM_data').glob("**/*.nc"))
+cpm_files=list((stonehavenRainLib.dataDir/'CPM').glob("**/*.nc"))
 ed_extreme_precip = xarray.open_mfdataset(cpm_files).seasonalMax
 # now extract roughly 100x100 km box centred on Edinburgh and only for summer
 ed_rot = stonehavenRainLib.rotated_coords['Edinburgh']

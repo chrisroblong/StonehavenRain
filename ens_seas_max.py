@@ -14,15 +14,6 @@ import xarray
 import numpy as np
 import pandas as pd
 import argparse
-import resource # so we can see memory usage
-import warnings
-
-import pathlib
-import stonehavenRainLib
-import xarray
-import numpy as np
-import pandas as pd
-import argparse
 import resource # so we can see memory usage every month.
 import warnings
 import glob
