@@ -14,7 +14,7 @@ import numpy as np
 import statsmodels.api as sm
 
 """
-Very ugly code which larely plots key figure showing chaning intensity and probability ratios as function of time period and rtn period/rainfall
+Very ugly code which largely plots key figure showing chaning intensity and probability ratios as function of time period and rtn period/rainfall
 Does the following -- using results produced by:
    analyse_cpm_data_rolling -- data from analysis of cpm data
    comp_radar_fits -- data from analysis of radar data
