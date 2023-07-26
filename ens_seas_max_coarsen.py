@@ -193,7 +193,7 @@ if args.range is not None:
 
 # add coarsening
 pr_coarsen_long = ds.pr.coarsen(grid_longitude=coarsen, boundary="trim").mean()
-pr_coarsen = pr_coarsen_long.coarsen(grid_longitude=coarsen, boundary="trim").mean()
+pr_coarsen = pr_coarsen_long.coarsen(grid_latitude=coarsen, boundary="trim").mean()
 
 
 if args.verbose:

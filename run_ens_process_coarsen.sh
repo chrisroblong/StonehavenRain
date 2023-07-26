@@ -9,7 +9,7 @@ Q='high-mem --mem=100000' # Q for job
 for dir in /badc/ukcp18/data/land-cpm/uk/2.2km/rcp85/*/pr/1hr/latest
 do echo "Processing $dir"
    ens=$(echo $dir | sed -E  s'!^.*rcp85/([0-9][0-9]*)/.*!\1!')
-   outdir=CPM$ens
+   outdir=data/CPM/CPM$ens
    mkdir -p $outdir
    for range in '1980 2020' '2020 2040' '2060 2080'
    do 
