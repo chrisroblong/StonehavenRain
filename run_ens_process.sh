@@ -5,7 +5,7 @@ mkdir -p output # where output is going
 # run processing jobs for CPM ensemble
 rgn="359 361 3.5 5.5" # region = +/- 1 degree of Stonehaven
 TIME='12:00:00' # time job will be in the Q
-Q='short-serial' # Q for job
+Q='high-mem --mem=100000' # Q for job
 for dir in /badc/ukcp18/data/land-cpm/uk/2.2km/rcp85/*/pr/1hr/latest
 do echo "Processing $dir"
    ens=$(echo $dir | sed -E  s'!^.*rcp85/([0-9][0-9]*)/.*!\1!')
