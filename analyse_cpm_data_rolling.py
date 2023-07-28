@@ -110,15 +110,25 @@ st_temp = xarray.load_dataset(covariate_dir / 'st_reg_tas.nc').tas
 st_precip = xarray.load_dataset(covariate_dir / 'st_reg_pr.nc').pr
 st_reg_hum = qsat(st_temp)
 cpm_files = list((stonehavenRainLib.dataDir / 'CPM').glob("**/*.nc"))
-st_extreme_precip = xarray.open_mfdataset(cpm_files).seasonalMax
-# now extract roughly 100x100 km box centred on Edinburgh and only for summer
-st_rot = stonehavenRainLib.rotated_coords['Edinburgh']
+
+
+# now extract roughly 100x100 km box centred on Stonehaven and only for summer
+st_rot = stonehavenRainLib.rotated_coords['Stonehaven']
 st_rgn_rot = dict()
 for c, name in zip(st_rot, ['grid_longitude', 'grid_latitude']):
     st_rgn_rot[name] = slice(c - 0.5, c + 0.5)
 
-st_extreme_precip = st_extreme_precip.sel(time=(st_extreme_precip.time.dt.season == 'JJA'))
-st_extreme_precip = st_extreme_precip.sel(**st_rgn_rot).load()
+
+rainmaxlist = []
+for file in cpm_files:
+    array = xarray.open_dataset(file).seasonalMax
+    array = array.sel(time=(array.time.dt.season == 'JJA'))
+    array = array.sel(**st_rgn_rot).load()
+    rainmaxlist.append(array)
+st_extreme_precip = xarray.combine_by_coords(rainmaxlist)
+
+#st_extreme_precip = st_extreme_precip.sel(time=(st_extreme_precip.time.dt.season == 'JJA'))
+#st_extreme_precip = st_extreme_precip.sel(**st_rgn_rot).load()
 
 # get in the topographic info for the CPM. Note coords differ slightly from st_extreme prob due to FP changes.
 cpm_ht = xarray.load_dataset(stonehavenRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
@@ -138,7 +148,7 @@ t_today = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('2
 t_pi = float(obs_cet.sel(time=(obs_cet.time.dt.month == 7)).sel(time=slice('1850', '1899')).mean())
 temp_p2k = 2 * 0.94 + t_pi  # from Ed
 
-## Do the fit
+# Do the fit
 stack_dims = ['time', 'ensemble_member']
 file = outdir_gev / f"constant_fit.nc"
 fit_nocov = gev_r.xarray_gev(st_extreme_precip.stack(time_ensemble=stack_dims),
@@ -325,7 +335,7 @@ label = commonLib.plotLabel()
 fig, ax_dict = plt.subplot_mosaic([['location', 'scale'],
                                    ['location', 'scale'],
                                    ['scatter', 'scatter_shape'],
-                                   ['r_gev_fit_ed', 'r_gev_fit_w_ed']],
+                                   ['r_gev_fit_st', 'r_gev_fit_w_st']],
                                   # gridspec_kw=dict(height_ratios=[2,1,1]),
                                   num='cpm_gev_fit', clear=True, figsize=[9, 10],
                                   subplot_kw_mosaic=dict(location=plot_kws, scale=plot_kws))
@@ -411,17 +421,17 @@ fig.colorbar(cm, ax=ax_scatters, orientation='horizontal', label='', fraction=0.
 # plot qq-plots for covariate fits
 ## plot the fits for CPM data
 cet = xarray.load_dataset(covariate_dir / 'cet_tas.nc').tas
-ed = stonehavenRainLib.rotated_coords['Edinburgh']
-st_ext = st_extreme_precip.sel(grid_latitude=ed[1], grid_longitude=ed[0], method='nearest', rolling=1).load()  #
-st_west_ext = st_extreme_precip.sel(grid_latitude=ed[1], grid_longitude=ed[0] - 0.25, method='nearest',
+st = stonehavenRainLib.rotated_coords['Stonehaven']
+st_ext = st_extreme_precip.sel(grid_latitude=st[1], grid_longitude=st[0], method='nearest', rolling=1).load()  #
+st_west_ext = st_extreme_precip.sel(grid_latitude=st[1], grid_longitude=st[0] - 0.25, method='nearest',
                                     rolling=1).load()  #
-st_north_ext = st_extreme_precip.sel(grid_latitude=ed[1] + 0.25, grid_longitude=ed[0], method='nearest',
+st_north_ext = st_extreme_precip.sel(grid_latitude=st[1] + 0.25, grid_longitude=st[0], method='nearest',
                                      rolling=1).load()  #
 ts_summer = cet.resample(time='QS-DEC').mean().dropna('time')
 ts_summer = ts_summer.sel(time=(ts_summer.time.dt.month == 6))  # get the summer values
 ts_summer['time'] = st_extreme_precip.time  # make sure times are the same
 
-for data, name in zip([st_ext, st_west_ext], ['r_gev_fit_ed', 'r_gev_fit_w_ed']):
+for data, name in zip([st_ext, st_west_ext], ['r_gev_fit_st', 'r_gev_fit_w_st']):
     ax = ax_dict[name]
     df_data = [data.values.flatten()]
     df_data.append(ts_summer.values.flatten())
