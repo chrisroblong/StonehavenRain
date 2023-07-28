@@ -36,7 +36,7 @@ def read_cet(file=None, retrieve=False, direct='data', mean='seasonal', temp_typ
     :param temp_type: What temp_type of CET to be retrieved (mean|max|min)
     :return: xarray
     """
-    mo_cet_root = 'https://www.metoffice.gov.uk/hadobs/hadcet'
+    mo_cet_root = 'https://www.metoffice.gov.uk/hadobs/hadcet/data/legacy'
     urls = dict(dailymean='cetdl1772on.dat',
                 monthlymean='cetml1659on.dat',
                 seasonalmean='ssn_HadCET_mean.txt',
