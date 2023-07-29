@@ -60,15 +60,14 @@
 \pagenumbering{roman}
 
 \begin{abstract}
-  Heavy rainfall on the 20th of August 2020 resulted in a landslip on the Dundee-Aberdeen railway line near Carmont, Aberdeenshire.
+Extreme rainfall on Wednesday 12 August 2020 resulted in debris being washed out of a drain and onto the Dundee-Aberdeen line at Carmont, Aberdeenshire.
 
-  This caused the Stonehaven derailment,
-    in which three people were killed.
+This caused the Stonehaven derailment,
+    in which three people were killed and six people were injured,
+    leaving no passengers on the train unharmed.
 
-  In this dissertation,
-    I quantify the effect of observed and future climate warming on the risk of similar extreme rainfall events occuring.
-
-
+There is evidence that future change to the climate makes extreme weather events, including rainfall,
+    more common.
 
 \end{abstract}
 
@@ -84,7 +83,7 @@ Give the chapters and state who did the work
 
 \bigskip
 
-Calculations were done using Python with use of various packages.
+Calculations used Python with many standard packages packages.
 
 Numpy and XArray are used to manage and process both real and modelled rainfall data.
 
@@ -123,18 +122,13 @@ and a monte carlo bootstrap of the rainfall distribution.
 In mid-July I created plots for these distributions and started to work with the
 Convective Permitting Model data.
 
-For the final parts of the summer I worked mainly on perfecting the
-algorithm for the Random Osculator and implementing the EvenMoreRandom
-Osculators algorithm with the improved Heaviside Articulation. The
-final results were encouraging, but more work is clearly needed. To
-this end, I have been awarded a studentship by the British University
-of Lifelong Learning to extend this work during my PhD Studies at
-the non-existent Scottish Highlands Institute of Technology in
-Inveroxter.
+
 
 I started writing this dissertation in mid-July, and I spent the first
 three weeks of August working on it full-time.
 
+I have achieved x, y, z results, but understand that my findings are limited.
+I would run multiple models and
 
 
 \newpage
@@ -158,7 +152,7 @@ making this project possible
 
 \pagenumbering{arabic}
 
-\chapter{Introduction}
+\chapter{Introduction}\label{ch:intro}
 The Introduction should contain a description of your project and the
 problem you are trying to solve. It should start off at a level that
 should be understandable by anyone with a degree in physics, but it
@@ -168,34 +162,28 @@ Where appropriate you should include references to work that has
 already been done on your topic and anything else which lets you set
 your work in context.
 
-One of the things you will need to do is to ensure that you have a
-suitable list of references.  To do this you should see \cite{ref:lam}
-or some other suitable reference.  Note the format of the citation used
-here is the style favoured in this School.  Here is another
-reference \cite{ref:bloggs} for good measure.
 
-Alternatively, you can use \BibTeX. See later for some details on this.
+\chapter{Background Theory}\label{ch:background}
 
-You will also want to make sure you have no spelling or grammatical
-mistakes. To help identify speling mistukes you can use the commands
-\emph{aspell}, \emph{ispell} or \emph{spell} on most Linux/Unix
-computers. See the appropriate manual pages. Remember that spelling
-mistakes are not the only errors which can occur. Spelling checkers
-will not find errors which are, in fact, valid words such as
-\emph{there} for {\em their}, nor will they find repeated repeated
-words which sometimes occur if your concentration is broken when
-typing. \textbf{There is no substitute for thorough proof reading!}
+\section{Event Attribution Theory}\label{sec:attribution}
 
-Your dissertation should be no longer than 15,000 words. In terms of
-pages, 30 pages are ok. 50 pages are fine. But it shouldn't be
-much longer than that.
+The weather is a complex system,
+    so any weather event is necessarily multifactorial,
+    with no single cause.
+It is therefore necessary to use a probabilistic lens to perform a scientific analysis.
 
+In this case, the weather at a given place and time of year is expressed as a statistical distribution of events.
+The climate may then be considered either the distribution itself,
+    or the parameters informing the distribution.
+In other words, ``Climate is what we expect, weather is what we get.''.
 
-\chapter{Event Attribution Theory}
-\chapter{Extreme Value Statistics}
+This distribution is then considered to be a dependent variable,
+    with the independent variable being any change in the climate.
 
+\section{Extreme Value Statistics}\label{sec:exstats}
 
-\chapter{Design and/or development (of my project)}
+\chapter{Development}\label{ch:dev}
+
 
 This section should be written in standard scientific
 language. Standard techniques in your research field should not be
@@ -217,25 +205,11 @@ that to maintain good structure you may have to present the
 explorations/calculations/computations/whatever in a different order
 from the one in which you carried them out.
 
+\chapter{Event Definition}\label{ch:def}
 
+\chapter{Event Modelling}\label{ch:model}
 
-\chapter{Another Chapter Title}
-\section{Number of Chapters}
-
-You may vary the number of chapters. The Introduction and Background
-Theory chapter are essential, although you may choose a different
-title for the latter. These two introductory chapters are usually
-followed by a chapter on what you did yourself, with a title such as
-Design and Development, although you can choose any title you
-wish. After that, you might to have another chapter, or you may go
-straight to the Results and Conclusions chapter.
-
-After the Introduction, you are free to use any chapter titles you wish.
-
-
-
-
-\chapter{Results and Analysis}
+\chapter{Results and Analysis}\label{ch:results}
 
 This section should detail the obtained results in a clear,
 easy-to-follow manner. It is important to make clear what are original
@@ -252,7 +226,7 @@ Be selective in what you include: half a dozen \emph{e.g.}~tables that
 contain wrong data you collected while you forgot to switch on the
 computer are not relevant and may mask the correct results.
 
-\section{Discussion of your results}
+\section{Discussion of your results}\label{sec:discussion}
 
 This section should give a picture of what you have taken out of your
 project and how you can put it into context.
@@ -261,7 +235,7 @@ This section should summarise the results obtained, detail conclusions
 reached, suggest future work, and changes that you would make if you
 repeated the project.
 
-\chapter{Conclusions}
+\chapter{Conclusions}\label{ch:conclusions}
 
 This is the place to put your conclusions about your work. You can
 split it into different sections if appropriate. You may want to include
@@ -389,9 +363,15 @@ computer code which no-one will ever read. You should be careful that
 anything like this you include should contain some element of
 uniqueness which justifies its inclusion.
 
+\bibliographystyle{unsrt}
+\bibliography{ref}
+
+
 \begin{thebibliography}{100}
 
     \bibitem{ref:event} G~J~van Oldenborgh, K~van der Wiel, S~Kew, S~Philip, F~Otto, R~Vautard, A~King, F~Lott, J~Arrighi, R~Singh and M~van Aalst. \emph{2021 Pathways and pitfalls in extreme event attribution.} Climactic Change, Volume 166, Article 13.
+
+    \bibitem{ref:quote} E~Arnold
 
     \bibitem{ref:lam} L~Lamport. \emph{1986 \LaTeX\  User's Guide and Reference Manual.} Addison Wesley, pp~242.
 
