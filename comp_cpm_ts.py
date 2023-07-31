@@ -46,14 +46,7 @@ for var in ['tas', 'pr']:
     for p in stonehavenRainLib.cpmDir.glob('[0-9][0-9]'):
         pth = p / var / 'mon/latest'
         pth_rain = p / 'pr/mon/latest'
-        ncfiles = []
-        for year in range(1980, 2041):
-            yearstr = str(year)
-            ncfiles = ncfiles + list(pth.glob('*'+yearstr+'11.nc'))
-        for year in range(2060, 2081):
-            yearstr = str(year)
-            ncfiles = ncfiles + list(pth.glob('*'+yearstr+'11.nc'))
-        print("loading" + str(len(ncfiles)) + "files")
+        ncfiles = list(pth.glob('*.nc'))
         da = xarray.open_mfdataset(ncfiles,
                                    chunks=chunks, parallel=True,
                                    concat_dim='time', combine='nested',
