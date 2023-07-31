@@ -181,8 +181,7 @@ def xarray_gev(ds, cov=None, shapeCov=False, dim='time_ensemble', file=None, rec
                                                    output_core_dims=[['parameter'], ['parameter'], ['NegLog'], ['AIC']],
                                                    vectorize=True, kwargs=kwargs)
 
-    pnames = ['location', 'scale','shape',  'Dlocation', 'Dscale', 'Dshape']
-    # name variables and then combine into one dataset.
+    pnames = ['location', 'scale', 'shape', 'Dlocation', 'Dscale', 'Dshape']
 
     params = params.rename("Parameters")
     std_err = std_err.rename("StdErr")

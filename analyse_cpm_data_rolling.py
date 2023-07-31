@@ -118,17 +118,16 @@ st_rgn_rot = dict()
 for c, name in zip(st_rot, ['grid_longitude', 'grid_latitude']):
     st_rgn_rot[name] = slice(c - 0.5, c + 0.5)
 
-
 rainmaxlist = []
 for file in cpm_files:
     array = xarray.open_dataset(file).seasonalMax
     array = array.sel(time=(array.time.dt.season == 'JJA'))
     array = array.sel(**st_rgn_rot).load()
     rainmaxlist.append(array)
-st_extreme_precip = xarray.combine_by_coords(rainmaxlist)
+st_extreme_precip = xarray.combine_by_coords(rainmaxlist).seasonalMax
 
-#st_extreme_precip = st_extreme_precip.sel(time=(st_extreme_precip.time.dt.season == 'JJA'))
-#st_extreme_precip = st_extreme_precip.sel(**st_rgn_rot).load()
+# st_extreme_precip = st_extreme_precip.sel(time=(st_extreme_precip.time.dt.season == 'JJA'))
+# st_extreme_precip = st_extreme_precip.sel(**st_rgn_rot).load()
 
 # get in the topographic info for the CPM. Note coords differ slightly from st_extreme prob due to FP changes.
 cpm_ht = xarray.load_dataset(stonehavenRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
@@ -156,7 +155,7 @@ fit_nocov = gev_r.xarray_gev(st_extreme_precip.stack(time_ensemble=stack_dims),
 xfit = dict()
 xfit_shape = dict()
 covariates = dict()
-for ts, title in zip([cet, cpm, st_temp, st_reg_hum], ['CET', 'CPM_region', 'Edinburgh_region', 'Ed_Humidity']):
+for ts, title in zip([cet, cpm, st_temp, st_reg_hum], ['CET', 'CPM_region', 'Stonehaven_region', 'St_Humidity']):
     file = outdir_gev / f"cov_{title}.nc"
     ts_summer = ts.resample(time='QS-DEC').mean().dropna('time')
     ts_summer = ts_summer.sel(time=(ts_summer.time.dt.month == 6))
