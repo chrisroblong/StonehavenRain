@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper]{report}
 
 \usepackage{graphics}
-\usepackage{fullpage,epsf,graphicx}%, amstext,url} 
+\usepackage{fullpage,epsf,graphicx}%, amstext,url}
 \graphicspath{{figures/}}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -77,13 +77,22 @@ There is evidence that future change to the climate makes extreme weather events
 \textbf{Declaration}
 \end{center}
 
-I declare that this dissertation was composed entirely by myself.
+I declare that this report is entirely my own work unless stated otherwise.
 
-Give the chapters and state who did the work
+Chapter~\ref{ch:back} contains background material,
+    with the first section primarily relying on World Weather Attribution's methodology~\cite{van_Oldenborgh_et_al_2021},
+    and the second section makes use of the information in Coles' textbook on the topic~\cite{Coles_2001}.
+
+Chapter~\ref{ch:dev} consists of my own work,
+    excepting the use of code and creation of equivalent diagrams to a currently approved but not yet published paper by my supervisor.
+Code used in this project is given in~\cite{Me_2023},
+    code used in my supervisor's paper is given in~\cite{Tett_2022}
+
+Chapter~\ref{ch:results} is entirely my own work.
 
 \bigskip
 
-Calculations used Python with many standard packages packages.
+Calculations used Python with many standard packages.
 
 Numpy and XArray are used to manage and process both real and modelled rainfall data.
 
@@ -128,7 +137,11 @@ I started writing this dissertation in mid-July, and I spent the first
 three weeks of August working on it full-time.
 
 I have achieved x, y, z results, but understand that my findings are limited.
-I would run multiple models and
+With additional time,
+    I could then consider the effects of different event definition,
+    other than the one-hour rainfall within the grid areas given,
+    as well as used different models and quantified the difference in these approaches.
+This is discussed further in section~\ref{sec:discussion}.
 
 
 \newpage
@@ -163,22 +176,48 @@ already been done on your topic and anything else which lets you set
 your work in context.
 
 
-\chapter{Background Theory}\label{ch:background}
+\chapter{Background Theory}\label{ch:back}
 
 \section{Event Attribution Theory}\label{sec:attribution}
 
-The weather is a complex system,
-    so any weather event is necessarily multifactorial,
+As a part of a complex system,
+    any weather event is necessarily multifactorial,
     with no single cause.
 It is therefore necessary to use a probabilistic lens to perform a scientific analysis.
 
 In this case, the weather at a given place and time of year is expressed as a statistical distribution of events.
 The climate may then be considered either the distribution itself,
     or the parameters informing the distribution.
-In other words, ``Climate is what we expect, weather is what we get.''.
+In other words, ``Climate is what we expect, weather is what we get.''~\cite{Herbertson_1935}.
 
-This distribution is then considered to be a dependent variable,
-    with the independent variable being any change in the climate.
+The scientific method may then be applied,
+    using the climate distribution as a dependent variable to the factor being considered.
+Issues, of both a technical and a theoretical nature can arise with this approach,
+    and will be discussed in subsection~\ref{subsec:attrchallenge}.
+
+\subsection{Development of Event Attribution Theory}\label{subsec:attrdev}
+
+\subsection{Steps to Event Attribution}\label{subsec:attrsteps}
+
+The precise number of steps for successful event attribution vary by the situation.
+Van Oldenborgh et al.~\cite{van_Oldenborgh_et_al_2021} gives 8 separate steps,
+    while Otto~\cite{Otto_2017} gives 6 steps.
+Both of these methodologies are functionally identical,
+    I shall use the steps described by Otto, as the steps given there are more straightforward.
+
+The below description also removes the analysis trigger and communication steps given in the literature.
+This is to emphasise the analytical process,
+    although these steps should be considered when addressing audiences outside the scientific community.
+
+\subsubsection{Event Definition}
+
+\subsubsection{Model Evaluation}
+
+\subsubsection{Likelihood Estimation}
+
+\subsubsection{Interpretation}
+
+\subsection{Challenges in Event Attribution}\label{subsec:attrchallenge}
 
 \section{Extreme Value Statistics}\label{sec:exstats}
 
@@ -205,9 +244,9 @@ that to maintain good structure you may have to present the
 explorations/calculations/computations/whatever in a different order
 from the one in which you carried them out.
 
-\chapter{Event Definition}\label{ch:def}
+\section{Event Definition}\label{sec:def}
 
-\chapter{Event Modelling}\label{ch:model}
+\section{Event Modelling}\label{sec:model}
 
 \chapter{Results and Analysis}\label{ch:results}
 
@@ -260,130 +299,10 @@ You can do references in the simple way explained in the introduction,
 or you can use \BibTeX.
 
 
-\section{\BibTeX}
-\label{sec:bibtex}
-
-It is convenient to use \BibTeX\ to compile your bibliography.  First
-you need to create a .bib file e.g.  you may call it ref.bib Then you
-can put all your references into the file with entries such as
-\begin{verbatim}
-@Book{ob:bornwolf,
-     author = "Born, M and Wolf, E",
-     title  = "Principles of Optics",
-     publisher = "Cambridge University Press",
-     year = 1999,
-     edition = {7th},
-}
-
-@Article{jr:ashkin,
-Author = {A. Ashkin and J.M. Dziedzic and J.E. Bjorkholm and S. Chu},
-Title = "Observation of a single beam gradient force optical tap for 
-dielectric particles",
-Journal = "Optics Letters",
-Volume = 11,
-Pages = "288-290",
-Year = 1986}
-
-@INPROCEEDINGS{seger,
- author = {J. Seger and H.J. Brockman},
- title = {What is bet-hedging?},
- editors={P.H. Harvey and L. Partridge},
- booktitle = {Oxford Surveys in Evolutionary Biology},
- year={1987},
- page={18},
- publisher={Oxford University Press},
- place={Oxford}}
-\end{verbatim}
-for a book, an article in a journal or an article in a proceedings volume
-respectively.
-
-Inside your \LaTeX\ file
-you should include 
-\begin{verbatim}
-\bibliographystyle{unsrt}                      
-and
-\bibliography{ref}
-\end{verbatim}
-The first command determines the reference style, here plain and 
-unsorted. With this referencing style 
-a numerical referencing system (which is now the most
-common in physics literature) is used and the numbering of references
-will be the order in which they appear in the document. Alternatively, 
-you could use
-a customised `style file' but there is no real need.  The second
-command just inputs your .bib file Note that only the references cited
-in the text will appear in the bibliography so you can have spare
-references in your .bib file.
-
-
-You use the name you have given to an entry (e.g.
-for the book example above the name is ob:bornwolf)
-to cite the relevant article
-by using the cite command in your \LaTeX\ file e.g. 
-\begin{verbatim}
-\cite{ob:bornwolf}
-\end{verbatim}
-
-
-\section{Producing your documents using \texttt{pdflatex}}
-
-To use pdflatex your figures need to be in pdf format.  You can convert almost any image file to pdf using \texttt{convert}.  e.g. \texttt{convert myfigure.png myfigure.pdf}.
-
-The first time you should type:
-\begin{verbatim}
-  pdflatex ProjectReport
-  bibtex ProjectReport
-  pdflatex ProjectReport
-  pdflatex ProjectReport
-\end{verbatim} 
-This first time you run\texttt{pdflatex} it will produce a
-\texttt{ProjectReport.aux}.  The \BibTeX\ command reads in the
-bibliography file and makes the files \texttt{ProjectReport.bbl} and
-\texttt{ProjectReport.blg} files.  These files are read in the next
-\texttt{pdflatex} command, but you'll still have ``undefined
-cross-reference'' errors which are sorted out by the last
-\texttt{pdflatex} command.
-
-Subsequently, you should only need to do one (or two)
-\texttt{pdflatex}s, or \texttt{pdfbibtex} followed by
-\texttt{pdflatex} twice if you change any references.
-
-\vspace{5mm} You may also use plain \texttt{latex} instead of
-\texttt{pdflatex}.  This requires you to use postscript graphics
-instead of pdf.
-
-
-
-
-\chapter{Stuff that won't be read by anyone}
-
-Some people include in their thesis a lot of detail, particularly lots
-of tables containing raw results, figures of intermediate results, or
-computer code which no-one will ever read. You should be careful that
-anything like this you include should contain some element of
-uniqueness which justifies its inclusion.
-
 \bibliographystyle{unsrt}
 \bibliography{ref}
 
 
-\begin{thebibliography}{100}
-
-    \bibitem{ref:event} G~J~van Oldenborgh, K~van der Wiel, S~Kew, S~Philip, F~Otto, R~Vautard, A~King, F~Lott, J~Arrighi, R~Singh and M~van Aalst. \emph{2021 Pathways and pitfalls in extreme event attribution.} Climactic Change, Volume 166, Article 13.
-
-    \bibitem{ref:quote} E~Arnold
-
-    \bibitem{ref:lam} L~Lamport. \emph{1986 \LaTeX\  User's Guide and Reference Manual.} Addison Wesley, pp~242.
-
-    \bibitem{ref:bloggs} F~Bloggs. \emph{1993 \LaTeX\  Users do it in Environments.} International~Journal of Silly Findings, Volume 22, pp~23-29.
-
-    \bibitem{ref:no-one} P~Thrower. \emph{2019 Too Much Rhubarb Crumble.} Dessertation Review Letters, Volume 2, pp~1-20.
-
-    \bibitem{ref:the-early-ones} H~McDonald, S~Simpson, S~Ross and K~Green. \emph{The Ones That Got Away.} Unclear Physics, Volume 1, pp~1-68.
-
-
-
-\end{thebibliography}
 
 
 \end{document}
