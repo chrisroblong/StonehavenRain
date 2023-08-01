@@ -85,8 +85,8 @@ Chapter~\ref{ch:back} contains background material,
 
 Chapter~\ref{ch:dev} consists of my own work,
     excepting the use of code and creation of equivalent diagrams to a currently approved but not yet published paper by my supervisor.
-Code used in this project is given in~\cite{Me_2023},
-    code used in my supervisor's paper is given in~\cite{Tett_2022}
+Code used in this project is given in~\cite{Me_Code},
+    code used in my supervisor's paper is given in~\cite{Tett_Code}
 
 Chapter~\ref{ch:results} is entirely my own work.
 
@@ -94,9 +94,9 @@ Chapter~\ref{ch:results} is entirely my own work.
 
 Calculations used Python with many standard packages.
 
-Numpy and XArray are used to manage and process both real and modelled rainfall data.
+NumPy and XArray are used to manage and process both real and modelled rainfall data.
 
-Cartopy is used to process data between both Ordinance Survey and Longitude-Latitude coordinate systems.
+CartoPy is used to process data between both Ordinance Survey and Longitude-Latitude coordinate systems.
 
 R and the RPy package are used to fit extreme value distributions to the rainfall data.
 
@@ -155,7 +155,7 @@ This is discussed further in section~\ref{sec:discussion}.
 \end{center}
 
 I'd like to thank my supervisor Professor Simon Tett for
-making this project possible
+making this project possible.
 
 
 
@@ -195,7 +195,16 @@ The scientific method may then be applied,
 Issues, of both a technical and a theoretical nature can arise with this approach,
     and will be discussed in subsection~\ref{subsec:attrchallenge}.
 
-\subsection{Development of Event Attribution Theory}\label{subsec:attrdev}
+In all the examples given in this section,
+    the independent variable is anthropogenic climate change.
+This is often quantified by using a temperature metric,
+    although additional factors may be considered.
+
+It may be noted that,
+    due to their generality,
+    climate event attribution techniques may be of use outside risk analysis from modern changes in the climate.
+% add about historical extremes
+
 
 \subsection{Steps to Event Attribution}\label{subsec:attrsteps}
 
@@ -203,11 +212,25 @@ The precise number of steps for successful event attribution vary by the situati
 Van Oldenborgh et al.~\cite{van_Oldenborgh_et_al_2021} gives 8 separate steps,
     while Otto~\cite{Otto_2017} gives 6 steps.
 Both of these methodologies are functionally identical,
-    I shall use the steps described by Otto, as the steps given there are more straightforward.
+    I shall base my description upon the steps described by Otto,
+    as the steps given there are more straightforward.
 
-The below description also removes the analysis trigger and communication steps given in the literature.
-This is to emphasise the analytical process,
-    although these steps should be considered when addressing audiences outside the scientific community.
+Only four steps are given in full below.
+This is due to the removal of an analysis trigger step at the start of the process
+    and a communication step at the end of the process,
+    both of which I will cover here briefly.
+
+An analysis trigger is a set of criteria used by researchers to determine whether an event should be investigated.
+These serve a utilitarian purpose,
+    allowing the events with the greatest impact to be investigated first.
+These may include the number of deaths or number impacted,
+    as in chapter 2 of~\cite{van_Oldenborgh_et_al_2021},
+    or economic and cultural factors, as in~\cite{Tett_Soon}.
+The former criteria may skew analysis towards poorer nations~\cite{Kahn_2005},
+    while the latter may skew analysis towards richer nations.
+
+This step is omitted in this case
+
 
 \subsubsection{Event Definition}
 
