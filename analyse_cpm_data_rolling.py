@@ -6,14 +6,14 @@ Data is saved and subsequently used by plot_intensity_risk_ratios.py
 
 Then produce figure for SI.
 Will show:
-1) Scale and location plots around Edinburgh
+1) Scale and location plots around Stonehaven
 2) Scatter plot coloured by ht of Dscale & Dlocation
 3) QQ-plots for some samples. Ideal would be one plot but can't do that!
-This code will generate the fits if data does not exist or recreate_fit is True. There are used
+This code will generate the fits if data does not exist or recreate_fit is True. These are used
  to compute changes in risk and intensity.
 """
 import pathlib
-
+import cftime
 import commonLib
 import stonehavenRainLib
 import xarray
@@ -106,10 +106,11 @@ covariate_dir = stonehavenRainLib.dataDir / "transfer_dir/cpm_fits"
 cet = xarray.load_dataset(covariate_dir / 'cet_tas.nc').tas
 cpm = xarray.load_dataset(covariate_dir / 'cpm_reg_tas.nc').tas
 
+coarsening = "1" # adds coarsening
 st_temp = xarray.load_dataset(covariate_dir / 'st_reg_tas.nc').tas
 st_precip = xarray.load_dataset(covariate_dir / 'st_reg_pr.nc').pr
 st_reg_hum = qsat(st_temp)
-cpm_files = list((stonehavenRainLib.dataDir / 'CPM').glob("**/*.nc"))
+cpm_files = list((stonehavenRainLib.dataDir / 'CPM').glob("**/coarsen_"+coarsening+"*.nc"))
 
 
 # now extract roughly 100x100 km box centred on Stonehaven and only for summer
@@ -125,6 +126,7 @@ for file in cpm_files:
     array = array.sel(**st_rgn_rot).load()
     rainmaxlist.append(array)
 st_extreme_precip = xarray.combine_by_coords(rainmaxlist).seasonalMax
+st_extreme_precip = st_extreme_precip.drop_duplicates('time')
 
 # st_extreme_precip = st_extreme_precip.sel(time=(st_extreme_precip.time.dt.season == 'JJA'))
 # st_extreme_precip = st_extreme_precip.sel(**st_rgn_rot).load()
@@ -331,13 +333,43 @@ for k, v in stonehavenRainLib.stonehaven_region.items():
 kw_cbar = dict(orientation='horizontal', label='', fraction=0.1, pad=0.15, extend='both')
 
 label = commonLib.plotLabel()
-fig, ax_dict = plt.subplot_mosaic([['location', 'scale'],
-                                   ['location', 'scale'],
-                                   ['scatter', 'scatter_shape'],
-                                   ['r_gev_fit_st', 'r_gev_fit_w_st']],
-                                  # gridspec_kw=dict(height_ratios=[2,1,1]),
-                                  num='cpm_gev_fit', clear=True, figsize=[9, 10],
-                                  subplot_kw_mosaic=dict(location=plot_kws, scale=plot_kws))
+# Define the layout of subplots
+rows = [['location', 'scale'],
+        ['location', 'scale'],
+        ['scatter', 'scatter_shape'],
+        ['r_gev_fit_st', 'r_gev_fit_w_st']]
+
+# Calculate the number of rows and columns
+num_rows = len(rows)
+num_cols = max(len(row) for row in rows)
+
+# Create the figure and axes
+fig, axes = plt.subplots(num_rows, num_cols, figsize=(9, 10), subplot_kw={'projection': ccrs.PlateCarree()})
+
+# Create a dictionary to store the axes
+ax_dict = {}
+
+# Loop through the rows and columns to assign axes to the corresponding subplots
+for i, row in enumerate(rows):
+    for j, col in enumerate(row):
+        ax_dict[col] = axes[i, j]
+
+# Remove any unused axes
+for ax in axes.flatten():
+    if ax not in ax_dict.values():
+        ax.remove()
+
+# Optionally, set titles for each subplot
+ax_dict['location'].set_title('Location')
+ax_dict['scale'].set_title('Scale')
+ax_dict['scatter'].set_title('Scatter')
+ax_dict['scatter_shape'].set_title('Scatter Shape')
+ax_dict['r_gev_fit_st'].set_title('r_gev_fit_st')
+ax_dict['r_gev_fit_w_st'].set_title('r_gev_fit_w_st')
+
+# Adjust layout and spacing
+plt.tight_layout()
+
 for p in ['location', 'scale']:
     ax = ax_dict[p]
     ax.set_extent(rgn, crs=ccrs.OSGB())
