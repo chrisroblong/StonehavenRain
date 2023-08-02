@@ -216,4 +216,4 @@ def run_return_plot():
 	mc_rp = (1. / (gev_r.xarray_sf(rain, mc_dist.Parameters, 'Rx15min')+0.00001)).quantile(q, 'sample') # avoid div by 0
 	plot_return_period(radar_data_all=radar_data_all, mc_rp=mc_rp, rp=rp, crash_rain=crash_rain)
 
-run_return_plot()
+animatestonehavenmorning(timechunk(st_time, 16))
