@@ -1,4 +1,4 @@
-# Code used in Tett et al,2023 
+# Code used in Dissertation,2023 
 
 ## Code used to process CPM and radar data on JASMIN
 
@@ -28,14 +28,17 @@ You need to install R on your computer and  modify this library to point to R.
 * radar_qc -- plot figure showing radar data is mostly OK.
 
 ## Main figures
-
+Old plotting:
 * plot_edinburgh_geography -- Plot edinburgh image, plan of castle and map of SE Scotland. 
 * plot_edinburgh_precip_dist -- Plot precipitation for 4th July 2021 and distributions of radar regional extremes data.
-* plot_intensity_risk_ratios -- Plot intensity and probability risk ratios 
+
+Used for plotting:
+* plot_intensity_risk_ratios -- Plot intensity and probability risk ratios
+* plotStonehaven -- Code to perform all plots are contained in here
 
 ------
 ## Additional Code
-* comp_rotated_coords --compute co-ordinates for CET locations. Done as JASMIN does not have the library. 
+* comp_rotated_coords --compute co-ordinates for CET locations. Done as JASMIN does not have the library, could be done w cartopy in JASMIN.
     Values then got inserted (manually) into stonehavenRainLib
 * create_counties -- Create county shape files from OS data. Used to generate high enough resolution  county data. 
 * radar_station_metadata.xlxs -- Radar station metadata
