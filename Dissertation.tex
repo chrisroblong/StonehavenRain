@@ -79,8 +79,8 @@ There is evidence that future change to the climate makes extreme weather events
 
 I declare that this report is entirely my own work unless stated otherwise.
 
-Chapter~\ref{ch:back} contains background material,
-    with the first section primarily relying on World Weather Attribution's methodology~\cite{van_Oldenborgh_et_al_2021},
+Chapter~\ref{ch:attribution} contains background material,
+    with the first and third sections primarily relying on World Weather Attribution's methodology~\cite{van_Oldenborgh_et_al_2021},
     and the second section makes use of the information in Coles' textbook on the topic~\cite{Coles_2001}.
 
 Chapter~\ref{ch:dev} consists of my own work,
@@ -128,9 +128,10 @@ the Stonehaven region, as well as finding the quantiles of these extrema,
 as well as using R to find the parameters of a GEV fit to both the empirical
 and a monte carlo bootstrap of the rainfall distribution.
 
-In mid-July I created plots for these distributions and started to work with the
-Convective Permitting Model data.
-
+In mid-July, I created plots for these distributions and started to work with the Convection Permitting Model data,
+    processing it as necessary to be appropriate for the use case.
+This allowed me to create the time series to act as covariates to the CPM rainfall data,
+    which were used in the first week of August to compute the final outcomes and plots.
 
 
 I started writing this dissertation in mid-July, and I spent the first
@@ -176,9 +177,7 @@ already been done on your topic and anything else which lets you set
 your work in context.
 
 
-\chapter{Background Theory}\label{ch:back}
-
-\section{Event Attribution Theory}\label{sec:attribution}
+\chapter{Event Attribution Theory}\label{ch:attribution}
 
 As a part of a complex system,
     any weather event is necessarily multifactorial,
@@ -203,17 +202,36 @@ This is often quantified by using a temperature metric,
 It may be noted that,
     due to their generality,
     climate event attribution techniques may be of use outside risk analysis from modern changes in the climate.
-% add about historical extremes
+% TODO: add about historical extremes Ruddiman
 
+An event attribution study aims to provide two quantities.
+The first is the change in the probability of the event.
+The second is the change in the magnitude of the event.
 
-\subsection{Steps to Event Attribution}\label{subsec:attrsteps}
+\subsubsection{Development of Event Attribution}
+
+In 2003, whilst experiencing flooding as a result of extreme weather,
+    Allen~\cite{Allen_2003} posited the probabilistic interpretation of climate change impacts,
+    proposing a potential to find greenhouse gas emitters liable for extreme weather events.
+%  Add note about the fact that a grant would not be paid to emitters for reducing the likelihood.
+A notable early use case of this probabilistic approach was by Stott et al.~\cite{Stott_2004},
+    finding that 75\% of the risk of the European heatwave is attributable to anthropogenic climate change.
+
+World Weather Attribution produces rapid Event Attribution studies,
+    some of which are within a month of the event occuring~\cite{van_Oldenborgh_et_al_2018},
+    using the probabilistic approach.
+Alternative approaches also exist,
+    such as the `storyline' approach,
+    outlined by Shepherd et al. in~\cite{Shepherd_et_al_2018},
+    although these may be considered contentious~\cite{García-Portela_Maraun_2023}.
+
+\section{Steps to Event Attribution}\label{subsec:attrsteps}
 
 The precise number of steps for successful event attribution vary by the situation.
-Van Oldenborgh et al.~\cite{van_Oldenborgh_et_al_2021} gives 8 separate steps,
+Van Oldenborgh et al.~\cite{van_Oldenborgh_et_al_2021} give 8 separate steps,
     while Otto~\cite{Otto_2017} gives 6 steps.
-Both of these methodologies are functionally identical,
-    I shall base my description upon the steps described by Otto,
-    as the steps given there are more straightforward.
+Both of these methodologies are functionally identical;
+    I shall base my description upon 4 of the steps described by Otto.
 
 Only four steps are given in full below.
 This is due to the removal of an analysis trigger step at the start of the process
@@ -229,20 +247,83 @@ These may include the number of deaths or number impacted,
 The former criteria may skew analysis towards poorer nations~\cite{Kahn_2005},
     while the latter may skew analysis towards richer nations.
 
-This step is omitted in this case
+It is of note that potential liability of anthropogenic climate change may be a triggering factor,
+    so the analysis begins due to a hypothesis that the event was caused by anthropogenic climate change.
+I believe that this may bias the results of a meta-analysis of event attribution studies,
+    and so increase the challenge in determining anthropogenic climate change as a cause of more extreme events in general.
+I omit giving any further detail on the analysis trigger as it is beyond the scope of mathematical or physical interest.
+
+The communication of the outcome of the analysis may also be considered in the study.
+This is especially true outside the scientific community
+    and considers the risk of the audience drawing incorrect conclusions,
+    as well as the risk of policymakers acting on incorrect information.
 
 
-\subsubsection{Event Definition}
+\subsection{Event Definition}\label{subsec:backeventdef}
 
-\subsubsection{Model Evaluation}
+To perform an attribution analysis,
+    the weather event must first be defined in clear and quantitative terms.
+This requires specifying a variable with a threshold that has been crossed,
+    as well as the time and region at which an event may be considered.
 
-\subsubsection{Likelihood Estimation}
+This is not necessarily straightforward.
+An event attribution is normally triggered by the event's social or environmental impact,
+     not just due to the meteorological significance.
+Therefore, care must be taken to ensure that the definition of the event is sufficiently similar to the conditions that would cause a similar impact.
 
-\subsubsection{Interpretation}
+Many of the challenges in Event Attribution arise directly from a poor Event Definition.
+Events that are too narrowly defined may have issues with reproducibility,
+    as will be discussed in~\ref{subsec:eventrepro},
+    while events that are too widely defined may give invalid results,
+    as will be discussed in~\ref{subsec:modelvalid}.
 
-\subsection{Challenges in Event Attribution}\label{subsec:attrchallenge}
+\subsubsection{Variable and Threshold}
+
+The climate variable used to define the event requires travelling up the causal chain that leads to it.
+As a set of examples,
+    floods/droughts are caused by extreme highs/lows in rainfall,
+    while heat waves and cold spells are caused by extreme high or low temperatures.
+
+However,
+    all of these events require the extreme rainfall/temperature to be sustained for the event to be hazardous.
+Simple metrics may be applicable here,
+    as the definition can then use the rainfall/temperature averaged over a given time period.
+The selection of time period itself also requires a consideration of the event.
+A damaging heavy storm requires extreme winds over a matter of minutes,
+    while it may take days for the land to dry out sufficiently for a drought to occur.
+
+More advanced metrics may be used.
+For example, an Expert Team on Climate Change Detection Indices~\cite{Zhang_2011}
+    describes a `Growing Season Length',
+    allowing climate-caused famine to be quantified using only daily temperature data.
+A `Wet-Bulb Temperature' has been used to combine humidity and temperature data to create an index that better measures teh effect of a heatwave on human health~\cite{Li_2020}.
+
+\subsubsection{Spatial and Temporal Region}
+
+The area
+%  TODO El Nino, Season, Region, vary variable within region or not, homogenous weather
+
+\subsection{Model Evaluation}\label{subsec:backmodeleval}
+
+\subsection{Likelihood Estimation}\label{subsec:backlikeest}
+
+\subsection{Interpretation}\label{subsec:backinterp}
+
+\subsection*{Alternative Approaches}\label{subsec:altappro}
 
 \section{Extreme Value Statistics}\label{sec:exstats}
+
+\subsection{GEV Distribution}\label{subsec:gev}
+
+\subsection{Generalised Pareto Distribution}\label{subsec:gpd}
+
+\section{Challenges in Event Attribution}\label{sec:attrchallenge}
+
+\subsection{Event Reproducibility}\label{subsec:eventrepro}
+
+\subsection{Statistical Independence}\label{subsec:statindep}
+
+\subsection{Validity of Model}\label{subsec:modelvalid}
 
 \chapter{Development}\label{ch:dev}
 
