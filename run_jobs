@@ -19,7 +19,7 @@ do
 	mkdir -p $TMPDIR
 	echo "Made $TMPDIR submitting job"
 #	sbatch -p $Q --time=$TIME -o "output/process_radar_${RESOLN}_$year.out" ./process_radar_data.py $year --verbose --monitor --resolution $RESOLN --nodaily --region 20500 659500 -74500 1000000
-	sbatch -p $Q --time=$TIME -o "output/process_radar_${RESOLN}_$year.out" ./process_radar_data.py $year --verbose --monitor --resolution $RESOLN --nodaily --region 280500 480500 684500 884500 --outdir summary_5km_1h --resample 15Min
+	sbatch -p $Q --time=$TIME -o "output/process_radar_${RESOLN}_$year.out" ./process_radar_data.py $year --verbose --monitor --resolution $RESOLN --nodaily --region 280500 480500 684500 884500 --outdir summary_5km_1h --resample 1h
 done
 
 
