@@ -1,7 +1,11 @@
 \documentclass[12pt,a4paper]{report}
 
 \usepackage{graphics}
-\usepackage{fullpage,epsf,graphicx}%, amstext,url}
+\usepackage{fullpage,epsf,graphicx}
+\usepackage{amsmath}%, amstext,url}
+\usepackage{comment}
+\usepackage{hyperref}
+\usepackage{verbatim}
 \graphicspath{{figures/}}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -60,14 +64,12 @@
 \pagenumbering{roman}
 
 \begin{abstract}
-Extreme rainfall on Wednesday 12 August 2020 resulted in debris being washed out of a drain and onto the Dundee-Aberdeen line at Carmont, Aberdeenshire.
 
-This caused the Stonehaven derailment,
-    in which three people were killed and six people were injured,
-    leaving no passengers on the train unharmed.
-
-There is evidence that future change to the climate makes extreme weather events, including rainfall,
-    more common.
+Extreme rainfall on 12 August 2020 caused the Stonehaven Derailment,
+    which resulted in three deaths.
+This project applies current event attribution techniques for extreme rainfall events,
+    finding a probability ratios for the extreme rainfall to be 1.1, 1.3 and 1.6 for the 1980s, 2010s and in a 2K warmer world
+    respectively over pre-industrial.
 
 \end{abstract}
 
@@ -78,6 +80,10 @@ There is evidence that future change to the climate makes extreme weather events
 \end{center}
 
 I declare that this report is entirely my own work unless stated otherwise.
+
+The introduction~\ref{ch:intro} describes the motivations for the work.
+This includes the information showing the impact of the extreme rainfall on the derailment by the Rail Accident Investigation Board~\cite{RAIB_2022},
+    as well as my supervisor's paper analysing the effect of climate change on the risk of an extreme rainfall event~\cite{Tett_Soon}.
 
 Chapter~\ref{ch:attribution} contains background material,
     with the first and third sections primarily relying on World Weather Attribution's methodology~\cite{van_Oldenborgh_et_al_2021},
@@ -131,18 +137,13 @@ and a monte carlo bootstrap of the rainfall distribution.
 In mid-July, I created plots for these distributions and started to work with the Convection Permitting Model data,
     processing it as necessary to be appropriate for the use case.
 This allowed me to create the time series to act as covariates to the CPM rainfall data,
-    which were used in the first week of August to compute the final outcomes and plots.
-
+    which were used in the first week of August to compute the probability ratios, intensity ratios and plots.
+Any work done in August other than writing up the dissertation was spent analysing and critiquing the techniques used.
 
 I started writing this dissertation in mid-July, and I spent the first
 three weeks of August working on it full-time.
 
-I have achieved x, y, z results, but understand that my findings are limited.
-With additional time,
-    I could then consider the effects of different event definition,
-    other than the one-hour rainfall within the grid areas given,
-    as well as used different models and quantified the difference in these approaches.
-This is discussed further in section~\ref{sec:discussion}.
+I have achieved the final outcome of a probability ratio, and %  TODO discuss analysis
 
 
 \newpage
@@ -167,6 +168,10 @@ making this project possible.
 \pagenumbering{arabic}
 
 \chapter{Introduction}\label{ch:intro}
+
+
+
+\begin{comment}
 The Introduction should contain a description of your project and the
 problem you are trying to solve. It should start off at a level that
 should be understandable by anyone with a degree in physics, but it
@@ -175,7 +180,7 @@ can become more technical later
 Where appropriate you should include references to work that has
 already been done on your topic and anything else which lets you set
 your work in context.
-
+\end{comment}
 
 \chapter{Event Attribution Theory}\label{ch:attribution}
 
@@ -192,7 +197,7 @@ In other words, ``Climate is what we expect, weather is what we get.''~\cite{Her
 The scientific method may then be applied,
     using the climate distribution as a dependent variable to the factor being considered.
 Issues, of both a technical and a theoretical nature can arise with this approach,
-    and will be discussed in subsection~\ref{subsec:attrchallenge}.
+    and will be discussed in subsection~\ref{sec:attrchallenge}.
 
 In all the examples given in this section,
     the independent variable is anthropogenic climate change.
@@ -202,7 +207,8 @@ This is often quantified by using a temperature metric,
 It may be noted that,
     due to their generality,
     climate event attribution techniques may be of use outside risk analysis from modern changes in the climate.
-% TODO: add about historical extremes Ruddiman
+For example,
+    Ruddiman~\cite{Ruddiman_2010} has attempted to attribute the lack of a recent glaciation to the beginning of agriculture.
 
 An event attribution study aims to provide two quantities.
 The first is the change in the probability of the event.
@@ -220,12 +226,15 @@ A notable early use case of this probabilistic approach was by Stott et al.~\cit
 World Weather Attribution produces rapid Event Attribution studies,
     some of which are within a month of the event occuring~\cite{van_Oldenborgh_et_al_2018},
     using the probabilistic approach.
-Alternative approaches also exist,
-    such as the `storyline' approach,
+Alternative approaches also exist.
+One of these is the `Boulder' methodology,
+    described in section 2.2 of~\cite{Otto_2017},
+    which seeks to break down the proportions to which the event was caused by natural variability and the due to Anthropogenic Climate Change.
+Another is the `storyline' methodology,
     outlined by Shepherd et al. in~\cite{Shepherd_et_al_2018},
-    although these may be considered contentious~\cite{García-Portela_Maraun_2023}.
+    although this has been considered contentious~\cite{García-Portela_Maraun_2023}.
 
-\section{Steps to Event Attribution}\label{subsec:attrsteps}
+\section{Steps to Event Attribution}\label{sec:attrsteps}
 
 The precise number of steps for successful event attribution vary by the situation.
 Van Oldenborgh et al.~\cite{van_Oldenborgh_et_al_2021} give 8 separate steps,
@@ -257,7 +266,6 @@ The communication of the outcome of the analysis may also be considered in the s
 This is especially true outside the scientific community
     and considers the risk of the audience drawing incorrect conclusions,
     as well as the risk of policymakers acting on incorrect information.
-
 
 \subsection{Event Definition}\label{subsec:backeventdef}
 
@@ -300,8 +308,48 @@ A `Wet-Bulb Temperature' has been used to combine humidity and temperature data 
 
 \subsubsection{Spatial and Temporal Region}
 
-The area
-%  TODO El Nino, Season, Region, vary variable within region or not, homogenous weather
+In addition to defining a threshold variable,
+    it is necessary to define the regions and times at which an event can be considered sufficiently similar to that being analysed.
+This is due to the fact that both historical trend analysis is impossible on a single extreme event at a single place on a single day of the year
+    and that climate models will rarely reproduce events in such a narrow definition.
+The second of these factors will be discussed in subsection~\ref{subsec:eventrepro}.
+
+For the spatial region,
+    a region with a known climate similar to that in which the event occurred is chosen,
+    typically directly around the location of the event.
+This is done so that the frequency and types of event will match the location of the original event,
+    as well as to ensure that the factors that change the climate,
+    whether Anthropomorphic or not,
+    are similar to those changing the climate at the point of the event.
+
+In addition to the aforementioned similarity in location,
+    a historical trend analysis can aid in defining a region,
+    along with tools including topography and climate classifications.
+The region is chosen based on similar weather,
+    not a similarity in hazard risk,
+    as the goal is to perform an attribution for the event,
+    not to advise on potential future risk.
+For example,
+    a region defined for a flood event over a flood-prone area would only consider areas with similar rainfall,
+    not those similarly flood-prone.
+
+For the temporal region,
+    or time period for the event to be considered,
+    an analogous process must be used.
+It is often appropriate to use a seasonal time period,
+    as this can also limit the event to those with similar meteorology,
+    such as by only considering monsoon rainfall~\cite{Otto_et_al_2023}.
+This can also prove to be a practical step,
+    reducing the amount of data to be used later in the attribution process.
+
+Additional `Boundary Conditions'~\cite{van_Oldenborgh_et_al_2021} may then also be imposed.
+Of note is the importance of the El Niño,
+    especially for drought events in the southern hemisphere~\cite{Lyon_2004},
+    so this may also be accounted for when defining these event.
+
+Once all of these definitions have been made,
+    a `class' of events has been described.
+This class will then be used to find like events in both the historical and model data.
 
 \subsection{Model Evaluation}\label{subsec:backmodeleval}
 
@@ -309,11 +357,96 @@ The area
 
 \subsection{Interpretation}\label{subsec:backinterp}
 
-\subsection*{Alternative Approaches}\label{subsec:altappro}
-
 \section{Extreme Value Statistics}\label{sec:exstats}
 
+This subsection will describe the statistical foundations of extreme event modelling,
+    paraphrasing Coles' book~\cite{Coles_2001} unless where otherwise stated.
+Climate events that pose hazards are necessarily extreme.
+Therefore, to model these events,
+    extreme value distributions are necessary.
+
+Throughout the analysis,
+    we assume that the variables are independent and identically distributed ($i.i.d.$).
+The issues that may arise from this assumption not being valid are considered in subsection~\ref{subsec:statvalid}.
+
+For event definitions which average a variable over a season,
+    as opposed to focusing on the extreme
+    a normal distribution is instead appropriate.
+This is as the Central Limit Theorem states that the limit of the mean of $n$ $i.i.d.$ random variables tends to a normal distribution.
+The equivalents for extreme events, the GEV distribution and Extremal Types Theorem,
+    will be explained in due course.
+
 \subsection{GEV Distribution}\label{subsec:gev}
+
+\subsubsection{Extremal Types Theorem}
+
+This explanation is as given in section 3.1 of~\cite{Coles_2001}.
+
+Let $M_n$ be the maximum of $n$ $i.i.d.$ random variables.
+If there exist sequences of constants $a_n > 0$ and $b_n$, and non-degenerate $G$ such that:
+
+\[ P\left( \frac{M_n - b_n}{a_n}  \leq z \right) \rightarrow G(z) \text{ as } n \rightarrow \infty \]
+
+Then $G$ is a member of the GEV (Generalised Extreme Value) family.
+
+Section 3.1.4  of~\cite{Coles_2001} outlines a proof of the Extremal Types Theorem.
+This involves showing that being a GEV distribution is equivalent to being `Max-Stable',
+    then that the maxima of GEV distributions are Max-Stable,
+    giving the GEV as the distribution of the original maximum in the infinite limit.
+It is of note that this is similar to one approach to proving the Central Limit Theorem,
+    which considers the normal distribution as a unique fixed point under convolutions,
+    resulting in normal distributions being an infinite limit of the sum or mean~\cite{Hamedani_Walter_1984}.
+
+Section 3.5 of~\cite{Coles_2001} shows, \textit{mutatis mutandis},
+    that the extremal types theorem applies identically to minima by reversing the sign of the data.
+
+\subsubsection{Parameters and Types of GEV distributions}
+
+The GEV distribution has a CDF given by:
+
+\[ G(z) = \exp \left( - \left( 1 + \xi \left( \frac{z-\mu}{\sigma} \right)  \right)^{-\frac{1}{\xi}} \right) \]
+
+This has three parameters, the location $\mu$, the scale $\sigma$ and the shape $\xi$.
+It is clear from this CDF that the change of location and scale parameters represent moving and rescaling the distribution,
+    much as the mean and standard deviation parameters do for a normal distribution.
+
+The shape parameter determines the thickness of the tail of the distribution.
+The larger the shape parameter, the thicker the tail of the distribution.
+
+%  TODO insert graph w different shape parameters
+
+Where $\xi > 0$,
+    the distribution is heavy-tailed.
+This type of GEV distribution is also known as a Fr\'{e}chet distribution.
+Special cases of this distribution have unique properties,
+    where $\xi \geq \frac{1}{2}$, the distribution has infinite variance and
+    where $\xi \geq 1$, the distribution has infinite mean.
+
+Where $\xi < 0$, the distribution is light-tailed,
+    also known as a reversed Weibull distribution.
+These distributions are limited to a maximum `most extreme' value of $\mu - \frac{\sigma}{\xi}$.
+It can therefore be expected that distributions modelling extrema with physical constraints would have a negative shape parameter.
+For example, Table 3 of Chikobvu and Chifurira's paper~\cite{Chikobvu_2015} modelling rainfall minima finds a negative shape parameter,
+    which would be expected as rainfall cannot be negative.
+
+Where $\xi = 0$,
+    the distribution is a Gumbel distribution.
+The CDF of this distribution requires taking the limit as $\xi \rightarrow 0$,
+    giving a double exponential CDF\@.
+The extrema of normal distributions converge to a Gumbel distribution,
+    shown as a step in the proof of Proposition 1 of~\cite{Bailey_2014}.
+This means that, with the Central Limit Theorem,
+    the maxima of a sample of means of any distribution approaches a Gumbel distribution as both samples grow larger,
+    provided the samples are independent.
+
+The above paragraph suggests that a Gumbel distribution is appropriate for modelling rainfall maxima,
+    as the rainfall is averaged over a time period and then a maxima is taken over those time periods for a given year or season.
+However, this has not been found to be true.
+Koutsoyiannis~\cite{Koutsoyiannis_2003} finds both an ``extremely slow'' theoretical convergence to a Gumbel distribution and
+    that the Gumbel distribution does not fit empirical rainfall maxima.
+Therefore, the three-parameter GEV distribution is used to model rainfall maxima in event attribution.
+
+\subsubsection{Return levels of GEV distributions}
 
 \subsection{Generalised Pareto Distribution}\label{subsec:gpd}
 
@@ -321,39 +454,63 @@ The area
 
 \subsection{Event Reproducibility}\label{subsec:eventrepro}
 
-\subsection{Statistical Independence}\label{subsec:statindep}
+\subsection{Statistical Reliability}\label{subsec:statvalid}
 
 \subsection{Validity of Model}\label{subsec:modelvalid}
 
 \chapter{Development}\label{ch:dev}
 
-
-This section should be written in standard scientific
-language. Standard techniques in your research field should not be
-written out in detail. In computational projects this section should
-be used to explain the algorithms used and the layout of the
-computational code. A copy of the actual code may be given in the
-appendices if appropriate.
-
-This section should emphasise the philosophy of the approach used and
-detail novel techniques. However please note: this section should not
-be a blow-by-blow account of what you did throughout the project. It
-should not contain large detailed sections about things you tried and
-found to be completely wrong! However, if you find that a technique
-that was expected to work failed, that is a valid result and should be
-included.
-
-Here logical structure is particularly important, and you may find
-that to maintain good structure you may have to present the
-explorations/calculations/computations/whatever in a different order
-from the one in which you carried them out.
-
 \section{Event Definition}\label{sec:def}
+
+\subsection{The Stonehaven Event}\label{subsec:actualevent}
+
+\subsubsection{Rainfall at the crash location}
+
+%  TODO insert plot of stonehaven morning rainfall
+
+\subsubsection{Rainfall in the Stonehaven region}
+
+%  TODO insert several hourly plots of the storm passing
+
+\subsection{Definition and Constraints}\label{subsec:defandcons}
+
+\subsubsection{Stonehaven Geography}
+
+%  TODO insert geography/height map, note Koppen classification
+
+\subsection{Processing and Fitting the Radar Data}\label{subsec:radarprocess}
+
+\subsubsection{Computing Maxima}
+
+\subsubsection{Computing Events}
+
+%  TODO discuss ok_count implication on size of event
+
+\subsubsection{Fitting event distribution}
+
+%  TODO mention monte carlo bootstrap
+
+\subsubsection{Annual rainfall maxima}
 
 \section{Event Modelling}\label{sec:model}
 
+%  TODO insert chart w various coarsenings
+
 \chapter{Results and Analysis}\label{ch:results}
 
+%  TODO mention lack of trend analysis due to lack of radar data
+
+\section{Results}\label{sec:results}
+
+\begin{comment}
+This section should give a picture of what you have taken out of your
+project and how you can put it into context.
+
+This section should summarise the results obtained, detail conclusions
+reached, suggest future work, and changes that you would make if you
+repeated the project.
+\end{comment}
+\begin{comment}
 This section should detail the obtained results in a clear,
 easy-to-follow manner. It is important to make clear what are original
 results and what are repeats of previous calculations or computations.
@@ -368,18 +525,27 @@ Results or computations should be presented with uncertainties
 Be selective in what you include: half a dozen \emph{e.g.}~tables that
 contain wrong data you collected while you forgot to switch on the
 computer are not relevant and may mask the correct results.
+\end{comment}
+
+\subsection{Radar Data Fit}\label{subsec:radardatafit}
+
+%  TODO insert return chart
+
+\subsection{Model Correlations}\label{Model Correlations}
+
+%  TODO insert CET scatter
+
+\subsection{Risk Ratios}\label{subsec:riskratio}
+
+%  TODO insert prob_radar_CPM
+
+%  TODO insert plot showing overlap of distributions w/ parameters
 
 \section{Discussion of your results}\label{sec:discussion}
 
-This section should give a picture of what you have taken out of your
-project and how you can put it into context.
-
-This section should summarise the results obtained, detail conclusions
-reached, suggest future work, and changes that you would make if you
-repeated the project.
-
 \chapter{Conclusions}\label{ch:conclusions}
 
+\begin{comment}
 This is the place to put your conclusions about your work. You can
 split it into different sections if appropriate. You may want to include
 a section of future work which could be carried out to continue your
@@ -387,6 +553,7 @@ research.
 
 The conclusion section should be at least one page long, preferably 2
 pages, but not much longer.
+\end{comment}
 
 \appendix
 % the appendix command just changes heading styles for appendices.
