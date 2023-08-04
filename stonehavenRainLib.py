@@ -75,7 +75,7 @@ except ModuleNotFoundError:
 
 
 def get_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', region=None,
-                   height_range=slice(0, 200), mxMeanRain=1000.):
+                   height_range=slice(0, 400), mxMeanRain=1000.):
     """
     read in radar data and mask it by heights and mean rain being reasonable.
     :param file: file to be read in
@@ -109,7 +109,7 @@ def get_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', region=None,
 
 
 def gen_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', quantiles=None,
-                   region=None, height_range=slice(0, 200), discrete_hr=12):
+                   region=None, height_range=slice(0, 400), discrete_hr=12):
     """
     generated flattened radar data.
     Read in data, keep data between height_range, mask by seasonal total rainfall < 1000 mm, group by time (discretized to 12 hours by default), requiring at least 25 values.  and then compute quantiles for each grouping
@@ -132,7 +132,7 @@ def gen_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', quantiles=No
     radar_data = rseasMskmax.groupby(indx).quantile(quantiles).rename(group='time_index',
                                                                       quantile='time_quant')  # .values
     ok_count = (~rseasMskmax.isnull()).groupby(indx).sum().rename(group='time_index')  # count non nan
-    radar_data = radar_data[(ok_count > 25)]  # want at least 25 values
+    radar_data = radar_data[(ok_count > 10)]  # want at least 10 values
     ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2021')
     rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
     ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2020')

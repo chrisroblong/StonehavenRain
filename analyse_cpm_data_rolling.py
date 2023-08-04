@@ -1,6 +1,6 @@
 """
 Fit covariate dependent GEV to extremes from CPM and saves them.  Data should contain time/rolling period/ensemble_id, grid_lat & grid_long
-Then compute bootstrap uncertainties on average fits when hts between 0 and 200 m.
+Then compute bootstrap uncertainties on average fits when hts between 0 and 400 m.
 
 Data is saved and subsequently used by plot_intensity_risk_ratios.py
 
@@ -98,7 +98,9 @@ def qsat(temperature):
 
 
 # where all the processed data goes.
-outdir_gev = stonehavenRainLib.dataDir / 'gev_fits_roll'
+# coarsening = "1"  # adds coarsening TODO: uncomment
+path_end = coarsening + '_gev_fits_roll'
+outdir_gev = stonehavenRainLib.dataDir / path_end
 outdir_gev.mkdir(parents=True, exist_ok=True)  # create the directory
 
 ## read in the data we need
@@ -106,7 +108,6 @@ covariate_dir = stonehavenRainLib.dataDir / "transfer_dir/cpm_fits"
 cet = xarray.load_dataset(covariate_dir / 'cet_tas.nc').tas
 cpm = xarray.load_dataset(covariate_dir / 'cpm_reg_tas.nc').tas
 
-coarsening = "1" # adds coarsening
 st_temp = xarray.load_dataset(covariate_dir / 'st_reg_tas.nc').tas
 st_precip = xarray.load_dataset(covariate_dir / 'st_reg_pr.nc').pr
 st_reg_hum = qsat(st_temp)
@@ -119,6 +120,7 @@ st_rgn_rot = dict()
 for c, name in zip(st_rot, ['grid_longitude', 'grid_latitude']):
     st_rgn_rot[name] = slice(c - 0.5, c + 0.5)
 
+
 rainmaxlist = []
 for file in cpm_files:
     array = xarray.open_dataset(file).seasonalMax
@@ -127,20 +129,24 @@ for file in cpm_files:
     rainmaxlist.append(array)
 st_extreme_precip = xarray.combine_by_coords(rainmaxlist).seasonalMax
 st_extreme_precip = st_extreme_precip.drop_duplicates('time')
+if coarsening == "3":
+    st_extreme_precip = st_extreme_precip.isel(grid_longitude=~st_extreme_precip.argmax('grid_longitude'))
+print(st_extreme_precip)
 
 # st_extreme_precip = st_extreme_precip.sel(time=(st_extreme_precip.time.dt.season == 'JJA'))
 # st_extreme_precip = st_extreme_precip.sel(**st_rgn_rot).load()
 
 # get in the topographic info for the CPM. Note coords differ slightly from st_extreme prob due to FP changes.
 cpm_ht = xarray.load_dataset(stonehavenRainLib.dataDir / 'orog_land-cpm_BI_2.2km.nc', decode_times=False).squeeze()
-cpm_ht = cpm_ht.sel(
-    longitude=slice(st_extreme_precip.grid_longitude.min() - 0.01, st_extreme_precip.grid_longitude.max() + 0.01),
-    latitude=slice(st_extreme_precip.grid_latitude.min() - 0.01, st_extreme_precip.grid_latitude.max() + 0.01))
 cpm_ht = cpm_ht.rename(longitude='grid_longitude', latitude='grid_latitude')
+cpm_ht = cpm_ht.sel(**st_rgn_rot).load()
+#print(cpm_ht)
+cpm_ht = cpm_ht.coarsen(grid_longitude=int(coarsening), boundary="trim").mean()
+cpm_ht = cpm_ht.coarsen(grid_latitude=int(coarsening), boundary="trim").mean()
 # need to fix the longitudes & latitudes...
 cpm_ht = cpm_ht.assign(grid_longitude=st_extreme_precip.grid_longitude,
                        grid_latitude=st_extreme_precip.grid_latitude).ht
-msk = (cpm_ht > 0) & (cpm_ht < 200)
+msk = (cpm_ht > 0) & (cpm_ht < 400)
 
 # get in observed seasonal CET
 obs_cet = commonLib.read_cet()
@@ -192,7 +198,7 @@ def comp_bootstrap(ratio_Dparam, cpm_ht, direct=None, filename_start=None, refre
     mn_file = direct / f"{filename_start}_mean.nc"
     if refresh or (not bs_file.exists()):
         print("Making mean and boostrap of params")
-        L = (cpm_ht > 0) & (cpm_ht < 200)
+        L = (cpm_ht > 0) & (cpm_ht < 400)
         ratio_Dparam_flatten = ratio_Dparam.where(L).stack(horizontal=stonehavenRainLib.cpm_horizontal_coords)
         ratio_Dparam_flatten = ratio_Dparam_flatten.where(np.isfinite(ratio_Dparam_flatten), drop=True)
         nCPM = ratio_Dparam_flatten.sel(parameter='Dlocation').sel(rolling=1).size
@@ -333,43 +339,13 @@ for k, v in stonehavenRainLib.stonehaven_region.items():
 kw_cbar = dict(orientation='horizontal', label='', fraction=0.1, pad=0.15, extend='both')
 
 label = commonLib.plotLabel()
-# Define the layout of subplots
-rows = [['location', 'scale'],
-        ['location', 'scale'],
-        ['scatter', 'scatter_shape'],
-        ['r_gev_fit_st', 'r_gev_fit_w_st']]
-
-# Calculate the number of rows and columns
-num_rows = len(rows)
-num_cols = max(len(row) for row in rows)
-
-# Create the figure and axes
-fig, axes = plt.subplots(num_rows, num_cols, figsize=(9, 10), subplot_kw={'projection': ccrs.PlateCarree()})
-
-# Create a dictionary to store the axes
-ax_dict = {}
-
-# Loop through the rows and columns to assign axes to the corresponding subplots
-for i, row in enumerate(rows):
-    for j, col in enumerate(row):
-        ax_dict[col] = axes[i, j]
-
-# Remove any unused axes
-for ax in axes.flatten():
-    if ax not in ax_dict.values():
-        ax.remove()
-
-# Optionally, set titles for each subplot
-ax_dict['location'].set_title('Location')
-ax_dict['scale'].set_title('Scale')
-ax_dict['scatter'].set_title('Scatter')
-ax_dict['scatter_shape'].set_title('Scatter Shape')
-ax_dict['r_gev_fit_st'].set_title('r_gev_fit_st')
-ax_dict['r_gev_fit_w_st'].set_title('r_gev_fit_w_st')
-
-# Adjust layout and spacing
-plt.tight_layout()
-
+fig, ax_dict = plt.subplot_mosaic([['location', 'scale'],
+                                   ['location', 'scale'],
+                                   ['scatter', 'scatter_shape'],
+                                   ['r_gev_fit_st', 'r_gev_fit_w_st']],
+                                  # gridspec_kw=dict(height_ratios=[2,1,1]),
+                                  num='cpm_gev_fit', clear=True, figsize=[9, 10],
+                                  per_subplot_kw=dict(location=plot_kws, scale=plot_kws))
 for p in ['location', 'scale']:
     ax = ax_dict[p]
     ax.set_extent(rgn, crs=ccrs.OSGB())
@@ -407,8 +383,8 @@ def scatter_dloc_scale(ax, ratio_Dparam, ratio_mean, ratio_bootstrap, cpm_ht, to
     e = confidence_ellipse(bootstrap_ratio.sel(parameter='Dlocation', rolling=rolling).values,
                            bootstrap_ratio.sel(parameter='Dscale', rolling=rolling).values, ax, n_std=2,
                            edgecolor='red', linewidth=4)
-    # Only keep hts where between 0 and 200.
-    L = (cpm_ht > 0) & (cpm_ht < 200)
+    # Only keep hts where between 0 and 400.
+    L = (cpm_ht > 0) & (cpm_ht < 400)
     rrm = rr.where(L, np.nan)
     rrm = rrm.stack(horizontal=stonehavenRainLib.cpm_horizontal_coords)
     rrm = rrm.where(np.isfinite(rrm), drop=True)
@@ -496,7 +472,7 @@ commonLib.saveFig(fig)
 # print out ratios relative to CC
 print(mn_ratio.drop_vars(['t', 'surface']) / float(cc_scale))
 ## and print out mean AIC values
-L = (cpm_ht > 0) & (cpm_ht < 200)
+L = (cpm_ht > 0) & (cpm_ht < 400)
 with np.printoptions(precision=0):
     print("All pts")
     print("No varn             ", fit_nocov.AIC.mean(stonehavenRainLib.cpm_horizontal_coords).values)

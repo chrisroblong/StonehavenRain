@@ -39,8 +39,16 @@ def mc_dist(radar_data_all, n_monte_carlo):
         mc_radar_data = radar_data_all.radar.isel(time_index=indx_rdr)  # data > 0 < 200
         # compute empirical fit
         radar_fit_mc = gev_r.xarray_gev(mc_radar_data, dim='time_index')
-        mc_dist.append( radar_fit_mc)
-    return xarray.concat(mc_dist, dim='sample')
+        mc_dist.append(radar_fit_mc)
+    ds = xarray.concat(mc_dist, dim='sample').dropna(dim='sample')  # removed NaNs
+    ds['sample'] = range(len(ds['sample']))  # coord label to be able to remove bad samples
+    bad_samples = ds.Parameters.where((ds.Parameters.min(dim='time_quant').sel(parameter='location') < 0)).dropna(dim='sample')['sample']
+    ds = ds.drop_sel(sample=bad_samples)
+    bad_samples = ds.Parameters.where((ds.Parameters.min(dim='time_quant').sel(parameter='scale') < 0)).dropna(dim='sample')['sample']
+    ds = ds.drop_sel(sample=bad_samples)
+    ds = ds.drop_vars("sample")
+    print(ds)
+    return ds
 
 
 def save(radar_data_all, prefix=""):
@@ -58,9 +66,10 @@ def no2020(radar_data_all):
 time = slice('2005','2022')
 file = stonehavenRainLib.dataDir / 'transfer_dir/summary_5km_1h.nc'
 radar_data_all = stonehavenRainLib.gen_radar_data(file=file).sel(time=time)
-no2020radar_data_all = no2020(radar_data_all)
+#no2020radar_data_all = no2020(radar_data_all)
 print(radar_data_all)
-print(no2020radar_data_all)
+#print(no2020radar_data_all)
 save(radar_data_all)
-save(no2020radar_data_all, "no2020")
+#save(no2020radar_data_all, "no2020")
 print_emp_val(file)
+
