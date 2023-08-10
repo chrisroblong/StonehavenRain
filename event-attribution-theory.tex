@@ -1,0 +1,299 @@
+As a part of a complex system,
+    any weather event is necessarily multifactorial,
+    with no single cause.
+It is therefore necessary to use a probabilistic lens to perform a scientific analysis.
+
+In this case, the weather at a given place and time of year is expressed as a statistical distribution of events.
+The climate may then be considered either the distribution itself,
+    or the parameters informing the distribution.
+In other words, ``Climate is what we expect, weather is what we get.''~\cite{Herbertson_1935}.
+
+The scientific method may then be applied,
+    using the climate distribution as a dependent variable to the factor being considered.
+Issues, of both a technical and a theoretical nature can arise with this approach,
+    and will be discussed in subsection~\ref{sec:attrchallenge}.
+
+In all the examples given in this section,
+    the independent variable is anthropogenic climate change.
+This is often quantified by using a temperature metric,
+    although additional factors may be considered.
+
+It may be noted that,
+    due to their generality,
+    climate event attribution techniques may be of use outside risk analysis from modern changes in the climate.
+For example,
+    Ruddiman~\cite{Ruddiman_2010} has attempted to attribute the lack of a recent glaciation to the beginning of agriculture.
+
+An event attribution study aims to provide two quantities.
+The first is the change in the probability of the event.
+The second is the change in the magnitude of the event.
+
+\subsubsection{Development of Event Attribution}
+
+In 2003, whilst experiencing flooding as a result of extreme weather,
+    Allen~\cite{Allen_2003} posited the probabilistic interpretation of climate change impacts,
+    proposing a potential to find greenhouse gas emitters liable for extreme weather events.
+%  Add note about the fact that a grant would not be paid to emitters for reducing the likelihood.
+A notable early use case of this probabilistic approach was by Stott et al.~\cite{Stott_2004},
+    finding that 75\% of the risk of the European heatwave is attributable to anthropogenic climate change.
+
+World Weather Attribution produces rapid Event Attribution studies,
+    some of which are within a month of the event occuring~\cite{van_Oldenborgh_et_al_2018},
+    using the probabilistic approach.
+Alternative approaches also exist.
+One of these is the `Boulder' methodology,
+    described in section 2.2 of~\cite{Otto_2017},
+    which seeks to break down the proportions to which the event was caused by natural variability and the due to Anthropogenic Climate Change.
+Another is the `storyline' methodology,
+    outlined by Shepherd et al.\ in~\cite{Shepherd_et_al_2018},
+    although this has been considered contentious~\cite{García-Portela_Maraun_2023}.
+
+\section{Steps to Event Attribution}\label{sec:attrsteps}
+
+The precise number of steps for successful event attribution vary by the situation.
+Van Oldenborgh et al.~\cite{van_Oldenborgh_et_al_2021} give 8 separate steps,
+    while Otto~\cite{Otto_2017} gives 6 steps.
+Both of these methodologies are functionally identical;
+    I shall base my description upon 4 of the steps described by Otto.
+
+Only four steps are given in full below.
+This is due to the removal of an analysis trigger step at the start of the process
+    and a communication step at the end of the process,
+    both of which I will cover here briefly.
+
+An analysis trigger is a set of criteria used to determine whether an event should be investigated.
+These serve a utilitarian purpose,
+    allowing the events with the greatest impact to be investigated first.
+These may include the number of deaths or number impacted,
+    as in chapter 2 of~\cite{van_Oldenborgh_et_al_2021},
+    or economic and cultural factors, as in~\cite{Tett_Soon}.
+The former criteria may skew analysis towards poorer nations~\cite{Kahn_2005},
+    while the latter may skew analysis towards richer nations.
+
+It is of note that potential liability of anthropogenic climate change may be a triggering factor,
+    so the analysis begins due to a hypothesis that the event was caused by anthropogenic climate change.
+I believe that this may bias the results of a meta-analysis of event attribution studies,
+    and so increase the challenge in determining anthropogenic climate change as a cause of more extreme events in general.
+I omit giving any further detail on the analysis trigger as it is beyond the scope of mathematical or physical interest.
+
+The communication of the outcome of the analysis may also be considered in the study.
+This is especially true outside the scientific community
+    and considers the risk of the audience drawing incorrect conclusions,
+    as well as the risk of policymakers acting on incorrect information.
+
+\subsection{Event Definition}\label{subsec:backeventdef}
+
+To perform an attribution analysis,
+    the weather event must first be defined in clear and quantitative terms.
+This requires specifying a variable with a threshold that has been crossed,
+    as well as the time and region at which an event may be considered.
+
+This is not necessarily straightforward.
+An event attribution is normally triggered by the event's social or environmental impact,
+     not just due to the meteorological significance.
+Therefore, care must be taken to ensure that the definition of the event is sufficiently similar to the conditions that would cause a similar impact.
+
+Many of the challenges in Event Attribution arise directly from a poor Event Definition.
+Events that are too narrowly defined may have issues with reproducibility,
+    as will be discussed in~\ref{subsec:eventrepro},
+    while events that are too widely defined may give invalid results,
+    as will be discussed in~\ref{subsec:modelvalid}.
+
+\subsubsection{Variable and Threshold}
+
+The climate variable used to define the event requires travelling up the causal chain that leads to it.
+As a set of examples,
+    floods/droughts are caused by extreme highs/lows in rainfall,
+    while heat waves and cold spells are caused by extreme high or low temperatures.
+
+However,
+    all of these events require the extreme rainfall/temperature to be sustained for the event to be hazardous.
+Simple metrics may be applicable here,
+    as the definition can then use the rainfall/temperature averaged over a given time period.
+The selection of time period itself also requires a consideration of the event.
+A damaging heavy storm requires extreme winds over a matter of minutes,
+    while it may take days for the land to dry out sufficiently for a drought to occur.
+
+More advanced metrics may be used.
+For example, an Expert Team on Climate Change Detection Indices~\cite{Zhang_2011}
+    describes a `Growing Season Length',
+    allowing climate-caused famine to be quantified using only daily temperature data.
+A `Wet-Bulb Temperature' has been used to combine humidity and temperature data to create an index that better measures teh effect of a heatwave on human health~\cite{Li_2020}.
+
+\subsubsection{Spatial and Temporal Region}
+
+In addition to defining a threshold variable,
+    it is necessary to define the regions and times at which an event can be considered sufficiently similar to that being analysed.
+This is due to the fact that both historical trend analysis is impossible on a single extreme event at a single place on a single day of the year
+    and that climate models will rarely reproduce events in such a narrow definition.
+The second of these factors will be discussed in subsection~\ref{subsec:eventrepro}.
+
+For the spatial region,
+    a region with a known climate similar to that in which the event occurred is chosen,
+    typically directly around the location of the event.
+This is done so that the frequency and types of event will match the location of the original event,
+    as well as to ensure that the factors that change the climate,
+    whether Anthropomorphic or not,
+    are similar to those changing the climate at the point of the event.
+
+In addition to the aforementioned similarity in location,
+    a historical trend analysis can aid in defining a region,
+    along with tools including topography and climate classifications.
+The region is chosen based on similar weather,
+    not a similarity in hazard risk,
+    as the goal is to perform an attribution for the event,
+    not to advise on potential future risk.
+For example,
+    a region defined for a flood event over a flood-prone area would only consider areas with similar rainfall,
+    not those similarly flood-prone.
+
+For the temporal region,
+    or time period for the event to be considered,
+    an analogous process must be used.
+It is often appropriate to use a seasonal time period,
+    as this can also limit the event to those with similar meteorology,
+    such as by only considering monsoon rainfall~\cite{Otto_et_al_2023}.
+This can also prove to be a practical step,
+    reducing the amount of data to be used later in the attribution process.
+
+Additional `Boundary Conditions'~\cite{van_Oldenborgh_et_al_2021} may then also be imposed.
+Of note is the importance of the El Niño,
+    especially for drought events in the southern hemisphere~\cite{Lyon_2004},
+    so this may also be accounted for when defining these event.
+
+Once all of these definitions have been made,
+    a `class' of events has been described.
+This class will then be used to find like events in both the historical and model data.
+
+\subsection{Model Evaluation}\label{subsec:backmodeleval}
+
+\subsection{Likelihood Estimation}\label{subsec:backlikeest}
+
+\subsection{Interpretation}\label{subsec:backinterp}
+
+\section{Extreme Value Statistics}\label{sec:exstats}
+
+This subsection will describe the statistical foundations of extreme event modelling,
+    paraphrasing Coles' book~\cite{Coles_2001} unless where otherwise stated.
+Climate events that pose hazards are necessarily extreme.
+Therefore, to model these events,
+    extreme value distributions are necessary.
+
+Throughout the analysis,
+    we assume that the variables are independent and identically distributed ($i.i.d.$).
+The issues that may arise from this assumption not being valid are considered in subsection~\ref{subsec:statvalid}.
+
+For event definitions which average a variable over a season,
+    as opposed to focusing on the extreme
+    a normal distribution is instead appropriate.
+This is as the Central Limit Theorem states that the limit of the mean of $n$ $i.i.d.$ random variables tends to a normal distribution.
+The equivalents for extreme events, the GEV distribution and Extremal Types Theorem,
+    will be explained in due course.
+
+\subsection{GEV Distribution}\label{subsec:gev}
+
+\subsubsection{Extremal Types Theorem}
+
+This explanation is as given in section 3.1 of~\cite{Coles_2001}.
+
+Let $M_n$ be the maximum of $n$ $i.i.d.$ random variables.
+If there exist sequences of constants $a_n > 0$ and $b_n$, and non-degenerate $G$ such that:
+
+\[ P\left( \frac{M_n - b_n}{a_n}  \leq z \right) \rightarrow G(z) \text{ as } n \rightarrow \infty \]
+
+Then $G$ is a member of the GEV (Generalised Extreme Value) family.
+
+Section 3.1.4  of~\cite{Coles_2001} outlines a proof of the Extremal Types Theorem.
+This involves showing that being a GEV distribution is equivalent to being `Max-Stable',
+    then that the maxima of GEV distributions are Max-Stable,
+    giving the GEV as the distribution of the original maximum in the infinite limit.
+It is of note that this is similar to one approach to proving the Central Limit Theorem,
+    which considers the normal distribution as a unique fixed point under convolutions,
+    resulting in normal distributions being an infinite limit of the sum or mean~\cite{Hamedani_Walter_1984}.
+
+Section 3.5 of~\cite{Coles_2001} shows, \textit{mutatis mutandis},
+    that the extremal types theorem applies identically to minima by reversing the sign of the data.
+
+\subsubsection{Parameters and Types of GEV distributions}
+
+The GEV distribution has a CDF given by:
+\begin{equation}\label{eq:gevcdf}
+    G(z) = \exp \left( - \left( 1 + \xi \left( \frac{z-\mu}{\sigma} \right)  \right)^{-\frac{1}{\xi}} \right)
+\end{equation}
+
+This has three parameters, the location $\mu$, the scale $\sigma$ and the shape $\xi$.
+It is clear from this CDF that the change of location and scale parameters represent moving and rescaling the distribution,
+    much as the mean and standard deviation parameters do for a normal distribution.
+
+The shape parameter determines the thickness of the tail of the distribution.
+The larger the shape parameter, the thicker the tail of the distribution.
+
+%  TODO insert graph w different shape parameters
+
+Where $\xi > 0$,
+    the distribution is heavy-tailed.
+This type of GEV distribution is also known as a Fr\'{e}chet distribution.
+Special cases of this distribution have unique properties,
+    where $\xi \geq \frac{1}{2}$, the distribution has infinite variance and
+    where $\xi \geq 1$, the distribution has infinite mean.
+
+Where $\xi < 0$, the distribution is bounded,
+    also known as a reversed Weibull distribution.
+These distributions are limited to a maximum `most extreme' value of $\mu - \frac{\sigma}{\xi}$.
+It can therefore be expected that distributions modelling extrema with physical constraints would have a negative shape parameter.
+For example, Table 3 of Chikobvu and Chifurira's paper~\cite{Chikobvu_2015} modelling rainfall minima finds a negative shape parameter,
+    which would be expected as rainfall cannot be negative.
+
+Where $\xi = 0$,
+    the distribution is a Gumbel distribution.
+The CDF of this distribution requires taking the limit as $\xi \rightarrow 0$,
+    giving a double exponential CDF\@.
+The extrema of normal distributions converge to a Gumbel distribution,
+    shown as a step in the proof of Proposition 1 of~\cite{Bailey_2014}.
+This means that, with the Central Limit Theorem,
+    the maxima of a sample of means of any distribution approaches a Gumbel distribution as both samples grow larger,
+    provided the samples are independent.
+
+The above paragraph suggests that a Gumbel distribution is appropriate for modelling rainfall maxima,
+    as the rainfall is averaged over a time period and then a maxima is taken over those time periods for a given year or season.
+However, this has not been found to be true.
+Koutsoyiannis~\cite{Koutsoyiannis_2003} finds both an ``extremely slow'' theoretical convergence to a Gumbel distribution and
+    that the Gumbel distribution does not fit empirical rainfall maxima.
+Therefore, the three-parameter GEV distribution is used to model rainfall maxima in event attribution.
+
+\subsubsection{Return levels of GEV distributions}
+
+Equation~\ref{eq:gevcdf} can be inverted to give a return level $z_p$ for a probability $p$:
+\begin{equation}\label{eq:gevreturn}
+    z_p = \mu - \frac{\sigma}{\xi}\left( 1-\left( -\log\left( 1-p \right) \right)^{-\xi} \right)
+\end{equation}
+
+This can also be used to compute the rarity of events for each return period $P$,
+    as the probability $p$ is equal to $1/P$.
+
+This is allows the GEV distribution to use the language common for extreme weather events,
+    as with knowledge of the underlying distribution,
+    it is possible to compute the magnitude of an event for any return period.
+
+\subsection{GEV Parameter Estimation}\label{subsec:parameterest}
+
+In sections~\ref{subsec:radardatafit} and~\ref{subsec:radardatafit},
+    parameters are fitted to data using the extRemes R library~\cite{extremes_R}.
+This software uses MLE (Maximum Likelihood Estimation) to get best estimates of the parameters of a dataset,
+    assuming the data obeys a GEV distribution.
+This technique will be covered briefly here.
+
+The extRemes package is also used to fit linear changes in a parameter with respect to a covariate.
+Although this uses the same underlying mathematics as this section,
+    relying on MLE,
+    the exact algorithm used is beyond the scope of this report.
+
+\subsubsection{}
+
+\section{Challenges in Event Attribution}\label{sec:attrchallenge}
+
+\subsection{Event Reproducibility}\label{subsec:eventrepro}
+
+\subsection{Statistical Reliability}\label{subsec:statvalid}
+
+\subsection{Validity of Model}\label{subsec:modelvalid}
