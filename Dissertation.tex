@@ -6,6 +6,9 @@
 \usepackage{comment}
 \usepackage{hyperref}
 \usepackage{verbatim}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{subcaption}
 \graphicspath{{figures/}}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -44,7 +47,7 @@
 \vspace*{0.4\textheight}
 
 \begin{center}
-        \includegraphics[width=35mm]{crest.pdf}
+        \includegraphics[width=35mm]{crest}
 \end{center}
 
 \medskip
@@ -81,7 +84,7 @@ This project applies current event attribution techniques for extreme rainfall e
 
 I declare that this report is entirely my own work unless stated otherwise.
 
-The introduction~\ref{ch:intro} describes the motivations for the work.
+The introduction, chapter~\ref{ch:intro}, describes the motivations for the work.
 This includes the information showing the impact of the extreme rainfall on the derailment by the Rail Accident Investigation Board~\cite{RAIB_2022},
     as well as my supervisor's paper analysing the effect of climate change on the risk of an extreme rainfall event~\cite{Tett_Soon}.
 
@@ -105,11 +108,18 @@ NumPy and XArray are used to manage and process both real and modelled rainfall 
 CartoPy is used to process data between both Ordinance Survey and Longitude-Latitude coordinate systems.
 
 R and the RPy package are used to fit extreme value distributions to the rainfall data.
+This calls the extRemes R package~\cite{extremes_R}.
+
+The Rain Radar Data is taken from the Met Office's NIMROD system~\cite{radar_data}.
+
+The Model Data is taken from the Met Office Hadley Centre's UKCP18 Convection-Permitting Model projections~\cite{model_data}.
+
+Tht topography data on an OSGB grid is taken from~\cite{radar_topog}.
 
 The data processing ran on both the JASMIN supercomputer and on my local machine,
 GitHub was used to manage the transfer of both code and data.
 
-The majority of the code used in this project is based on the code used by my supervisor performing a similar analysis on the 2021 Edinburgh cloudburst.
+The majority of the code used in this project is based on the code used by my supervisor performing a similar analysis on the 2021 Edinburgh cloudburst~\cite{Tett_Soon}.
 
 
 \newpage
@@ -143,7 +153,8 @@ Any work done in August other than writing up the dissertation was spent analysi
 I started writing this dissertation in mid-July, and I spent the first
 three weeks of August working on it full-time.
 
-I have achieved the final outcome of a probability ratio, and %  TODO discuss analysis
+I have achieved the final outcome of probability ratios for the event and
+    discussed the limitations of these results.
 
 
 \newpage
@@ -169,8 +180,13 @@ making this project possible.
 
 \chapter{Introduction}\label{ch:intro}
 
+\section{Stonehaven Derailment}\label{sec:stonederail}
 
+%  TODO use RAIB analysis
 
+\section{Rainfall in a warmer world}\label{sec:warmerrainfall}
+
+%  TODO rely on Simon's paper and other references
 \begin{comment}
 The Introduction should contain a description of your project and the
 problem you are trying to solve. It should start off at a level that
@@ -231,7 +247,7 @@ One of these is the `Boulder' methodology,
     described in section 2.2 of~\cite{Otto_2017},
     which seeks to break down the proportions to which the event was caused by natural variability and the due to Anthropogenic Climate Change.
 Another is the `storyline' methodology,
-    outlined by Shepherd et al. in~\cite{Shepherd_et_al_2018},
+    outlined by Shepherd et al.\ in~\cite{Shepherd_et_al_2018},
     although this has been considered contentious~\cite{García-Portela_Maraun_2023}.
 
 \section{Steps to Event Attribution}\label{sec:attrsteps}
@@ -247,7 +263,7 @@ This is due to the removal of an analysis trigger step at the start of the proce
     and a communication step at the end of the process,
     both of which I will cover here briefly.
 
-An analysis trigger is a set of criteria used by researchers to determine whether an event should be investigated.
+An analysis trigger is a set of criteria used to determine whether an event should be investigated.
 These serve a utilitarian purpose,
     allowing the events with the greatest impact to be investigated first.
 These may include the number of deaths or number impacted,
@@ -403,8 +419,9 @@ Section 3.5 of~\cite{Coles_2001} shows, \textit{mutatis mutandis},
 \subsubsection{Parameters and Types of GEV distributions}
 
 The GEV distribution has a CDF given by:
-
-\[ G(z) = \exp \left( - \left( 1 + \xi \left( \frac{z-\mu}{\sigma} \right)  \right)^{-\frac{1}{\xi}} \right) \]
+\begin{equation}\label{eq:gevcdf}
+    G(z) = \exp \left( - \left( 1 + \xi \left( \frac{z-\mu}{\sigma} \right)  \right)^{-\frac{1}{\xi}} \right)
+\end{equation}
 
 This has three parameters, the location $\mu$, the scale $\sigma$ and the shape $\xi$.
 It is clear from this CDF that the change of location and scale parameters represent moving and rescaling the distribution,
@@ -422,7 +439,7 @@ Special cases of this distribution have unique properties,
     where $\xi \geq \frac{1}{2}$, the distribution has infinite variance and
     where $\xi \geq 1$, the distribution has infinite mean.
 
-Where $\xi < 0$, the distribution is light-tailed,
+Where $\xi < 0$, the distribution is bounded,
     also known as a reversed Weibull distribution.
 These distributions are limited to a maximum `most extreme' value of $\mu - \frac{\sigma}{\xi}$.
 It can therefore be expected that distributions modelling extrema with physical constraints would have a negative shape parameter.
@@ -448,7 +465,32 @@ Therefore, the three-parameter GEV distribution is used to model rainfall maxima
 
 \subsubsection{Return levels of GEV distributions}
 
-\subsection{Generalised Pareto Distribution}\label{subsec:gpd}
+Equation~\ref{eq:gevcdf} can be inverted to give a return level $z_p$ for a probability $p$:
+\begin{equation}\label{eq:gevreturn}
+    z_p = \mu - \frac{\sigma}{\xi}\left( 1-\left( -\log\left( 1-p \right) \right)^{-\xi} \right)
+\end{equation}
+
+This can also be used to compute the rarity of events for each return period $P$,
+    as the probability $p$ is equal to $1/P$.
+
+This is allows the GEV distribution to use the language common for extreme weather events,
+    as with knowledge of the underlying distribution,
+    it is possible to compute the magnitude of an event for any return period.
+
+\subsection{GEV Parameter Estimation}\label{subsec:parameterest}
+
+In sections~\ref{subsec:radardatafit} and~\ref{subsec:radardatafit},
+    parameters are fitted to data using the extRemes R library~\cite{extremes_R}.
+This software uses MLE (Maximum Likelihood Estimation) to get best estimates of the parameters of a dataset,
+    assuming the data obeys a GEV distribution.
+This technique will be covered briefly here.
+
+The extRemes package is also used to fit linear changes in a parameter with respect to a covariate.
+Although this uses the same underlying mathematics as this section,
+    relying on MLE,
+    the exact algorithm used is beyond the scope of this report.
+
+\subsubsection{}
 
 \section{Challenges in Event Attribution}\label{sec:attrchallenge}
 
@@ -460,56 +502,273 @@ Therefore, the three-parameter GEV distribution is used to model rainfall maxima
 
 \chapter{Development}\label{ch:dev}
 
-\section{Event Definition}\label{sec:def}
+\subsubsection*{Stonehaven Region}
+
+Throughout this chapter,
+    reference is made to the `Stonehaven Region'.
+This is defined as +/- 50km of the crash location for radar data,
+    which uses an ordinance survey grid,
+    and as +/- 0.5 degrees of the crash location for the radar data.
+
+\section{Empirical Data}\label{sec:def}
+
+The data used in this section is taken from the Met Office's NIMROD system~\cite{radar_data}.
+This data has a 5km by 5km spatial resolution and a 15-minute temporal resolution,
+    although data is also available in a 1km by 1km spatial resolution.
+The coarser dataset was chosen as the Stonehaven event was a Summer convective storm,
+    which occurs on scales great enough to be captured at a 5km resolution.
 
 \subsection{The Stonehaven Event}\label{subsec:actualevent}
 
 \subsubsection{Rainfall at the crash location}
 
-%  TODO insert plot of stonehaven morning rainfall
+\begin{figure}[H]
+    \begin{center}
+    \includegraphics[width=100mm]{stonehavendayraingraph}
+    \end{center}
+    \caption{A graph of the rainfall at the Stonehaven crash location.
+    X-axis is the date and hour (24-hour clock) of the rainfall measurement,
+        ranging across the morning of the 12th of August 2020.
+    Y-axis is the rainfall measured in mm/h.}
+    \label{fig:stonehavendayraingraph}
+\end{figure}
+
+From figure~\ref{fig:stonehavendayraingraph},
+    the rainfall event begins at 4:15 and ends at 8:15.
+The rainfall at the crash location is then given in sixteen 15-minute chunks of time,
+    or as across four hours.
+
+This may suggest a four-hour event definition should be used.
+However, this was not done for two reasons.
+First, it is clear that the rainfall occurred in two 2-hour peaks,
+ so a 4-hour definition would not be appropriate for this event.
+Second, in section~\ref{subsec:radarprocess},
+    the radar data is processed into chunks,
+    each of which start on an increment of the length of time of the event.
+While this would accurately capture this 4-hour storm, being between 4:00 and 8:00,
+    an event from 6:00 to 10:00 would be considered two events of half the size.
+
+A one-hour peak was then used instead.
+This was as it allowed storms of a similar length to be quantified by their peak rainfall.
 
 \subsubsection{Rainfall in the Stonehaven region}
 
-%  TODO insert several hourly plots of the storm passing
+\begin{figure}[H]
+    \centering
 
-\subsection{Definition and Constraints}\label{subsec:defandcons}
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{stonerain5}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{stonerain6}
+    \end{subfigure}
+
+    \vspace{\baselineskip}
+
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{stonerain7}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{stonerain8}
+    \end{subfigure}
+    \caption{Rainfall in the Stonehaven region (+/- 50km of Stonehaven)
+        at times of 5, 6, 7 and 8AM of the 12th August 2020,
+        in the top left, top right, bottom left and bottom right respectively.
+    Scale is mm/h.
+    Black lines are coastlines, red lines are local authority boundaries.
+    Purple dot is the crash location.}
+    \label{fig:stoneregionrain}
+\end{figure}
+
+Figure~\ref{fig:stoneregionrain} shows the rainfall in the Stonehaven region,
+    demonstrating the movement of the storm North-East throughout the morning of the event.
+This figure is also available as an animation using data from 15-minute intervals,
+    showing the storm moving as expected.
+
+The figure also suggests that the event covers a large area,
+    validating the use of the coarser-resolution 5km dataset as sufficient to describe the event.
+One unfortunate consequence of using the 5km dataset is on the rainfall described in figure~\ref{fig:stonehavendayraingraph},
+    as the crash location lies near the boundary of four cells, yet the data is only taken from the nearest cell,
+    leading to the graph being less accurate approximation of the rainfall at the crash location than would be given by a 1km resolution dataset.
+
+\subsection{Further Constraints}\label{subsec:furthercons}
 
 \subsubsection{Stonehaven Geography}
 
-%  TODO insert geography/height map, note Koppen classification
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{stonetopog90}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{stonetopog4950}
+    \end{subfigure}
+    \caption{Plot of the topography in the Stonehaven region.
+    Scale is in meters.
+    Left is the raw data (at 90mx90m resolution),
+    right is the resampled data (at 4950mx4950m resolution) as used for future processing.
+    Black lines are coastlines, red lines are local authority boundaries.
+    Red dot is the crash location.}
+    \label{fig:stonetopog}
+\end{figure}
+
+The 4950m resolution data shown in figure~\ref{fig:stonetopog} was found by taking a mean average of 55 of the data points in each dimension,
+    giving each grid cell an average of 3250 raw data points.
+
+The area of the Stonehaven crash is around the 200m contour,
+    with the crash occurring at around 100m,
+    due to the cutting the railway passes through.
+Looking at figure 26 of~\cite{RAIB_2022},
+    the drain responsible for the crash is 150m above sea level.
+Furthermore, the drain's catchment reaches close to 200m.
+
+The topography of the region for the event attribution analysis was then chosen to be from 0m (sea level),
+    to 400m.
+This is done to make the topography around the crash location typical for the region in which the analysis is performed.
+A 200m limit was suggested,
+    to match the limit taken in~\cite{Tett_Soon},
+    but was not taken forward as this had the potential to give too few data points to define an event.
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics{stonetopogcut}
+    \end{center}
+    \caption{Map of the Stonehaven region with radar data grid cells (5kmx5km) within a topographical range of 0--400m in yellow,
+    grid cells outside of range in violet.
+    Black lines are coastlines, red lines are local authority boundaries.
+    Red dot is the crash location.}
+    \label{fig:stonetopogallowed}
+\end{figure}
+
+Out of the 400 grid cells in the Stonehaven Region,
+    data is taken from 185 of the grid cells.
+This is as 194 of the grid cells are not over land,
+    and an additional 21 grid cells have too high topography.
+
+As the radar data is at a 5km resolution,
+    while the resampled topography data is at a 4950m resolution,
+    the XArray \texttt{interp\_like} method is used to get a linear interpolation for the height at each 5km grid cell.
 
 \subsection{Processing and Fitting the Radar Data}\label{subsec:radarprocess}
 
+The steps used in this section are identical to those used to processing and fitting the radar data for the Edinburgh cloudburst event~\cite{Tett_Soon},
+    with changes made to fit the different definition and region in this case.
+
 \subsubsection{Computing Maxima}
 
-\subsubsection{Computing Events}
+As the goal was to use an Extreme Value distribution to model the data,
+    it is necessary to draw the extrema out from the data.
+The dataset itself~\cite{radar_data} is composed of \texttt{.tar} files, each of which containing the radar data of a given day.
 
-%  TODO discuss ok_count implication on size of event
+The \texttt{process\_radar\_data} Python script finds the maximum one-hour rainfall in each of these daily datasets and
+    uses these to generate a dataset with the one-hour maximum rainfall and the time of the one-hour maximum rainfall
+    at all points in the Stonehaven Region for a given month, in a NetCDF format
+The \texttt{combine\_summary} Python script then takes these monthly maxima and their times and combines them into a single dataset,
+    again as a NetCDF .
+
+These Python scripts are called by the Shell scripts \texttt{run\_jobs} and \texttt{run\_combine} respectively.
+The Shell scripts are run on a JASMIN Science Analysis Server and submit the Python scripts as SLURM jobs to the LOTUS Batch Processing Cluster,
+    allowing all the monthly maxima to be computed in a single script and the combination of the datasets to access an amount of memory to make the task feasible.
+
+The \texttt{get\_radar\_data} function in the \texttt{stonehavenRainLib} Python script then selects the summer months and
+    combines them to get the maximum hourly rainfall in the summer of each year,
+    along with the time of the maxima.
+This function also applies the topographical height mask described in subsection~\ref{subsec:furthercons},
+    returning an XArray DataSet of the radar data that will be used to describe and generate statistics for the event.
+
+\subsubsection{Computing Events and Definition}
+
+Now that the seasonal maxima have been found,
+    the data can be used to define events.
+This process is done in the \texttt{gen\_radar\_data} function in the \texttt{stonehavenRainLib} Python script.
+The seasonal maxima,
+    of which there is one for each grid cell in each year in the dataset,
+    are grouped by the time in which they occurred.
+
+These groups are 12-hour periods,
+    representing either the AM or PM hours of a day.
+Each group is then an event,
+    containing the grid cells which experienced their maximum hourly rainfall within the group's time period.
+The groups with less than 10 grid cells were discarded,
+    as these events are less than 250km$^2$ in size and
+    so do not represent events similar enough to the Stonehaven event.
+
+This gives a final event definition as 250km$^2$ of the land below 400m and within +/- 50km of Stonehaven
+    experiencing their annual summer hourly rainfall maxima in the same 12-hour period.
+
+For each event, the 0.05, 0.1, 0.2, 0.5, 0.8, 0.9 and 0.95 quantiles were found and returned in a dataset.
+The magnitude of a given event is defined by its 0.95 quantile.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=80mm]{dataprocessschematic}
+    \caption{Diagram representing the data processing after the maxima of each grid square has been found,
+    within each year.
+    `rain' represents the summer maximum rainfall in a grid cell,
+        `time' represents the time of this maximum,
+        red horizontal lines represent the taking of quantiles from the rainfall maxima.
+    Number of data points and quantiles are not to scale.}
+    \label{fig:dataprocessschematic}
+\end{figure}
 
 \subsubsection{Fitting event distribution}
 
-%  TODO mention monte carlo bootstrap
+The radar data is fit to a GEV distribution with the \texttt{comp\_radar\_fits} Python script,
+    which calls the \texttt{gev\_r} Python library to run code in R .
+The `fevd', fit extreme value distribution,
+    command in R is used to fit an extreme value distribution to the radar data,
+    which uses MLE, as described in subsection~\ref{subsec:parameterest}.
+This command is applied each of the quantiles of the event,
+    with the events as the data points,
+    giving the parameters of GEV distributions describing each quantile of the events.
+With these parameters generated,
+     it was possible to find the empirical return period for the Stonehaven event.
 
-\subsubsection{Annual rainfall maxima}
+To generate uncertainties,
+    a Monte Carlo bootstrap method is used,
+    given in the \texttt{mc\_dist} function.
+This involved generating a list of the same size of the number of events,
+    taking a random sample with replacement,
+    then applying the `fevd' command to each sample.
 
-\section{Event Modelling}\label{sec:model}
+1000 samples were taken,
+    of which 9 provided anomalous (negative) location or scale parameters,
+    and so were discarded.
+The discarding process was valid as the value of these parameters was ~-100,
+    while all other samples had values of these parameters between 2 and 15,
+    as well as that removing this few samples would not have a significant effect on the 95\% confidence interval.
 
+\section{Modelled Data}\label{sec:model}
+
+The Model data used in this section is
+    the Met Office Hadley Centre's UKCP18 Convection-Permitting Model Projections for the UK at 2.2km resolution~\cite{model_data}.
+
+\subsection{Pre-processing}\label{subsec:preprocess}
+
+\subsubsection{Co-ordinate rotation}
+
+\subsubsection{Coarsening}
 %  TODO insert chart w various coarsenings
+
+\subsubsection{Height mask}
+
+\subsection{Fitting covariates}\label{subsec:covfit}
+
+\subsection{Calculating risk ratios}\label{subsec:riskratios}
 
 \chapter{Results and Analysis}\label{ch:results}
 
-%  TODO mention lack of trend analysis due to lack of radar data
-
 \section{Results}\label{sec:results}
 
-\begin{comment}
-This section should give a picture of what you have taken out of your
-project and how you can put it into context.
-
-This section should summarise the results obtained, detail conclusions
-reached, suggest future work, and changes that you would make if you
-repeated the project.
-\end{comment}
 \begin{comment}
 This section should detail the obtained results in a clear,
 easy-to-follow manner. It is important to make clear what are original
@@ -531,7 +790,7 @@ computer are not relevant and may mask the correct results.
 
 %  TODO insert return chart
 
-\subsection{Model Correlations}\label{Model Correlations}
+\subsection{Model Correlations}\label{subsec:modelcorr}
 
 %  TODO insert CET scatter
 
@@ -541,7 +800,26 @@ computer are not relevant and may mask the correct results.
 
 %  TODO insert plot showing overlap of distributions w/ parameters
 
-\section{Discussion of your results}\label{sec:discussion}
+\section{Discussion}\label{sec:discussion}
+
+\begin{comment}
+This section should give a picture of what you have taken out of your
+project and how you can put it into context.
+
+This section should summarise the results obtained, detail conclusions
+reached, suggest future work, and changes that you would make if you
+repeated the project.
+\end{comment}
+
+\subsection{Event Definition}\label{subsec:diseventdef}
+
+%  TODO mention lack of trend analysis due to lack of radar data
+
+%   TODO mention Koppen in analysis
+
+\subsection{Model Resolution}\label{subsec:dismodeldef}
+
+\subsection{Model Validity}\label{subsec:dismodelvalid}
 
 \chapter{Conclusions}\label{ch:conclusions}
 
@@ -557,6 +835,8 @@ pages, but not much longer.
 
 \appendix
 % the appendix command just changes heading styles for appendices.
+
+%  TODO insert code behind each figure
 
 \chapter{Stuff that's too detailed}
 
