@@ -746,24 +746,88 @@ This involved generating a list of the same size of the number of events,
 The discarding process was valid as the value of these parameters was ~-100,
     while all other samples had values of these parameters between 2 and 15,
     as well as that removing this few samples would not have a significant effect on the 95\% confidence interval.
+The 991 samples left are greater than the 800 suggested by Booth and Sarkar~\cite{Booth_Sarkar_1998}
+    for an effective error estimation.
 
 \section{Modelled Data}\label{sec:model}
 
-The Model data used in this section is
+The model data used in this section is
     the Met Office Hadley Centre's UKCP18 Convection-Permitting Model Projections for the UK at 2.2km resolution~\cite{model_data}.
+This dataset was chosen as the resolution is less than 5km,
+    and so is able to accurately represent convective storms.
+
+The CPM ensemble consists of 12 members and covers the 100 years from 1981 to 2080,
+    modelling the RCP8.5 emissions scenario.
+In this investigation,
+    the model's hourly temperature and rainfall data will be used
 
 \subsection{Pre-processing}\label{subsec:preprocess}
 
-\subsubsection{Co-ordinate rotation}
+The CPM data used is on longitude-latitude coordinates,
+    with a north pole rotated to near the region the model covers.
+The location of the Stonehaven crash in this alternative coordinate system was found using the \texttt{comp\_rotated\_coords} Python script,
+    using CartoPy for the computations.
+This coordinate rotation was also done for the four weather stations used to compute Central England Temperature (CET).
+
+The pre-processing of the CPM data is done using the \texttt{ens\_seas\_max\_coarsen} python script,
+    which finds the seasonal one-hour rainfall maxima for each grid cell.
 
 \subsubsection{Coarsening}
-%  TODO insert chart w various coarsenings
+
+The CPM data uses a 2.2km resolution,
+    while the radar data uses a 5km resolution.
+To account for this,
+    the radar data is coarsened using the XArray \texttt{.coarsen} and \texttt{.mean} methods,
+    taking the mean average of four 2.2kmx2.2km grid cells, giving 4.4kmx4.4km grid cells.
+
+The height mask for the CPM was in the same 2.2km resolution
+    and so required the same pre-processing
 
 \subsubsection{Height mask}
 
-\subsection{Fitting covariates}\label{subsec:covfit}
+To match the event definition in section~\ref{subsec:radarprocess},
+    a similar height mask must be used,
+    with the same limits of 0m to 400m.
 
-\subsection{Calculating risk ratios}\label{subsec:riskratios}
+\subsection{Covariates}\label{subsec:covfit}
+
+\subsubsection{Time Series}
+
+The \texttt{comp\_cpm\_ts} Python script was used to compute the time series.
+This script takes each month in each ensemble member the CPM data and computes 3 values.
+These are computed using the 2.2km data without the coarsening or height mask.
+First is the Central England Temperature,
+    which takes the CPM data's average monthly temperature at the weather stations used to define CET,
+    while the other two time series use the average monthly temperature and precipitation in the Stonehaven Region.
+
+Two additional monthly time series were computed in the \texttt{analyse\_cpm\_data\_rolling} Python script.
+One of these takes the median extreme precipitation across the Stonehaven Region
+    using the extrema processed in \texttt{ens\_seas\_max\_coarsen.sh},
+While another uses the temperature in the Stonehaven Region to find the Saturation Specific Humidity.
+
+The formula used for this is the August-Roche-Magnus approximation to the Clausius-Clapeyron relation~\cite{Alduchov_Eskridge_1996}, given by:
+\begin{equation}\label{eq:qsat}
+    e_s = 6.112 \exp\left( \frac{17.6 T}{T + 243.5} \right)
+\end{equation}
+Where $T$ is the temperature in degrees Celsius.
+
+Each time series had 14400 members,
+    with 12 ensemble members providing data for the 1200 months across the 100-year window of the model.
+
+\subsubsection{Fitting Covariates}
+
+In a method analogous to the \texttt{comp\_radar\_fits} Python script calling the \texttt{gev\_r} library to use R to fit
+    a distribution to the radar rainfall extrema in subsection~\ref{subsec:radarprocess},
+    \texttt{analyse\_cpm\_data\_rolling} calls the \texttt{gev\_r} library to perform fits on the model rainfall extrema.
+This is done with the same `fevd' command in the extRemes R library~\cite{extremes_R},
+    except done with the time series as covariates.
+
+For this,
+    the location and scale parameters are allowed to change linearly with the variable $x$.
+The parameters are then $\mu = \mu_0 + x\mu_1$ and $\sigma = \sigma_0 + x\sigma_1$.
+The analysis is then repeated with the shape parameter also allowed to vary in the form $\xi = \xi_0 + x\xi_1$.
+
+\subsection{Calculating Risk Ratios}\label{subsec:riskratios}
 
 \chapter{Results and Analysis}\label{ch:results}
 
@@ -815,9 +879,12 @@ repeated the project.
 
 %  TODO mention lack of trend analysis due to lack of radar data
 
-%   TODO mention Koppen in analysis
+%  TODO mention Koppen in analysis
 
 \subsection{Model Resolution}\label{subsec:dismodeldef}
+
+Mention~\cite{Kendon_Fischer_Short_2023}
+%  TODO insert chart w various coarsenings
 
 \subsection{Model Validity}\label{subsec:dismodelvalid}
 
