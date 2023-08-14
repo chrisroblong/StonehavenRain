@@ -72,21 +72,139 @@ This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi 
     Dashed lines show expected changes if changes predicted by Clausius-Clapeyron relationship.
     Dots are colored by topography.
     Large red dot shows mean over all points where height is more than 0m and less than 400m.
-    Red ellipse shows 95\% uncertainty for this mean assuming 1\% of data is independent (see methods).
+    Red ellipse shows 95\% uncertainty for this mean, see subsection~\ref{subsec:riskratios}.
     Other colored large dots and ellipses show similar means and uncertainty ellipses for Rx2hr (brown), Rx4hr (purple) and Rx8hr (blue).
     Black ellipse shows 95\% uncertainty for all Rx1hr points where height is less than 0m and more than 200m.
     d) as c) but for case with shape parameter varying with CET
     e) QQ-plot for GEV fit to CPM data using CET as a covariate at the Stonehaven Crash location.
-    f) as d but for point 25km west of the Stonehaven Crash Location.}
+    f) as e) but for point 25km west of the Stonehaven Crash Location.}
     \label{fig:2cpm_gev_fit}
 \end{figure}
-
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c c c c c}
+        Covariate\textbackslash Data & Rx1h & Rx2h & Rx3h & Rx4h \\
+        None &7498&6533&5341&4130 \\
+        CET &7433&6482&5305&4109 \\
+        CET w/ Shape &7434&6483&5305&4109 \\
+        CPM Region &7402&6457&5287&4097 \\
+        CPM Region w/ Shape &7403&6458&5287&4097 \\
+        Stonehaven Region &7402&6457&5287&4098 \\
+        Stonehaven Region w/ Shape &7403&6458&5288&4098 \\
+        Stonehaven Humidity &7405&6459&5289&4099 \\
+        Stonehaven Humidity w/ Shape &7406&6460&5290&4100 \\
+    \end{tabular}
+    \caption{AIC for maximum summer 1, 2, 4 and 8 hourly summer maximum rainfall
+        above 0m and below 400m in the Stonehaven Region (+/- 0.5 degrees of the Stonehaven Crash location)
+        GEV fits with different covariates.
+    The covariates are CET, the average temperature in the CPM region (UK),
+    the average temperature in the Stonehaven Region and
+    the Saturation Humidity in the Stonehaven Region}
+    \label{tab:AICtable}
+\end{table}
 
 \subsection{Risk Ratios}\label{subsec:riskratio}
 
-%  TODO insert prob_radar_CPM
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{2probradarcpm}
+    \caption{Intensity ratio increase (\%) as a function of the return period (a) and
+    probability ratio as a function of regional Rx1hr (b).
+    The best estimate (line) and 5--95\% uncertainty range (shading) are shown.
+    Horizontal dotted lines in a) show expected intensity change if extremes scale with Clausius-Clapeyron.
+    The top axis in a and b shows the equivalent rainfall and return period estimated from the radar rainfall data while
+    vertical purple line shows the regional rainfall maximum for 2020.
+    Dotted, dashed and dot-dashed lines in a and b show results when scaling estimated from simulated 2, 4 and 8 hourly summer maxima (Rx2hr, Rx4hr and Rx8hr).
+    c) Intensity ratio increase (\%) as a function of return period for best estimates using different quantiles (labels on PI+2K line) to define regional extreme.
+    Hexagon markers show 95\% quantile used in a and b.
+    d) As c) but for probability ratio as a function of Rx1hr.
+    Vertical purple line shows Edinburgh Crash Rx1hr for 2020-08-12.
+    Note these are different from the regional 95\% quantiles shown in a and b.}
+    \label{fig:2probradarcpm}
+\end{figure}
 
-%  TODO insert plot showing overlap of distributions w/ parameters
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{2probradarcpmshape}
+    \caption{Identical to figure~\ref{fig:2probradarcpm},
+    with the shape parameter also allowed to vary with CET.}
+    \label{fig:2probradarcpmshape}
+\end{figure}
+
+\begin{table}[H]
+   \centering
+    \begin{tabular}{c c c}
+        Time Period & Intensity Ratio (\%) & 5--95\% uncertainty (\%) \\
+        1980s & 2 & 2--3 \\
+        2012--2021 & 9 & 11--7 \\
+        PI+2K & 18 & 14--22 \\
+        With varying shape: && \\
+        1980s & 2 & 2--3 \\
+        2012--2021 & 9 & 11--7 \\
+        PI+2K & 18 & 13--22 \\
+    \end{tabular}
+    \caption{A table with the intensity ratios $I_1/I_0$ for three different time periods,
+        both with and without a covariate shape parameter.
+    $I_1$ is the intensity of the event in the Time Period.
+    $I_0$ is the intensity of the event Pre-Industrial (1850-1899).}
+    \label{tab:irtable}
+\end{table}
+
+\begin{table}[H]
+   \centering
+    \begin{tabular}{c c c}
+        Time Period & Probability Ratio (\%) & 5--95\% confidence interval (\%) \\
+        1980s & 1.10 & 1.06--1.15 \\
+        2012--2021 & 1.37 & 1.22--1.61 \\
+        PI+2K & 1.78 & 1.46--2.34 \\
+        With varying shape: && \\
+        1980s & 1.10 & 1.06--1.15 \\
+        2012--2021 & 1.37 & 1.23--1.62 \\
+        PI+2K & 1.79 & 1.47--2.38 \\
+    \end{tabular}
+    \caption{A table with the probability ratios $p_1/p_0$ with confidence intervals for three different time periods,
+        both with and without a covariate shape parameter.
+    $p_1$ is the probability of the event in the Time Period.
+    $p_0$ is the probability of the event Pre-Industrial (1850-1899).}
+    \label{tab:prtable}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c c c}
+        Time Period\textbackslash Parameter & Location $\mu$ & Scale $\sigma$ \\
+        PI & 10.2 & 3.90 \\
+        1980s & 10.4 & 4.02 \\
+        2012--2021 & 10.8 & 4.34 \\
+        PI+2K & 11.3 & 4.79
+    \end{tabular}
+    \caption{A table showing the parameters of the GEV distribution for the magnitude an event defined in subsection~\ref{subsec:radarprocess} after
+        applying the scaling of the location $\mu$ and scale $\sigma$ parameters to the temperatures of different time periods.}
+    \label{tab:0.95params}
+\end{table}
+
+The data in table~\ref{tab:0.95params} does not have a covariate shape,
+    using the fixed shape parameter $\xi = -0.173$ from the empirical fit.
+The shape parameter is in the $-0.174$--$-0.172$ range for all three fits with covariate shape,
+    so it effectively duplicates the parameters here.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=150mm]{scaledgevdists}
+    \caption{A line chart of the Probability Density Functions of the GEV distributions with parameters given in table~\ref{tab:0.95params},
+        with a shape parameter $\xi = -0.172$.
+    The Time periods are Pre-Industrial (PI), the 1980s, 2012-2021
+    X-axis gives the 0.95 quantile of the maximum summer rainfall by grid cell,
+        Y-axis gives the probability density in probability/Rx1hr.
+    Vertical purple line is the intensity of the Stonehaven Event.}
+    \label{fig:scaledgevdists}
+\end{figure}
+
+Figure~\ref{fig:scaledgevdists} illustrates the probability ratios in the top half of table~\ref{tab:prtable}.
+$p_0$ is the area to the right of the purple line between 0 and the blue curve,
+    while $p_1$ is the area to the right of the purple line between 0 and the yellow, green and red curves for
+    the 1980s, 2012--2021 and a world 2K warmer than pre-industrial respectively.
+
 
 \section{Discussion}\label{sec:discussion}
 

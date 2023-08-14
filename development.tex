@@ -1,4 +1,3 @@
-\subsubsection*{Stonehaven Region}
 
 Throughout this chapter,
     reference is made to the `Stonehaven Region'.
@@ -309,7 +308,7 @@ Where $T$ is the temperature in degrees Celsius.
 
 Each time series had 14400 members,
     with 12 ensemble members providing data for the 1200 months across the 100-year window of the model.
-This was then reduced to 3600 data points by only taking the three summer months.
+This was then reduced to 3600 data points by only taking the three summer months of each year.
 
 \subsubsection{Fitting Covariates}
 
@@ -317,7 +316,7 @@ In a method analogous to the \texttt{comp\_radar\_fits} Python script calling th
     a distribution to the radar rainfall extrema in subsection~\ref{subsec:radarprocess},
     \texttt{analyse\_cpm\_data\_rolling} calls the \texttt{gev\_r} library to perform fits on the model rainfall extrema.
 This is done with the same `fevd' command in the extRemes R library~\cite{extremes_R},
-    except done with the time series as covariates.
+    except done with the monthly mean CET, total model area temperature, Stonehaven Region temperature and Stonehaven Region humidity as covariates.
 
 For this,
     the location and scale parameters are allowed to change linearly with the variable $x$.
