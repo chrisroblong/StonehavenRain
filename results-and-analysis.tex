@@ -66,12 +66,23 @@ It is unsurprising that the correlations found in (a) and (b) are very similar,
     with both having $R^2$ values that round to the same number to the nearest percentage.
 Some data points appear in almost identical points in both scatter diagrams.
 This is evident from equation~\ref{eq:qsat}.
-The by differentiating at $T=18$,
+By differentiating at $T=18$,
     equation~\ref{eq:qsat} has Taylor series to first order of $20.5627+1.2863(T-18)$.
 By substituting $T=14$ and $T=22$ into this linear approximation,
     only small errors of $0.532$ and $0.603$ are found.
 This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linear and so the fit onto the Stonehaven Region saturated humidity
     is a linear scaling of the fit onto the Stonehaven Region Temperature.
+
+(b) finds that the temperature in the Stonehaven Region is expected to increase by 0.79 degrees for every increase
+    in CET.
+This is of interest, as CET itself is expected to increase by 0.96 per degree of climate warming~\cite{Tett_Soon},
+    so the Stonehaven Region temperature is expected to increase far slower than global temperatures.
+
+In (c),
+    a negative correlation is found between the mean rain in the Stonehaven region and CET,
+    suggesting that total rainfall decreases with an increase in temperature.
+This contrasts with the positive correlation between the mean monthly maximum rainfall found in (d),
+    which suggests that the scaling of the extreme distribution will be positive.
 
 \subsubsection{Model GEV fit}
 
@@ -92,10 +103,32 @@ This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linea
     f) as e) but for point 25km west of the Stonehaven Crash Location.}
     \label{fig:2cpm_gev_fit}
 \end{figure}
+
+The thin, thick and dashed lines on (a) and (b) represent 0m, 200m and 400m contours respectively.
+These charts show that the rainfall is expected to be greater over higher areas,
+    with the extreme rainfall distribution having both greater location and scale parameters,
+    which are a factor of approximately 1.5x greater over 400m than they are between 0m and 200m.
+The rainfall over the sea is extremely low.
+This should be disregarded for reasons given in subsection~\ref{subsec:preprocess}
+
+The colours of the dots in (b) show that the scaling of both the shape and scale parameters with CET
+    increases with height.
+The confidence ellipses show that there is far greater uncertainty about the increase in the location parameter
+    than the scale parameter.
+The similarity of (b) and (c) suggest that fitting the shape parameter as to the covariate does not have
+    a significant effect on the fit of the other two parameters to the covariate.
+Table~\ref{tab:CCtable} gives the location of the red, brown, purple and blue dots relative to the
+    dashed lines representing Clausius-Clapeyron scaling.
+
+(e) shows that the quantiles for the GEV fit are similar at the Stonehaven Crash location,
+    while (f) is taken from a point near the 400m contour.
+At this point, the GEV fit breaks down at the top end,
+    with the GEV fit expecting values far greater than those provided by the CPM model it is fit to.
+
 \begin{table}[H]
     \centering
     \begin{tabular}{c c c c c}
-        Covariate\textbackslash Data & Rx1h & Rx2h & Rx3h & Rx4h \\
+        Covariate\textbackslash Data & Rx1h & Rx2h & Rx4h & Rx8h \\
         None &7498&6533&5341&4130 \\
         CET &7433&6482&5305&4109 \\
         CET w/ Shape &7434&6483&5305&4109 \\
@@ -114,6 +147,23 @@ This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linea
     the Saturation Humidity in the Stonehaven Region}
     \label{tab:AICtable}
 \end{table}
+
+The values of AIC for different rain intervals are not directly comparable,
+    as the fit is to different datasets.
+For all covariates,
+    it is found that fitting the shape to the covariate had no significant effect on the goodness of the GEV fit.
+For the 1 hour maxima,
+    fitting the GEV with the CPM Region temperature, Stonehaven Region Temperature and Stonehaven Region Humidity gave almost equally good fits.
+It was expected that the fit to the Stonehaven Region Temperature and Humidity would be similar for
+    reasons given in the discussion of~\ref{fig:2cet_scatter},
+    although Humidity does perform slightly worse as a covariate.
+Having no covariate provides a worse fit for the data.
+
+The probability of information loss formula, equation~\ref{eq:AIC_Info},
+    can be applied to the AIC values in table~\ref{tab:AICtable} for the one hour maximum model rainfall.
+This finds that a fit to CET is of order $10^{-7}$ times as probable to be a better fit than to another covariate,
+    and that a fit to no covariate is of order $10^{-21}$ times as probable to be a better fit than to a covariate other than CET.
+
 \begin{table}[H]
     \centering
     \begin{tabular}{c c c}
@@ -124,14 +174,36 @@ This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linea
         Rx8hr &0.38&1.01 \\
     \end{tabular}
     \caption{Ratio of mean parameter scalings to Clausius-Clapeyron scaling, $\left( \frac{\alpha_1}{\alpha_0} \right) / \left( \frac{H_1}{H_0} \right)$,
-        for parameter $\alpha$ and saturated humidity $H$,
-        where the shape parameter is fixed.
+        for parameter $\alpha$ in the GEV fit to CET and saturated humidity $H$ in a linear fit to CET,
+        where the shape parameter is fixed for the fit.
         Subscript $0$ is the value in the average summer CET of 2012--2021,
             subscript $1$ is the increase for every one degree increase of CET.
     Clausius-Clapeyron scaling is 5.73\%.}
     \label{tab:CCtable}
 \end{table}
 
+The scaling of all the parameters in table~\ref{tab:CCtable} are positive,
+    as would be expected from figure~\ref{fig:2cet_scatter} (d),
+    which shows that the maximum rainfall extrema increase with CET .
+For the one-hour rainfall maxima,
+    the location is scaled almost exactly as would be expected with Clausius-Clapeyron,
+    shown by the red dot in figure~\ref{fig:2cpm_gev_fit} (c) being almost exactly on the vertical dashed line,
+    while the scale parameter is scaled almost double that expected by Clausius-Clapeyron.
+Figure~\ref{fig:2cet_scatter} (a) and (d) also suggest this pattern,
+    as the both the saturated humidity and 1 hour maximum rainfall increase by around 6 (ignoring units)
+    per degree increase in CET, while saturated humidity takes a value at around 15 for a typical CET,
+    with Rx1hr taking a value of 10 and so having a larger proportional increase per degree of warming.
+
+As the time period of the extrema increases,
+    the scaling of the parameters decrease.
+Figure~\ref{fig:2cet_scatter} (c) suggests that this is to be expected,
+    as non-extreme rainfall in the Stonehaven decreases with CET and so by averaging over a longer time period,
+    the maximum rainfall exhibits behaviour more similar to average rainfall.
+
+The scale parameter $\sigma$ scales by more with CET than the location parameter $\mu$.
+The effect of this is that the modelled maximum rainfall in a typical year does not increase by a large amount,
+    but for more extreme years, those with higher return periods,
+    the maximum rainfall increases by a larger amount with CET than would be expected with Clausius-Clapeyron.
 
 \subsection{Risk Ratios}\label{subsec:riskratio}
 
@@ -153,13 +225,49 @@ This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linea
     \label{fig:2probradarcpm}
 \end{figure}
 
+Figure~\ref{fig:2probradarcpm} (a) shows that the intensity ratio decreases when fitted to model extrema over longer intervals,
+    only being sub-Clausius-Clapeyron when the event distribution is scaled like the average over 8 hour model maxima;
+(b) shows the same decreasing in risk ratios for scaling like longer-interval model maxima.
+This is to be expected from the data in table~\ref{tab:CCtable},
+    as it is known that maxima over longer periods give a lower scaling.
+
+(c) Shows that there is little difference in the intensity ratio by defining the Stonehaven Event by a different
+    quantile, with all the intensity ratios super-Clausius-Clapeyron and within the confidence interval
+    for the intensity ratio of the 0.95 quantile visible in (a).
+(c) also shows that the most unusual extrema of the Stonehaven Event were at the 0.5 and 0.8 quantiles,
+    both being rarer than 1-in-20 year events, as opposed to the 0.95 quantile definition used in the
+    rest of the analysis, which was a 1-in-17 year event.
+
+(d) shows that the probability ratio decreases with the quantile chosen for event definition from the 0.5 quantile onwards,
+    going from the 0.5 quantile having a probability ratio of almost 3,
+    while the 0.95 quantile has a probability ratio of around 1.8, visible in from the solid red line (b).
+Additionally, (d) shows that the Stonehaven Crash location had maximum rainfall between the 0.5 and 0.8 quantiles of the Stonehaven Event,
+    not at the 0.95 quantile.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{2probradarcpmshape}
-    \caption{Identical to figure~\ref{fig:2probradarcpm},
+    \caption{As for figure~\ref{fig:2probradarcpm},
     with the shape parameter also allowed to vary with CET.}
     \label{fig:2probradarcpmshape}
 \end{figure}
+
+Figure~\ref{fig:2probradarcpmshape} (c) and (d) show no difference from (c) and (d) of~\ref{fig:2probradarcpm}.
+This allows it to be concluded that fitting the shape parameter of the Rx1hr model data as to a CET covariate has
+    no impact on the intensity or probability ratio,
+    independent of the choice of quantile used to define the intensity of an Event.
+
+(a) and (b) show the same effects as (a) and (b) of~\ref{fig:2probradarcpm} at the return period and intensity
+    of the Stonehaven Event,
+    with the ratios decreasing with the time interval of model maxima fit to,
+    except with broader (weaker) confidence intervals.
+However,
+    for events with a return period of more than 25 years or an intensity of more than 30mm/hr,
+    the effect starts to reverse,
+    with the fit to the 8-hour model maxima giving the largest ratios.
+The pattern in (a) and (b) of figure~\ref{fig:2probradarcpm} is completely reversed by return periods of
+    more than 45 years or intensities of more than 35mm/hr,
+    with both the intensity and probability ratios increasing with the time interval of the maxima.
 
 \begin{table}[H]
    \centering
@@ -183,7 +291,7 @@ This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linea
 \begin{table}[H]
    \centering
     \begin{tabular}{c c c}
-        Time Period & Probability Ratio (\%) & 5--95\% confidence interval (\%) \\
+        Time Period & Probability Ratio & 5--95\% confidence interval (\%) \\
         1980s & 1.10 & 1.06--1.15 \\
         2012--2021 & 1.37 & 1.22--1.61 \\
         PI+2K & 1.78 & 1.46--2.34 \\
@@ -198,6 +306,16 @@ This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linea
     $p_0$ is the probability of the event Pre-Industrial (1850-1899).}
     \label{tab:prtable}
 \end{table}
+
+Tables~\ref{tab:irtable} and~\ref{tab:prtable} show that,
+    as expected from the parameters scaling positively with CET,
+    the both the intensity and probability of the event increase for later time periods,
+    when CET is greater.
+The ratios represent the intersections of the solid lines with the purple vertical lines in (a) and (b)
+    of figures~\ref{fig:2probradarcpm} and~\ref{fig:2probradarcpmshape},
+    with the confidence intervals representing the intersection of the shaded areas with the purple vertical line.
+
+Both the ratios and confidence intervals show either no or very little difference that
 
 \begin{table}[H]
     \centering
@@ -230,8 +348,8 @@ This gives 32.7, 33.6, 35.9 and 39.0mm/hr as hypothetical maxima in
     \caption{A line chart of the Probability Density Functions of the GEV distributions with parameters given in table~\ref{tab:0.95params},
         with a shape parameter $\xi = -0.172$.
     The Time periods are Pre-Industrial (PI), the 1980s, 2012-2021
-    X-axis gives the 0.95 quantile of the maximum summer rainfall by grid cell,
-        Y-axis gives the probability density in probability/Rx1hr.
+    X-axis gives the 0.95 quantile of the maximum summer rainfall by grid cell in mm/hr,
+        Y-axis gives the probability density in probability/(mm/hr).
     Vertical purple line is the intensity of the Stonehaven Event.}
     \label{fig:scaledgevdists}
 \end{figure}
@@ -253,15 +371,20 @@ reached, suggest future work, and changes that you would make if you
 repeated the project.
 \end{comment}
 
-\subsection{Event Definition}\label{subsec:diseventdef}
+\subsection{Model Resolution}\label{subsec:dismodeldef}
+
+Mention~\cite{Kendon_Fischer_Short_2023}.
+
+\subsubsection{Model Fits}
+
+\subsubsection{Risk Ratios}
+
+\subsection{Choices in analysis}\label{subsec:diseventdef}
 
 %  TODO mention lack of trend analysis due to lack of radar data
 
 %  TODO mention Koppen in analysis
 
-\subsection{Model Resolution}\label{subsec:dismodeldef}
+\subsubsection{Potential future work}
 
-Mention~\cite{Kendon_Fischer_Short_2023}
-%  TODO insert chart w various coarsenings
-
-\subsection{Model Validity}\label{subsec:dismodelvalid}
+\subsection{Implications for event attribution}\label{subsec:disfield}

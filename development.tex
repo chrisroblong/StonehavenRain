@@ -286,7 +286,12 @@ To match the event definition in section~\ref{subsec:radarprocess},
     a similar height mask must be used,
     with the same limits of 0m to 400m.
 
-%  TODO mention that it is land-cpm so must be >0
+The CPM used for this study is a projection over land,
+    with other UKCP18 models covering the marine domain,
+    albeit at a lower resolution of 12km and covering storm surges and sea levels as opposed to precipitation,
+    as described in the guidance of~\cite{model_data}.
+This makes the >0m height mask on the model a necessity,
+    as the model projections over the sea (with height 0m) are invalid.
 
 \subsection{Covariates}\label{subsec:covfit}
 
@@ -438,4 +443,4 @@ The computation of the probability and intensity ratios is repeated with alterna
     as each of 0.05, 0.1, 0.2, 0.5, 0.8 and 0.9 quantiles as opposed to the 0.95 quantile from the definition in subsection~\ref{subsec:radarprocess},
     with the emprical fit for each of these quantiles scaled to the 1 hour model maxima,
     to assess the effect of event definition on the outcome of the analysis.
-All of the risk ratio analysis is done twice, once with and once without a covariate shape parameter.
+The risk ratio analysis is done twice, once with and once without a covariate fit shape parameter.
