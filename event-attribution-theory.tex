@@ -26,7 +26,7 @@ For example,
 
 An event attribution study aims to provide two quantities.
 The first is the change in the probability of the event.
-The second is the change in the magnitude of the event.
+The second is the change in the intensity of the event.
 
 \subsubsection{Development of Event Attribution}
 
@@ -225,6 +225,9 @@ This has three parameters, the location $\mu$, the scale $\sigma$ and the shape 
 It is clear from this CDF that the change of location and scale parameters represent moving and rescaling the distribution,
     much as the mean and standard deviation parameters do for a normal distribution.
 
+$1-G(z)$ is the survival function of the distribution.
+This function gives the probability of an interval containing an event more extreme (of larger intensity) than $z$.
+
 The shape parameter determines the thickness of the tail of the distribution.
 The larger the shape parameter, the thicker the tail of the distribution.
 
@@ -263,17 +266,19 @@ Therefore, the three-parameter GEV distribution is used to model rainfall maxima
 
 \subsubsection{Return levels of GEV distributions}
 
-Equation~\ref{eq:gevcdf} can be inverted to give a return level $z_p$ for a probability $p$:
+Equation~\ref{eq:gevcdf} can be inverted to give a return level $z_p$ for a probability $p$, given in~\cite{Coles_2001}:
 \begin{equation}\label{eq:gevreturn}
     z_p = \mu - \frac{\sigma}{\xi}\left( 1-\left( -\log\left( 1-p \right) \right)^{-\xi} \right)
 \end{equation}
+This is otherwise known as the inverse survival function,
+    where $z_p$ is the value for which the probability of finding a value greater than $z_p$ is $p$.
 
-This can also be used to compute the rarity of events for each return period $P$,
+This can also be used to compute the rarity of events for a return period $P$,
     as the probability $p$ is equal to $1/P$.
 
 This is allows the GEV distribution to use the language common for extreme weather events,
     as with knowledge of the underlying distribution,
-    it is possible to compute the magnitude of an event for any return period.
+    it is possible to compute the intensity of an event for any return period.
 
 \subsection{GEV Parameter Estimation}\label{subsec:parameterest}
 

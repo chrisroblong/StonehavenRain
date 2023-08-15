@@ -19,25 +19,26 @@ computer are not relevant and may mask the correct results.
 
 \subsection{Radar Data Fit}\label{subsec:radardatafit}
 
-%  TODO insert return chart
 \begin{figure}[H]
-    \includegraphics{radarreturnplot}
-    \caption{A line graph plotting the return period in years against the magnitude of the event,
+    \centering
+    \includegraphics[width=150mm]{radarreturnplot}
+    \caption{A line graph plotting the return period in years against the intensity of the event,
         taken from fitting a GEV distribution to the event distribution.
-    The dashed purple vertical line is the magnitude of the Stonehaven event.
+    The dashed purple vertical line is the intensity of the Stonehaven event.
     The solid red vertical line is the actual one-hour rainfall maximum at the Stonehaven crash location.
-    The grey area gives the uncertainties from a Monte Carlo bootstrap of ~1000 samples.}
+    The grey area gives the uncertainties from a Monte Carlo bootstrap of approximately 1000 samples.}
     \label{fig:radarreturnplot}
 \end{figure}
 
 It was found that the maximum hourly rainfall at the crash location was 18.2mm/hr and
     that the empirical return period for the Stonehaven event was 17 years,
     as can be seen in figure~\ref{fig:radarreturnplot}.
-The magnitude of the Stonehaven event,
+The intensity of the Stonehaven event,
     the 0.95 quantile of the radar grid cells having their 2020 seasonal maxima in the AM of the 12th of August,
     was found to be 25.2mm/hr.
 
-Figure~\ref{fig:radarreturnplot} was created using the survival function of the GEV distribution fitted to the event data.
+Figure~\ref{fig:radarreturnplot} was created using the survival function of the GEV distribution fitted to the event data,
+    getting the return period as the reciprocal of the probability.
 This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi = -0.173$.
 
 \subsection{Model Data}\label{subsec:modelcorr}
@@ -48,7 +49,7 @@ This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi 
     \centering
     \includegraphics[width=150mm]{2cet_scatter}
     \caption{Scatter diagrams, from the Convection Permitting Model,
-        for summer CET vs Edinburgh region saturated humidity (g/Kg) (a),
+        for summer CET vs Stonehaven region saturated humidity (g/Kg) (a),
         Regional Temperature (b),
         Regional  Precipitation (mm/day) (c) and
         spatial median Rx1hr (mm/hr) for the region.
@@ -60,6 +61,17 @@ This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi 
     Dotted vertical red lines show minimum and maximum CET values from 1850--2020 observations.}
     \label{fig:2cet_scatter}
 \end{figure}
+
+It is unsurprising that the correlations found in (a) and (b) are very similar,
+    with both having $R^2$ values that round to the same number to the nearest percentage.
+Some data points appear in almost identical points in both scatter diagrams.
+This is evident from equation~\ref{eq:qsat}.
+The by differentiating at $T=18$,
+    equation~\ref{eq:qsat} has Taylor series to first order of $20.5627+1.2863(T-18)$.
+By substituting $T=14$ and $T=22$ into this linear approximation,
+    only small errors of $0.532$ and $0.603$ are found.
+This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linear and so the fit onto the Stonehaven Region saturated humidity
+    is a linear scaling of the fit onto the Stonehaven Region Temperature.
 
 \subsubsection{Model GEV fit}
 
@@ -102,6 +114,24 @@ This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi 
     the Saturation Humidity in the Stonehaven Region}
     \label{tab:AICtable}
 \end{table}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c c c}
+        Dataset\textbackslash Parameter  & Location $\mu$ & Scale $\sigma$ \\
+        Rx1hr &0.98&1.92 \\
+        Rx2hr &0.80&1.67 \\
+        Rx4hr &0.59&1.33 \\
+        Rx8hr &0.38&1.01 \\
+    \end{tabular}
+    \caption{Ratio of mean parameter scalings to Clausius-Clapeyron scaling, $\left( \frac{\alpha_1}{\alpha_0} \right) / \left( \frac{H_1}{H_0} \right)$,
+        for parameter $\alpha$ and saturated humidity $H$,
+        where the shape parameter is fixed.
+        Subscript $0$ is the value in the average summer CET of 2012--2021,
+            subscript $1$ is the increase for every one degree increase of CET.
+    Clausius-Clapeyron scaling is 5.73\%.}
+    \label{tab:CCtable}
+\end{table}
+
 
 \subsection{Risk Ratios}\label{subsec:riskratio}
 
@@ -118,7 +148,7 @@ This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi 
     c) Intensity ratio increase (\%) as a function of return period for best estimates using different quantiles (labels on PI+2K line) to define regional extreme.
     Hexagon markers show 95\% quantile used in a and b.
     d) As c) but for probability ratio as a function of Rx1hr.
-    Vertical purple line shows Edinburgh Crash Rx1hr for 2020-08-12.
+    Vertical purple line shows Stonehaven Crash Rx1hr for 2020-08-12.
     Note these are different from the regional 95\% quantiles shown in a and b.}
     \label{fig:2probradarcpm}
 \end{figure}
@@ -178,7 +208,7 @@ This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi 
         2012--2021 & 10.8 & 4.34 \\
         PI+2K & 11.3 & 4.79
     \end{tabular}
-    \caption{A table showing the parameters of the GEV distribution for the magnitude an event defined in subsection~\ref{subsec:radarprocess} after
+    \caption{A table showing the parameters of the GEV distribution for the intensity an event defined in subsection~\ref{subsec:radarprocess} after
         applying the scaling of the location $\mu$ and scale $\sigma$ parameters to the temperatures of different time periods.}
     \label{tab:0.95params}
 \end{table}
@@ -187,6 +217,12 @@ The data in table~\ref{tab:0.95params} does not have a covariate shape,
     using the fixed shape parameter $\xi = -0.173$ from the empirical fit.
 The shape parameter is in the $-0.174$--$-0.172$ range for all three fits with covariate shape,
     so it effectively duplicates the parameters here.
+
+As the shape parameter is negative,
+    it is possible to compute hypothetical the maximum,
+    infinite return period intensity of an event using the formula $\mu - \frac{\sigma}{\xi}$.
+This gives 32.7, 33.6, 35.9 and 39.0mm/hr as hypothetical maxima in
+    PI, the 1980s, 2012--2021 and PI+2K Time Periods respectively.
 
 \begin{figure}[H]
     \centering

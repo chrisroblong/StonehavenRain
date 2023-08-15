@@ -199,9 +199,11 @@ The groups with less than 10 grid cells were discarded,
 
 This gives a final event definition as 250km$^2$ of the land below 400m and within +/- 50km of Stonehaven
     experiencing their annual summer hourly rainfall maxima in the same 12-hour period.
-
 For each event, the 0.05, 0.1, 0.2, 0.5, 0.8, 0.9 and 0.95 quantiles were found and returned in a dataset.
-The magnitude of a given event is defined by its 0.95 quantile.
+The intensity of a given event is defined by its 0.95 quantile.
+
+Due to the separation into 12-hour bins,
+    it is assumed that each event is independent in all future calculations.
 
 \begin{figure}[H]
     \centering
@@ -284,6 +286,8 @@ To match the event definition in section~\ref{subsec:radarprocess},
     a similar height mask must be used,
     with the same limits of 0m to 400m.
 
+%  TODO mention that it is land-cpm so must be >0
+
 \subsection{Covariates}\label{subsec:covfit}
 
 \subsubsection{Time Series}
@@ -306,11 +310,21 @@ The formula used for this is the August-Roche-Magnus approximation to the Clausi
 \end{equation}
 Where $T$ is the temperature in degrees Celsius.
 
+The scaling of the Saturation Specific Humidity with temperature will be described as the Clausius-Clayperon scaling.
+This is as it represents the amount of moisture that the atmosphere can hold,
+    suggesting that rainfall should also scale by this amount with a change in temperature.
+
 Each time series had 14400 members,
     with 12 ensemble members providing data for the 1200 months across the 100-year window of the model.
 This was then reduced to 3600 data points by only taking the three summer months of each year.
 
 \subsubsection{Fitting Covariates}
+
+\texttt{analyse\_cpm\_data\_rolling} performs a linear fit of the Saturation Specific Humidity,
+    Stonehaven Region temperature, mean average Stonehaven Region precipitation and mean maximal Stonehaven Region precipitation.
+    using the \texttt{statsmodels} Python package's ordinary least squares regression feature.
+This provides the change in each of these variables, as well as the uncertainty with $R^2$ coefficients,
+    with respect to each fit.
 
 In a method analogous to the \texttt{comp\_radar\_fits} Python script calling the \texttt{gev\_r} library to use R to fit
     a distribution to the radar rainfall extrema in subsection~\ref{subsec:radarprocess},
@@ -323,4 +337,105 @@ For this,
 The parameters are then $\mu = \mu_0 + x\mu_1$ and $\sigma = \sigma_0 + x\sigma_1$.
 The analysis is then repeated with the shape parameter also allowed to vary in the form $\xi = \xi_0 + x\xi_1$.
 
+In contrast to \texttt{comp\_radar\_fits},
+    \texttt{analyse\_cpm\_data\_rolling} does not perform a single GEV fit on a set of events,
+    but instead a GEV fit for each grid cell in the Stonehaven region for the CPM .
+This far greater number of fits is possible as the CPM data contains data for 1200 summer maxima for each point,
+    with each of the 12 ensembles spanning 100 years,
+    as opposed to the 16 for the radar data.
+A data fit for each grid cell then allows the effect of the location on the CPM rainfall maxima to be analysed.
+This data fit is done nine times,
+    with either no covariate or the CET, CPM Region temperature, Stonehaven Region temperature or Stonehaven Region saturated humidity as a covariate.
+For each covariate, this is performed with and without the shape parameter varying.
+
+The scaling of the parameters $\mu_1 / \mu_0$, $\sigma_1 / \sigma_0$ and, where the shape is also fit to the covariate,
+    $\xi_1 / \xi_0$ can then be found at each grid cell.
+These fits and scalings are also computed for the 2 hour, 4 hour and 8 hour summer rainfall maxima.
+
+For the CET fit,
+    confidence intervals in these scalings are found using a Monte Carlo bootstrap method.
+This takes a random sample, with replacement, of 1\% of the grid cells and takes the mean of the scaling that sample,
+    with the small sample size allowing the assumption of the samples being independent.
+The quantiles of the 1000 samples taken are then used as confidence intervals.
+Both the bootstrap sample means and overall mean of the scalings are saved to be used in the risk ratio calculation.
+The overall mean scalings will be considered as simply the model scalings in later steps in the development.
+
+These scalings can be compared to the scaling expected from the Clausius-Clapeyron relationship,
+    which is computed by taking the linear fit of $H = H_0 + xH_1$ and computing $H_1 / H_0$.
+This is a valid comparison, as if the rainfall maxima is given by the CDF~\ref{eq:gevcdf},
+    then the distribution of the rainfall maxima multiplied by a constant is given by the same CDF,
+    with the location $\mu$ and scale $\sigma$ multiplied by the same constant.
+
+For both the linear and GEV fits against CET, the $\alpha_0$ for all parameters $\alpha$ is given by the value of that parameter for
+    the mean summer CET from 2012 to 2021.
+The covariate $x$ may then be determined as the difference from the CET in a month to the mean summer CET in 2012--2021.
+
 \subsection{Calculating Risk Ratios}\label{subsec:riskratios}
+
+The final calculation steps are performed in the \texttt{plot\_intensity\_risk\_ratios} Python script.
+This begins by finding the value of CET in different time periods.
+For historical time periods,
+    this is recorded by the Met Office~\cite{CET},
+    and the summer mean CET is used.
+The periods this data is drawn from are 1850--1899 (Pre-Industrial),
+    1980--1989, 2005--2020 and 2012--2021.
+For the hypothetical 2K warmer than Pre-Industrial word seasonal mean CET,
+    the Pre-Industrial CET is increased by 1.88$\pm$0.06 degrees using a normal distribution,
+    taking the distribution from~\cite{Tett_Soon}.
+
+\subsubsection{Applying CPM scaling to Empirical Distribution}
+
+Let $T_0$ be the mean summer CET in the 2005--2020 range.
+For each temperature, $\delta T$ is computed as $T - T_0$.
+
+The value of a parameter $\alpha$ in the GEV distribution fit to empirical events is then scaled to $\alpha_T$ at the new temperature:
+\begin{equation}\label{eq:newradarparams}
+    \alpha_T = \alpha + \delta T \frac{\alpha_1}{\alpha_0} \alpha
+\end{equation}
+Where $\alpha_1$ is the change in the parameter of the distribution of the extreme events in the model with respect to CET and
+    $\alpha_0$ is the value of the parameter of the modelled extreme event distribution in the 2012--2021 temperature range.
+
+This process is repeated, once with the shape parameter fixed, only applying the scalings $\mu_1 / \mu_0$ and $\sigma_1 / \sigma_0$
+    from the model distribution to the empirical distribution and again also applying the third $\xi_1 / \xi_0$ from the shape covariate fit.
+Both of these are repeated four times, using the scalings from the 1, 2, 4 and 8 hour model maxima,
+    although only the 1 hour maxima will be used to directly compute any risk ratios.
+
+This changes the empirical event distribution equivalently to the fitting of covariates to the model distribution in subsection~\ref{subsec:covfit},
+    as where the model parameters are multiplied by a factor $k$ due to changes in CET,
+    the event distribution parameters are assumed to also be multiplied by a factor of $k$.
+The key assumption made here is that the processes driving the change in the maxima from the model will act equivalently
+    on the extreme events defined in subsection~\ref{subsec:radarprocess}, as discussed in a supplement to~\cite{Tett_Soon}.
+
+\subsubsection{Calculating Ratios}
+
+To calculate the probability ratio for an event of a given intensity $I$,
+    the survival function of the distribution at each time period is used to find the probability of finding an event of equal or greater intensity.
+$p_0$ is this probability for the distribution in the Pre-Industrial (1850--1899) world,
+    with $p_1$ being the survival function value for a given other time period.
+The probability ratio for the event of intensity $I$ in the time period is then $p_1/p_0$.
+
+Equivalently, to calculate the intensity ratio for an event with return period $P$,
+    the inverse survival function of the distribution at each time period is used to find the event for which the probability of finding an event of equal to or greater intensity is $1/P$.
+$I_0$ and $I_1$ are the intensities of the event for the distribution in the Pre-Industrial world and in the given time period respectively,
+    with the intensity ratio as $I_1/I_0$.
+An intensity ratio expected from Clausius-Clapeyron scaling was also computed directly by allowing the event intensity to scale identically to saturation humidity with temperature.
+
+As both the intensity and the return period of the Stonehaven event are known,
+    it is straightforward to calculate these ratios.
+The `headline' ratios found in the abstract are those found by applying the 1 hour model maxima scaling to the empirical event distribution.
+However, the ratios were also determined for a collection of intensities and return periods to allow the effect of these on the ratio to be plotted.
+This is repeated for using fits based on the 1, 2, 4 and 8 hour model maxima.
+
+For the probability and intensity ratios found for the fits based on the 1 hour model maxima,
+    comparing Pre-Industrial to a 2K warmer world,
+    a Monte Carlo bootstrap is used to find confidence intervals.
+This takes \textasciitilde1000 random samples, each taking one element of the set of \textasciitilde1000 empirical fits found from the Monte Carlo process in subsection~\ref{subsec:radarprocess}
+    and one element of the set of \textasciitilde1000 CPM scalings found in the Monte Carlo process in subsection~\ref{subsec:covfit}.
+Each sample applies its CPM scaling to its Distribution and calculates the risk ratios as described above.
+The quantiles of these probability and intensity ratios give the confidence intervals.
+
+The computation of the probability and intensity ratios is repeated with alternative definitions of the intensity of the event
+    as each of 0.05, 0.1, 0.2, 0.5, 0.8 and 0.9 quantiles as opposed to the 0.95 quantile from the definition in subsection~\ref{subsec:radarprocess},
+    with the emprical fit for each of these quantiles scaled to the 1 hour model maxima,
+    to assess the effect of event definition on the outcome of the analysis.
+All of the risk ratio analysis is done twice, once with and once without a covariate shape parameter.
