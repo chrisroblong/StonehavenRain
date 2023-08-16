@@ -22,7 +22,8 @@ computer are not relevant and may mask the correct results.
 \begin{figure}[H]
     \centering
     \includegraphics[width=150mm]{radarreturnplot}
-    \caption{A line graph plotting the return period in years against the intensity of the event,
+    \caption[A line graph plotting the return period in years against the intensity of the event.]{
+        A line graph plotting the return period in years against the intensity of the event,
         taken from fitting a GEV distribution to the event distribution.
     The dashed purple vertical line is the intensity of the Stonehaven event.
     The solid red vertical line is the actual one-hour rainfall maximum at the Stonehaven crash location.
@@ -48,7 +49,8 @@ This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi 
 \begin{figure}[H]
     \centering
     \includegraphics[width=150mm]{2cet_scatter}
-    \caption{Scatter diagrams, from the Convection Permitting Model,
+    \caption[Scatter diagrams from the Convection Permitting Model.]{
+        Scatter diagrams, from the Convection Permitting Model,
         for summer CET vs Stonehaven region saturated humidity (g/Kg) (a),
         Regional Temperature (b),
         Regional  Precipitation (mm/day) (c) and
@@ -74,7 +76,7 @@ This suggests that in the CET range, equation~\ref{eq:qsat} is effectively linea
     is a linear scaling of the fit onto the Stonehaven Region Temperature.
 
 (b) finds that the temperature in the Stonehaven Region is expected to increase by 0.79 degrees for every increase
-    in CET.
+    in CET .
 This is of interest, as CET itself is expected to increase by 0.96 per degree of climate warming~\cite{Tett_Soon},
     so the Stonehaven Region temperature is expected to increase far slower than global temperatures.
 
@@ -89,7 +91,13 @@ This contrasts with the positive correlation between the mean monthly maximum ra
 \begin{figure}[H]
     \centering
     \includegraphics[width=100mm]{2cpm_gev_fit}
-    \caption{a) Location parameter $\mu = \mu_0 + \overline{T_{2012-2021}}\mu_1$  for 2012--2021 CET and Rx1hr.
+    \caption[a) Location parameter $\mu = \mu_0 + \overline{T_{2012-2021}}\mu_1$  for 2012--2021 CET and Rx1hr.
+    b) Scale parameter $\sigma = \sigma_0 + \overline{T_{2012-2021}}\sigma_1$ for 2012--2021 CET and Rx1hr.
+    c) Scatter plot of d(location)/d(CET) vs d(scale)/d(CET) as of 2012--2021 parameters.
+    d) as c) but for case with shape parameter varying with CET.
+    e) QQ-plot for GEV fit to CPM data using CET as a covariate at the Stonehaven Crash location.
+    f) as e) but for point 25km west of the Stonehaven Crash Location.]{
+        a) Location parameter $\mu = \mu_0 + \overline{T_{2012-2021}}\mu_1$  for 2012--2021 CET and Rx1hr.
     b) Scale parameter $\sigma = \sigma_0 + \overline{T_{2012-2021}}\sigma_1$ for 2012--2021 CET and Rx1hr.
     c) Scatter plot of d(location)/d(CET) vs d(scale)/d(CET) as of 2012--2021 parameters.
     Dashed lines show expected changes if changes predicted by Clausius-Clapeyron relationship.
@@ -139,7 +147,8 @@ At this point, the GEV fit breaks down at the top end,
         Stonehaven Humidity &7405&6459&5289&4099 \\
         Stonehaven Humidity w/ Shape &7406&6460&5290&4100 \\
     \end{tabular}
-    \caption{AIC for maximum summer 1, 2, 4 and 8 hourly summer maximum rainfall
+    \caption[AIC for maximum summer rainfall]{
+        AIC for maximum summer 1, 2, 4 and 8 hourly summer maximum rainfall
         above 0m and below 400m in the Stonehaven Region (+/- 0.5 degrees of the Stonehaven Crash location)
         GEV fits with different covariates.
     The covariates are CET, the average temperature in the CPM region (UK),
@@ -162,7 +171,7 @@ Having no covariate provides a worse fit for the data.
 The probability of information loss formula, equation~\ref{eq:AIC_Info},
     can be applied to the AIC values in table~\ref{tab:AICtable} for the one hour maximum model rainfall.
 This finds that a fit to CET is of order $10^{-7}$ times as probable to be a better fit than to another covariate,
-    and that a fit to no covariate is of order $10^{-21}$ times as probable to be a better fit than to a covariate other than CET.
+    and that a fit to no covariate is of order $10^{-21}$ times as probable to be a better fit than to a covariate other than CET .
 
 \begin{table}[H]
     \centering
@@ -173,7 +182,8 @@ This finds that a fit to CET is of order $10^{-7}$ times as probable to be a bet
         Rx4hr &0.59&1.33 \\
         Rx8hr &0.38&1.01 \\
     \end{tabular}
-    \caption{Ratio of mean parameter scalings to Clausius-Clapeyron scaling, $\left( \frac{\alpha_1}{\alpha_0} \right) / \left( \frac{H_1}{H_0} \right)$,
+    \caption[Ratio of mean parameter scalings to Clausius-Clapeyron scaling.]{
+        Ratio of mean parameter scalings to Clausius-Clapeyron scaling, $\left( \frac{\alpha_1}{\alpha_0} \right) / \left( \frac{H_1}{H_0} \right)$,
         for parameter $\alpha$ in the GEV fit to CET and saturated humidity $H$ in a linear fit to CET,
         where the shape parameter is fixed for the fit.
         Subscript $0$ is the value in the average summer CET of 2012--2021,
@@ -193,14 +203,19 @@ Figure~\ref{fig:2cet_scatter} (a) and (d) also suggest this pattern,
     as the both the saturated humidity and 1 hour maximum rainfall increase by around 6 (ignoring units)
     per degree increase in CET, while saturated humidity takes a value at around 15 for a typical CET,
     with Rx1hr taking a value of 10 and so having a larger proportional increase per degree of warming.
+This agrees with the IPCC working group 1 assessment~\cite{IPCC_2021},
+    finding that sub-daily extreme precipitation scales between one and two times that of Clausius-Clapeyron.
 
 As the time period of the extrema increases,
     the scaling of the parameters decrease.
 Figure~\ref{fig:2cet_scatter} (c) suggests that this is to be expected,
     as non-extreme rainfall in the Stonehaven decreases with CET and so by averaging over a longer time period,
     the maximum rainfall exhibits behaviour more similar to average rainfall.
+However, this finding is surprising in a wider context,
+    as the IPCC assessment~\cite{IPCC_2021} states that the scaling in excess of Clausius-Clapeyron should apply to all sub-daily precipitation extremes,
+    and all of the extrema given in this report are sub-daily.
 
-The scale parameter $\sigma$ scales by more with CET than the location parameter $\mu$.
+The scale parameter $\sigma$ scales by more per increase in CET than the location parameter $\mu$.
 The effect of this is that the modelled maximum rainfall in a typical year does not increase by a large amount,
     but for more extreme years, those with higher return periods,
     the maximum rainfall increases by a larger amount with CET than would be expected with Clausius-Clapeyron.
@@ -209,7 +224,7 @@ Where the shape parameter is fit as a covariate,
     the change in the shape parameter per degree increase of CET $\xi_1$ is
     0.004, 0.055, 0.128 and 0.252 for the maximum summer model rainfall in
     1 hour, 2 hour, 4 hour and 8 hour time periods respectively.
-The risk ratios will be calculated using the one hour maximum,
+The risk ratios will be calculated using the one-hour maximum,
     so the covariate fit of the shape parameter is expected to have little effect on these.
 
 \subsection{Risk Ratios}\label{subsec:riskratio}
@@ -217,14 +232,17 @@ The risk ratios will be calculated using the one hour maximum,
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{2probradarcpm}
-    \caption{Intensity ratio increase (\%) as a function of the return period (a) and
+    \caption[Intensity ratio (\%) as a function of the return period (a,c) and
+    probability ratio as a function of regional Rx1hr (b, d).
+    ]{
+        Intensity ratio (\%) as a function of the return period (a) and
     probability ratio as a function of regional Rx1hr (b).
     The best estimate (line) and 5--95\% uncertainty range (shading) are shown.
     Horizontal dotted lines in a) show expected intensity change if extremes scale with Clausius-Clapeyron.
     The top axis in a and b shows the equivalent rainfall and return period estimated from the radar rainfall data while
     vertical purple line shows the regional rainfall maximum for 2020.
     Dotted, dashed and dot-dashed lines in a and b show results when scaling estimated from simulated 2, 4 and 8 hourly summer maxima (Rx2hr, Rx4hr and Rx8hr).
-    c) Intensity ratio increase (\%) as a function of return period for best estimates using different quantiles (labels on PI+2K line) to define regional extreme.
+    c) Intensity ratio (\%) as a function of return period for best estimates using different quantiles (labels on PI+2K line) to define regional extreme.
     Hexagon markers show 95\% quantile used in a and b.
     d) As c) but for probability ratio as a function of Rx1hr.
     Vertical purple line shows Stonehaven Crash Rx1hr for 2020-08-12.
@@ -254,7 +272,8 @@ Additionally, (d) shows that the Stonehaven Crash location had maximum rainfall 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{2probradarcpmshape}
-    \caption{As for figure~\ref{fig:2probradarcpm},
+    \caption[Figure~\ref{fig:2probradarcpm} with a covariate fit shape.]{
+        As for figure~\ref{fig:2probradarcpm},
     with the shape parameter also allowed to vary with CET.}
     \label{fig:2probradarcpmshape}
 \end{figure}
@@ -291,7 +310,8 @@ This occurs as the increase in the shape parameter with CET for the larger model
         2012--2021 & 9 & 7--11 \\
         PI+2K & 18 & 13--22 \\
     \end{tabular}
-    \caption{A table with the intensity ratios $I_1/I_0$ for three different time periods,
+    \caption[A table with the intensity ratios.]{
+        A table with the intensity ratios $I_1/I_0$ for three different time periods,
         both with and without a covariate shape parameter.
     $I_1$ is the intensity of the event in the Time Period.
     $I_0$ is the intensity of the event Pre-Industrial (1850-1899).}
@@ -310,7 +330,7 @@ This occurs as the increase in the shape parameter with CET for the larger model
         2012--2021 & 1.37 & 1.23--1.62 \\
         PI+2K & 1.79 & 1.47--2.38 \\
     \end{tabular}
-    \caption{A table with the probability ratios $p_1/p_0$ with confidence intervals for three different time periods,
+    \caption[A table with the probability ratios.]{A table with the probability ratios $p_1/p_0$ with confidence intervals for three different time periods,
         both with and without a covariate shape parameter.
     $p_1$ is the probability of the event in the Time Period.
     $p_0$ is the probability of the event Pre-Industrial (1850-1899).}
@@ -327,6 +347,15 @@ The ratios represent the intersections of the solid lines with the purple vertic
 
 Both the ratios and confidence intervals show either no or very little difference from fitting the shape as a covariate.
 
+By assuming that the Stonehaven event occurred in a month of typical CET to the 2012--2012 time period,
+    the change in the intensity from 25.2mm/hr and return period of 17 years can be calculated.
+Pre-industrial,
+    the event would have had an intensity of 23.1 (CI: 22.7--23.6) mm/hr and a return period
+    of 23.3 (20.9--27.5) years.
+In a world 2K warmer than industrial,
+     the event would have had an intensity of 27.3 (26.8--27.7) mm/hr and a return period
+    of 13.1 (11.7--14.2) years.
+
 \begin{table}[H]
     \centering
     \begin{tabular}{c c c}
@@ -336,7 +365,8 @@ Both the ratios and confidence intervals show either no or very little differenc
         2012--2021 & 10.8 & 4.34 \\
         PI+2K & 11.3 & 4.79
     \end{tabular}
-    \caption{A table showing the parameters of the GEV distribution for the intensity an event defined in subsection~\ref{subsec:radarprocess} after
+    \caption[Parameters of the GEV distribution for the intensity an event.]{
+        A table showing the parameters of the GEV distribution for the intensity an event defined in subsection~\ref{subsec:radarprocess} after
         applying the scaling of the location $\mu$ and scale $\sigma$ parameters to the temperatures of different time periods.}
     \label{tab:0.95params}
 \end{table}
@@ -345,13 +375,25 @@ The data in table~\ref{tab:0.95params} does not have a the shape scaled from the
     using the fixed shape parameter $\xi = 0.173$ from the empirical fit.
 The shape parameter is in the $0.174$--$0.172$ range for all three fits with covariate shape,
     so it effectively duplicates the parameters here.
+
 Note that as the shape parameter is positive,
     this fit suggests that, with an infinite return period, there is no limit on the maximum hourly rainfall.
+While is clearly unphysical, the positive shape parameter gives a minimum possible value of event intensity in a given summer as
+    -12.3, -12.8, -14.3 and -16.3 mm/hr for the PI, the 1980s, 2012--2021 and PI+2K Time Periods respectively.
+This is clearly also unphysical,
+    as rainfall cannot be negative,
+    showing that the distribution is inappropriate in the infinite limit in either direction.
+However,
+    the inference is still valid when interpolating in higher probability dense areas of the distribution,
+    where the mean event intensity is 13.2, 13.5, 14.2 and 15.0 mm/hr and
+    the median event intensity is 11.7, 11.9, 12.4 and 13.1 mm/hr for
+    events in the PI, the 1980s, 2012--2021 and PI+2K Time Periods respectively.
 
-\begin{figure}[H] % TODO ask Simon
+\begin{figure}[H]
     \centering
     \includegraphics[width=150mm]{scaledgevdists}
-    \caption{A line chart of the Probability Density Functions of the GEV distributions with parameters given in table~\ref{tab:0.95params},
+    \caption[PDFs of the GEV distributions.]{
+        A line chart of the Probability Density Functions of the GEV distributions with parameters given in table~\ref{tab:0.95params},
         with a shape parameter $\xi = 0.173$.
     The Time periods are Pre-Industrial (PI), the 1980s, 2012-2021
     X-axis gives the 0.95 quantile of the maximum summer rainfall by grid cell in mm/hr,
@@ -404,7 +446,8 @@ The model analysis and risk ratio analysis described in section~\ref{sec:model} 
         \centering
         \includegraphics[width=\linewidth]{3cet_scatter}
     \end{subfigure}
-    \caption{Figure~\ref{fig:2cet_scatter} (d), with the 1 hour model rainfall maxima of the 2.2km resolution (left) and 6.6km resolution (right) models.}
+    \caption[Figure~\ref{fig:2cet_scatter} with 2.2km and 6.6km fits.]{
+        Figure~\ref{fig:2cet_scatter} (d), with the 1 hour model rainfall maxima of the 2.2km resolution (left) and 6.6km resolution (right) models.}
     \label{fig:13cet_scatter}
 \end{figure}
 
@@ -457,7 +500,8 @@ This is to be expected, as there are more data points to be sampled.
         \centering
         \includegraphics[width=\linewidth]{3probradarcpmshape}
     \end{subfigure}
-    \caption{Figure~\ref{fig:2probradarcpm} for the 2.2km model (top left) and the 6.6km model (top right).
+    \caption[Figures~\ref{fig:2probradarcpm} and~\ref{fig:2probradarcpmshape} for the 2.2km and 6.6km models.]{
+        Figure~\ref{fig:2probradarcpm} for the 2.2km model (top left) and the 6.6km model (top right).
     Figure~\ref{fig:2probradarcpmshape} for the 2.2km model (bottom left) and the 6.6km model (bottom right)}
     \label{fig:13probradarcpm}
 \end{figure}
@@ -488,8 +532,10 @@ This inversion point seems to be approximately one in 25 year or 35mm/hr events,
         2012--2021 & 9 & 7--9 & 9 & 6--13 \\
         PI+2K & 16 & 14--18 & 18 & 12--28 \\
     \end{tabular}
-    \caption{A table with the intensity ratios $I_1/I_0$ for three different time periods,
-        both with and without a covariate shape parameter.
+    \caption[Table~\ref{tab:irtable} fot 2.2km and 6.6km resolution model fits.]{
+        A table with the intensity ratios $I_1/I_0$ for three different time periods,
+        both with and without a covariate shape parameter,
+        for the 2.2km and 6.6km resolution model fits.
     $I_1$ is the intensity of the event in the Time Period.
     $I_0$ is the intensity of the event Pre-Industrial (1850-1899).}
     \label{tab:13irtable}
@@ -507,7 +553,8 @@ This inversion point seems to be approximately one in 25 year or 35mm/hr events,
         2012--2021 & 1.33 & 1.23--1.55 & 1.37 & 1.23--1.63 \\
         PI+2K & 1.71 & 1.47--2.22 & 1.79 & 1.47--2.36 \\
     \end{tabular}
-    \caption{A table with the probability ratios $p_1/p_0$ with confidence intervals for three different time periods,
+    \caption[Table~\ref{tab:prtable} for the 2.2km and 6.6km resolution model fits.]{
+        A table with the probability ratios $p_1/p_0$ with confidence intervals for three different time periods,
         both with and without a covariate shape parameter.
     $p_1$ is the probability of the event in the Time Period.
     $p_0$ is the probability of the event Pre-Industrial (1850-1899).}
@@ -551,21 +598,25 @@ Where the choices were found to potentially be impactful,
 
 \begin{itemize} \item Stonehaven Region and height mask \end{itemize}
 
-Defining the Stonehaven Region as a 100km\times100km square centered on the crash location was deemed valid,
+Defining the Stonehaven Region as a 100km$\times$100km square centered on the crash location was deemed valid,
     as choosing a region based on different factors could potentially lead to bias.
 The 0m to 400m height mask was considered a valid choice,
     as the catchment of the drain causing the Stonehaven crash peaked at around 200m,
     making 200m the median point of the rainfall.
 
-Figure~\ref{fig:2cpm_gev_fit} (a) and (b) shows that rainfall is much higher in the 200m-400m height range,
-    than in the 0m-200m height range,
+Figure~\ref{fig:2cpm_gev_fit} (a) and (b) shows that rainfall is much higher in the 200m--400m height range,
+    than in the 0m--200m height range,
     with figure~\ref{fig:2cpm_gev_fit} (c) showing that the parameters of the distribution scale more at higher grid cells.
 This suggests that the results would understate the risk ratios had a height mask with a lower cap been used.
 However, any lower cap would not properly reflect the risk ratios at the Stonehaven crash location,
-    as so many points in the 0m-200m height range display far lower rainfall extremes than at Stonehaven.
+    as so many points in the 0m--200m height range display far lower rainfall extremes than at Stonehaven.
 
-
-%  TODO mention Koppen in analysis
+One additional factor to consider is the homogeneity of the climate of the region used for the analysis.
+Looking at the K\"oppen classifications of the Stonehaven Region, given in~\cite{Koppen_file} from WorldClim data~\cite{worldclim},
+    the Stonehaven crash location lies on the boundary of Cfb Oceanic and Cfc Subpolar Oceanic.
+The defining difference between these definitions is average temperature,
+    so it is valid to include both.
+The height mask avoids the areas classed as Dfc Subarctic and ET Tundra in the Cairngorms National Park being included in the region.
 
 \begin{itemize}\item Time interval of event\end{itemize}
 
@@ -577,20 +628,102 @@ As this analysis was not done,
     the effect of different time intervals in the definition will be discussed when looking at the effect of
     different time intervals in the model.
 
+\begin{itemize}\item 12-hour bin for event definition\end{itemize}
+%  TODO talk about assumption of processes driving both changes affecting both equally
+
 \begin{itemize}\item Spatial size of event\end{itemize}
 
-%  TODO note points by number of times in dataset
-%  TODO get graph of event size
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=150mm]{eventsizehist}
+    \caption[Histogram showing the distribution of event sizes.]{
+        Histogram showing the distribution of event sizes in $\text{km}^2$ of the 77 events used the to fit the radar data.
+    The Stonehaven Event had a size of 3250$\text{km}^2$,
+        being the event covering the largest amount of space.
+    No events lower than 250 $\text{km}^2$ are in this histogram as those were removed.}
+    \label{fig:eventsizehist}
+\end{figure}
 
-\begin{itemize}\item Quantile used for magnitude of event\end{itemize}
+Applying the event size filter left only 77 events, as opposed to the 362 separate 12-hour periods in which at least one grid cell had a summer maximum precipitation.
+Removing these events was necessary choice as a single cell reaching a maximum does not represent a summer convective storm similar to that causing the Stonehaven Crash.
 
+However,
+    it is clear that there are many events which cover a far smaller area of the Stonehaven Region which are being used in the analysis.
+There is only one event covering a similar area,
+    occurring on the morning of the 28th July 2021.
+It is interesting that these events both occurred extremely late in the dataset,
+    but a sample size of 2 is insufficient to draw any conclusions about the likelihood of these events changing over time or with changes in temperature.
+
+The Stonehaven Event and the 2021 event covered 127 and 130 of the 185 grid cells respectively,
+    leaving 2020 and 2021 to have only 1 and 2 events from other grid cells each.
+If this is a strong effect on later years,
+    then the empirical fit will be biased to earlier years due to all events being weighted equally.
+From figure~\ref{fig:eventsyear}, it can be seen that there is no significant correlation between the
+    year and the number of events, so the fit is accurate to the entire time period.
+
+Figure~\ref{fig:cellsyear} shows the number of cells contributing to events for a given year.
+For all years, the majority of the 185 cells are providing data to the fit.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=120mm]{yearsinradardata}
+    \caption[Plot of the number of years each grid cell appears in an event.]{
+        Plot of the number of years each grid cell appears in an event.
+    Cells covered by the height mask in figure~\ref{fig:stonetopogallowed}
+        do not provide any data.
+    Black lines are coastlines, red lines are local authority boundaries.
+    Red dot is the crash location.}
+    \label{fig:yearsinradardata}
+\end{figure}
+
+Comparing the number of times grid cells provide seasonal rainfall maxima to the set of events
+    in figure~\ref{fig:yearsinradardata} to the topography in figure~\ref{fig:stonetopog},
+    no clear relationship between the topography of the point and the frequency of its appearance in events.
+This may suggest that there is no bias towards higher or lower points in the radar data fit.
+However,
+    as the fit is made to an upper quantile (0.95) of the maximum rainfall at the points contributing to an event,
+    this does not directly imply that the fit will not be biased.
+For example, if the highest points provide maxima that are in the top quantiles of the event,
+    these will have a larger impact on the magnitude used to define the event.
+
+On the other hand,
+    by comparing figure~\ref{fig:yearsinradardata} with figure~\ref{fig:stoneregionrain},
+    it is seen that the locations of Stonehaven Event are represented disproportionately in the
+    locations used to draw the sample of events.
+This suggests that the results are more specific to the Stonehaven Event than to other extreme rainfall in the region.
+It is unsurprising that the grid cells nearer the centre of the region appear in more events,
+    as grid cells nearer to the boundary are more likely to take their summer rainfall maxima
+    as a part of a storm that passes near to the Stonehaven Region but is not sufficiently close to
+    result in 10 cells taking a maximum value and qualifying as an event.
+
+\begin{itemize}\item Quantile used for intensity of event\end{itemize}
+
+As noted in the discussion of figure~\ref{fig:2probradarcpm},
+    the rainfall at the location of the Stonehaven Crash was between the 0.5 and 0.8 quantiles of the Stonehaven Event,
+    and the Stonehaven Event was especially unique with the 0.5 and 0.8 quantiles having larger return periods.
+This suggests that one of these quantiles may be a more appropriate definition of the intensity of an event,
+    as opposed to the 0.95 quantile used for the analysis.
+
+Figure~\ref{fig:2probradarcpm} (c) shows that the intensity ratio is not significantly changed by a choice of parameters,
+    suggesting that the intensity ratios found here are robust,
+    while (d) shows that the probability ratio is lower for the 0.95 quantile used in the analysis than either of the alternative quantiles,
+    suggesting that the probability ratios found here are conservative,
+    underestimating the effect of Anthropogenic Climate Change.
+As figures~\ref{fig:2probradarcpmshape} and~\ref{fig:13probradarcpm}
+    also exhibit this behaviour,
+    both of these findings are themselves robust relative to a change in model resolution or a CET scaling of the shape parameter.
+
+The choice of the 0.95 quantile in the original analysis was valid as this is a `more extreme' quantile and was thought to best capture the event's
+    effects on the region, as opposed to at the crash location.
+The trend in probability ratios continuing from all 4 four of the quantiles $\geq$ 0.5 shows that an actual effect is occurring,
+    as opposed to an artefact of the 0.95 quantile potentially being ill-defined for small events where fewer than 20 grid cells take seasonal maxima.
 
 \subsubsection{Model Fit}
-
 \begin{itemize}\item Time interval of maxima\end{itemize}
 
 \begin{itemize}\item Shape parameter fit to covariate\end{itemize}
 
+% TODO extRemes says shape scaling should be avoided
 
 \subsubsection{Potential future work}
 
@@ -598,7 +731,8 @@ As this analysis was not done,
 
 %  TODO mention fit to different times in the radar distribution
 %  TODO process with rolling average
-
+%  TODO process with different bins
+%  TODO
 %  TODO model event similarity
 
 \subsection{Implications for event attribution}\label{subsec:disfield}

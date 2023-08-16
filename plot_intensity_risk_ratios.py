@@ -71,10 +71,16 @@ def comp_intense_prob_ratios(radar_fit_all, dScale, rain_values, return_period_v
         s = scale.sel(parameter=['Dshape', 'Dlocation', 'Dscale']).assign_coords(
             parameter=['shape', 'location', 'scale'])
         radar_fit_scale = s * radar_fit  # compute the scaled distributions.
+        """
+        ds = radar_fit_scale.to_dataset()
+        if ds['rolling'].item() == 1 and k in ['PI', '1980s', '2012-2021', 'PI+2K']:
+            print(k)
+            print(radar_fit_scale.sel(time_quant=0.95))
+        """
         sf[k] = gev_r.xarray_sf(rain_values, radar_fit_scale,
                                 output_dim_name='Rx1h')  # probability for different rain values
         isf[k] = gev_r.xarray_isf(sf_values, radar_fit_scale)  # rainfall for different p-values
-    # now to compute intensity and probability ratios relative to 2005-2020
+    # now to compute intensity and probability ratios relative to 1850-1899
 
     ref_sf = sf.pop(ref_name)
     ref_isf = isf.pop(ref_name)
@@ -97,7 +103,7 @@ def pr_ir_monte_carlo(mc_radar_fit, bootstrap_ratio, temperatures, temp_p2k, rai
     """
     Monte carlo generate the prob and intensity ratios at specificed rain and return periods
     :param mc_radar_fit: Bootstrap samples (with index sample) of the radar fit parameters
-    :param bootstrap_ratio: Bootstrap samples (with index sample) of the GEV scaling parametrs sa a fraction of "today" parameters
+    :param bootstrap_ratio: Bootstrap samples (with index sample) of the GEV scaling parameters as a fraction of "today" parameters
     :param temperatures: The temperatures with labels
     :param temp_p2k: Temperatures as a dist for +2K
     :param rain: The rain values at which the prob ratios are to be generated
@@ -127,7 +133,7 @@ def pr_ir_monte_carlo(mc_radar_fit, bootstrap_ratio, temperatures, temp_p2k, rai
     mc_all_ir = []
     mc_all_pr = []
     temperatures_mc = temperatures.copy()
-    n_monte_carlo = 989 # bootstrap_ratio.sample.size  # how many samples do we have. # TODO get to match size
+    n_monte_carlo = 991 # bootstrap_ratio.sample.size  # how many samples do we have. # TODO get to match size
     print(f"Bootstrapping {n_monte_carlo} times")
     for indx in range(0, n_monte_carlo):
         # print out a progress marker.
@@ -446,7 +452,7 @@ out_dir.mkdir(parents=True, exist_ok=True)
 mc_radar_fit = xarray.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'bootstrap_reg_radar_params.nc')
 # and the best estimate fit
 radar_fit = xarray.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'reg_radar_params.nc')
-# and the actual radar data -- as quantile in each assumed independant extreme region
+# and the actual radar data -- as quantile in each assumed independent extreme region
 radar = xarray.load_dataset(stonehavenRainLib.dataDir / 'radar_fits' / 'reg_radar_rain.nc')
 ##radar_data = radar.radar
 # read in monthlyMax radar and find values for Edinburgh castle for 2020 and 2021. Add to radar dataSet.

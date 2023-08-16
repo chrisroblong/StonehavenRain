@@ -104,6 +104,7 @@ def get_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', region=None,
     mskRain = ((rseas.seasonalMean * (30 + 31 + 31) / 4.) < mxMeanRain) & htMsk
     rseasMskmax = xarray.where(mskRain, rseas.seasonalMax, np.nan)
     mxTime = rseas.seasonalMaxTime
+    mxTime = xarray.where(mskRain, mxTime, np.datetime64('NaT'))
 
     return rseasMskmax, mxTime
 
@@ -133,6 +134,7 @@ def gen_radar_data(file=dataDir / 'transfer_dir/summary_5km_1h.nc', quantiles=No
                                                                       quantile='time_quant')  # .values
     ok_count = (~rseasMskmax.isnull()).groupby(indx).sum().rename(group='time_index')  # count non nan
     radar_data = radar_data[(ok_count > 10)]  # want at least 10 values
+    indx.isin(ok_count[ok_count>10]['time_index']).sum(dim='time').to_netcdf(dataDir / 'number_of_years.nc')
     ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2021')
     rainC2021 = radar_data.sel(time_index=ed_indx).squeeze()
     ed_indx = indx.sel(stonehaven_crash, method='nearest').sel(time='2020')

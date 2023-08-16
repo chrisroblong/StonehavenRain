@@ -72,7 +72,7 @@ Extreme rainfall on 12 August 2020 caused the Stonehaven Derailment,
     which resulted in three deaths.
 This project applies current event attribution techniques for extreme rainfall events,
     finding a probability ratios for the extreme rainfall to be 1.10 (1.06--1.15 90\% CI),
-    1.37 (1.22--1.61) and 1.78 (1.47--2.38) for the 1980s, 2010s and in a 2K warmer world
+    1.37 (1.22--1.61) and 1.78 (1.46--2.34) for the 1980s, 2010s and in a 2K warmer world
     respectively over pre-industrial.
 
 \end{abstract}
@@ -98,7 +98,8 @@ Chapter~\ref{ch:dev} consists of my own work,
 Code used in this project is given in~\cite{Me_Code},
     code used in my supervisor's paper is given in~\cite{Tett_Code}
 
-Chapter~\ref{ch:results} is entirely my own work.
+Chapter~\ref{ch:results} is entirely my own work,
+    using the same plotting techniques as in~\cite{Tett_Soon}.
 
 \bigskip
 
@@ -227,16 +228,25 @@ pages, but not much longer.
 
 %  TODO insert code behind each figure
 
-\chapter{Stuff that's too detailed}
+\chapter{Distribution of events per year}
 
-Appendices should contain all the material which is considered too
-detailed to be included in the main body of the text, but which is
-important enough to be included in the thesis.
-
-Perhaps this is a good place to mention \BibTeX.
-
-You can do references in the simple way explained in the introduction,
-or you can use \BibTeX.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=150mm]{eventsyear}
+    \caption[A bar chart showing the number of events occurring in each year.]{A bar chart showing the number of events,
+        that being 10 grid cells taking their maximum summer rainfall value within the same 12-hour period,
+    occuring within each year.}
+    \label{fig:eventsyear}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=150mm]{cellsyear}
+    \caption[A bar chart showing the number of cells that contribute to events.]{
+        A bar chart showing the number of cells that contribute to events,
+        that being having their summer rainfall maxima in the same 12-hour block as at least 9 other cells.
+        The theoretical maximum is 185 cells.}
+    \label{fig:cellsyear}
+\end{figure}
 
 
 \bibliographystyle{unsrt}
