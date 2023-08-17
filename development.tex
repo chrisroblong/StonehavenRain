@@ -352,7 +352,7 @@ In contrast to \texttt{comp\_radar\_fits},
     but instead a GEV fit for each grid cell in the Stonehaven region for the CPM .
 This far greater number of fits is possible as the CPM data contains data for 1200 summer maxima for each point,
     with each of the 12 ensembles spanning 100 years,
-    as opposed to the 16 for the radar data.
+    as opposed to the 18 for the radar data.
 A data fit for each grid cell then allows the effect of the location on the CPM rainfall maxima to be analysed.
 This data fit is done nine times,
     with either no covariate or the CET, CPM Region temperature, Stonehaven Region temperature or Stonehaven Region saturated humidity as a covariate.
@@ -368,7 +368,9 @@ This takes a random sample, with replacement, of 1\% of the grid cells and takes
     with the small sample size allowing the assumption of the samples being independent.
 The quantiles of the 1000 samples taken are then used as confidence intervals.
 Both the bootstrap sample means and overall mean of the scalings are saved to be used in the risk ratio calculation.
-The overall mean scalings will be considered as simply the model scalings in later steps in the development.
+The overall mean scalings,
+    averaged over the grid cells,
+    will be considered as simply the model scalings for later steps in the development.
 
 These scalings can be compared to the scaling expected from the Clausius-Clapeyron relationship,
     which is computed by taking the linear fit of $H = H_0 + xH_1$ and computing $H_1 / H_0$.
@@ -404,6 +406,9 @@ The value of a parameter $\alpha$ in the GEV distribution fit to empirical event
 \end{equation}
 Where $\alpha_1$ is the change in the parameter of the distribution of the extreme events in the model with respect to CET and
     $\alpha_0$ is the value of the parameter of the modelled extreme event distribution in the 2012--2021 temperature range.
+This equation can also be explained as $\alpha_1$ representing a form of derivative of $\alpha_0$ with respect to CET,
+    and the $\alpha / \alpha_0$ rescaling the model parameter to match the empirical fit, reducing to
+    $\alpha_T = \alpha + \delta \alpha$.
 
 This process is repeated, once with the shape parameter fixed, only applying the scalings $\mu_1 / \mu_0$ and $\sigma_1 / \sigma_0$
     from the model distribution to the empirical distribution and again also applying the third $\xi_1 / \xi_0$ from the shape covariate fit.
@@ -414,7 +419,9 @@ This changes the empirical event distribution equivalently to the fitting of cov
     as where the model parameters are multiplied by a factor $k$ due to changes in CET,
     the event distribution parameters are assumed to also be multiplied by a factor of $k$.
 The key assumption made here is that the processes driving the change in the maxima from the model will act equivalently
-    on the extreme events defined in subsection~\ref{subsec:radarprocess}, as discussed in a supplement to~\cite{Tett_Soon}.
+    on the intensity of extreme events defined in subsection~\ref{subsec:radarprocess}.
+The application of this to the Edinburgh cloud-burst event is discussed in a supplement to~\cite{Tett_Soon},
+    while the validity of this assumption in this case is discussed in subsection~\ref{subsec:diseventdef}.
 
 \subsubsection{Calculating Ratios}
 

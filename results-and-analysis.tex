@@ -119,8 +119,10 @@ These charts show that the rainfall is expected to be greater over higher areas,
 The rainfall over the sea is extremely low.
 This should be disregarded for reasons given in subsection~\ref{subsec:preprocess}
 
-The colours of the dots in (b) show that the scaling of both the shape and scale parameters with CET
-    increases with height.
+The colours of the dots in (c) show that the increase of both the shape and scale parameters with CET
+    increases with height,
+    although, as a proportion of the base parameter, there is no evidence for additional scaling with height,
+    as, from (a) and (b), higher grid cells have higher base values for the parameters.
 The confidence ellipses show that there is far greater uncertainty about the increase in the location parameter
     than the scale parameter.
 The similarity of (b) and (c) suggest that fitting the shape parameter as to the covariate does not have
@@ -246,7 +248,7 @@ The risk ratios will be calculated using the one-hour maximum,
     Hexagon markers show 95\% quantile used in a and b.
     d) As c) but for probability ratio as a function of Rx1hr.
     Vertical purple line shows Stonehaven Crash Rx1hr for 2020-08-12.
-    Note these are different from the regional 95\% quantiles shown in a and b.}
+    Note these are different from the regional 95\% quantiles shown in (a) and (b).}
     \label{fig:2probradarcpm}
 \end{figure}
 
@@ -255,6 +257,14 @@ Figure~\ref{fig:2probradarcpm} (a) shows that the intensity ratio decreases when
 (b) shows the same decreasing in risk ratios for scaling like longer-interval model maxima.
 This is to be expected from the data in table~\ref{tab:CCtable},
     as it is known that maxima over longer periods give a lower scaling.
+
+The intensity and probability ratios in (a) and (b) increase with return period and event intensity.
+This is for short return period/low intensity events are in the bulk of the GEV distribution,
+    where the location parameter $\mu$ dominates, while long return period/high intensity events are in the tail of
+    the distribution, where scale parameter $\sigma$ dominates behaviour.
+The ratio of the intensity ratio to the Clausius-Clapeyron scaling, given by the dotted lines,
+    tends to the scaling of $\sigma$ relative to Clausius-Clapeyron,
+    given in table~\ref{tab:CCtable}, multiplied by the CET difference as the return period tends to infinity.
 
 (c) Shows that there is little difference in the intensity ratio by defining the Stonehaven Event by a different
     quantile, with all the intensity ratios super-Clausius-Clapeyron and within the confidence interval
@@ -629,7 +639,26 @@ As this analysis was not done,
     different time intervals in the model.
 
 \begin{itemize}\item 12-hour bin for event definition\end{itemize}
-%  TODO talk about assumption of processes driving both changes affecting both equally
+
+Each event is defined as occurring within a 12-hour window.
+The primary reason for this is to preserve statistical independence,
+    as if the seasonal maxima of each grid cell was considered as an extreme rainfall event
+    the events may not be independent,
+    as extreme rainfall at two locations caused by a single storm would not be independent.
+
+One concern with this approach is that a single storm may pass through the Stonehaven Region
+    across two consecutive 12-hour time periods,
+    giving two events that are not independent as they describe the same storm.
+After applying the minimum size fiter discussed in the next bullet point,
+    this occurs for 8 of the 77 events,
+    which is unlikely to have a significant effect on the validity GEV fit.
+
+The technique used for the fitting of distributions to the model data,
+    where each grid cell has a separate distribution fit to the seasonal maxima,
+    clearly maintains statistical independence as each maximum occurs in a different year.
+This is not possible for the empirical fit as there are only 18 years of seasonal maxima per grid cell,
+    as opposed to the 1200 years simulated in the model,
+    and 18 points is insufficient to fit GEV distributions with meaningfully without excessively wide confidence intervals.
 
 \begin{itemize}\item Spatial size of event\end{itemize}
 
@@ -661,6 +690,16 @@ If this is a strong effect on later years,
 From figure~\ref{fig:eventsyear}, it can be seen that there is no significant correlation between the
     year and the number of events, so the fit is accurate to the entire time period.
 
+Figure~\ref{fig:eventsyear} provides further evidence that the choice of event size
+    was acceptable,
+    with the events including the largest 2--7 storms in the region in each year.
+When a cutoff greater than 250$\text{km}^2$ was imposed,
+    one example of which was 500$\text{km}^2$,
+    it was possible to find a GEV fit for the whole dataset.
+However,
+    the Monte Carlo procedure for estimating confidence intervals resulted in many fits
+    to random samples with replacement giving significantly anomalous distributions,
+    leading to an overall infinite confidence interval.
 Figure~\ref{fig:cellsyear} shows the number of cells contributing to events for a given year.
 For all years, the majority of the 185 cells are providing data to the fit.
 
@@ -715,24 +754,143 @@ As figures~\ref{fig:2probradarcpmshape} and~\ref{fig:13probradarcpm}
 
 The choice of the 0.95 quantile in the original analysis was valid as this is a `more extreme' quantile and was thought to best capture the event's
     effects on the region, as opposed to at the crash location.
-The trend in probability ratios continuing from all 4 four of the quantiles $\geq$ 0.5 shows that an actual effect is occurring,
+The trend in probability ratios continuing for all 4 of the quantiles $\geq$ 0.5 shows that an actual effect is occurring,
     as opposed to an artefact of the 0.95 quantile potentially being ill-defined for small events where fewer than 20 grid cells take seasonal maxima.
 
 \subsubsection{Model Fit}
-\begin{itemize}\item Time interval of maxima\end{itemize}
+\begin{itemize}\item Use of different definition from radar data\end{itemize}
+
+As noted in the discussion of 12-hour bins,
+    the fit to the model is taken to be the average over the parameters for each grid cell,
+    as opposed to the fit to the empirical data being to events as defined above.
+For the application of the scaling from the model to be valid,
+     it is necessary to justify that the parameters of the event distribution should scale with
+    the average parameters of seasonal maximum rainfall of a grid cell in the model.
+
+Each event intensity is,
+    by taking a 0.95 quantile,
+    effectively a median average over the set of grid cells with seasonal maximum rainfall in the top decile of an event.
+It is clear that this would result in both parameters being larger compared to a distribution of seasonal maxima at a single cell,
+    as the cells with the largest maximum rainfall are taken to define the distribution.
+This is not a concern,
+    as the parameter scalings are multiplicative and so proportional to the size of the parameter being scaled,
+    seen in equation~\ref{eq:newradarparams}.
+
+However,
+    it is uncertain whether this would result in a change in variability between the distributions.
+As the event intensity is,
+    an effective average over the maximum of multiple grid cells,
+    this suggests that there would be less variability as the grid cells with higher and lower summer rainfall maxima will offset one another.
+On the other hand,
+    taking the grid cells for this median average are always taken from the top decile suggests
+    that variability would be increased, as they are in the tail of the distribution where variability is greater
+    due to the lower probability density.
+The fact that the grid cells of each event differ also suggests that variability would be higher,
+    as the maximums are being sampled from different distributions,
+    although this would be offset by the rainfall at each point not being independent due to occuring in the same event.
+Taking an upper quantile is more valid than taking a mean average of the maximum rainfall in the event,
+    as it balances the effects on variability described here.
+
+Consider a simpler event definition of an event being the maximum summer rainfall at a location,
+    with a GEV fit made to each location, as for the model data.
+If the variability for the definition used in the analysis of this project is greater,
+    then the location parameter for the empirical fit is likely an underestimate and the scale parameter is likely
+    an overestimate relative to the simpler definition,
+    as the scale parameter gives the PDF a wider spread to increase the variability.
+This would suggest that the intensity ratios are an overestimate for the simpler definition,
+    as the scale parameter scales by a greater amount than the location parameter with CET,
+    seen in table~\ref{tab:CCtable},
+    and \textit{vice versa} for a lower variability.
+It is unclear how this would affect the probability ratios,
+    as the underlying distribution would have changed.
+
+It is of note that the hypothetical in the previous paragraph is not desirable,
+    as this definition would cover events that are not convective storms,
+    being too loose for the Stonehaven Event.
+Although the variability concerns should be considered,
+    I do not consider these likely to have a large effect on the final result.
+This is as both the model and the empirical events are composed of one-hour rainfall maxima driven by the same effects,
+    and so would be expected to scale by the same amount with CET .
 
 \begin{itemize}\item Shape parameter fit to covariate\end{itemize}
 
-% TODO extRemes says shape scaling should be avoided
+All the results in subsections~\ref{subsec:covfit} and~\ref{subsec:riskratios} were computed with and without
+    the shape parameter $\xi$ fit to the CET covariate.
+No significant difference in the results were found,
+    showing that the results are robust with respect to this choice.
+
+I do not believe that fitting the shape parameter to the CET covariate would be an appropriate choice to make in this analysis.
+Looking at equation~\ref{eq:gevreturn},
+    scaling the location $\mu$ and the scale $\sigma$ parameters by the same factor scales the whole distribution,
+    including the mean, median and variance.
+Scaling both by different factors is also valid,
+    as the location parameter scaling will capture a change of the whole distribution,
+    while the scale parameter scaling will capture a change that increases as the rarity of the event increases.
+
+There is no similar reason to apply a multiplicative scaling,
+    as done by equation~\ref{eq:newradarparams} to the shape parameter.
+For small $\xi$, this will have little difference to scaling the shape parameter by the reciprocal factor,
+    while, due to the appearance in an exponential,
+    there is no reason to expect a simple linear change with the covariate.
+
+This may also lead to clearly incorrect outcomes.
+For example, take a model fit with positive shape that finds that the thickness of the tail,
+    and so the shape parameter,
+    increases with CET,
+    but an empirical fit with negative shape, i.e. $\xi_1, \xi_0 > 0$, $\xi_1 / \xi_0 > 1$, $\xi < 0$.
+Applying equation~\ref{eq:newradarparams} results in the shape parameter decreasing with CET,
+    resulting in the empirical fit becoming more bounded
+    the opposite of that observed in the model.
+
+It is of note that the documentation of the `fevd' command in the extRemes R package states
+    that it is ``ill-advised'' to fit the shape parameter to a covariate.
+
+\begin{itemize}\item Time interval of maxima\end{itemize}
+
+As only the one-hour summer rainfall maxima were processed in the radar data to be processed to events for the empirical fit,
+    only the one-hour event data was used to directly calculate risk ratios.
+However,
+    as can be seen in figure~\ref{fig:stonehavendayraingraph},
+    the rainfall at Stonehaven was across a 4-hour period,
+    which suggests that a 4-hour event definition would be more appropriate.
+
+It is impossible to calculate the exact risk ratios had this alternative definition been used,
+    as the exact empirical distribution of these events is not known.
+However, the results that are available could suggest what these results may be.
+
+Using an event definition over a longer time period would have meant using scalings from model maxima over that same longer time period.
+From table~\ref{tab:CCtable},
+    the parameters will then increase by a lesser proportion than was found for the one-hour event definition.
+This will likely result in a decreased intensity ratio,
+    as the critical value for all probabilities will have increased by a lesser proportion than for the shorter time periods with greater scalings,
+    which is visible in figure~\ref{fig:2probradarcpm} (a),
+    with the scaling being sub-Clausius-Clapeyron when applying an 8-hour model scaling to the 1-hour empirical fit.
+It is also likely that the probability ratios will be lower,
+    with the effect being visible in~\ref{fig:2probradarcpm} (b).
+
+As the scalings are decreased,
+    the distribution will be increased by a lesser amount and so it is expected that the effect of increased temperature on the return period would be weaker.
+This effect is likely to be mitigated by the fact that the Stonehaven event occurred over 4 hours,
+    and so is more likely to be rarer and further into the tail of the distribution,
+    where the scale parameter,
+    which, from table~\ref{tab:CCtable}, scales more than the location parameter,
+    has a more significant effect.
+
+I do not expect this to be near sufficient to undo the effects of the decreased scalings.
+Therefore,
+    the intensity and probability ratios in this report can be considered overestimates compared to those that would be
+    gathered from defining the Stonehaven Event to be over a longer duration.
 
 \subsubsection{Potential future work}
 
 %  TODO mention lack of trend analysis due to lack of radar data
-
+%  TODO assess risks specific to the railway
+%  TODO mention different scaling of shape parameter
 %  TODO mention fit to different times in the radar distribution
 %  TODO process with rolling average
 %  TODO process with different bins
-%  TODO
+%  TODO Pareto-Picklands model
+%  TODO distribution of Stonehaven region instead of CET
 %  TODO model event similarity
 
 \subsection{Implications for event attribution}\label{subsec:disfield}
