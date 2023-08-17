@@ -11,7 +11,7 @@ In other words, ``Climate is what we expect, weather is what we get.''~\cite{Her
 The scientific method may then be applied,
     using the climate distribution as a dependent variable to the factor being considered.
 Issues, of both a technical and a theoretical nature can arise with this approach,
-    and will be discussed in subsection~\ref{sec:attrchallenge}.
+    and will be discussed where they may arise in the process.
 
 In all the examples given in this section,
     the independent variable is anthropogenic climate change.
@@ -94,10 +94,8 @@ An event attribution is normally triggered by the event's social or environmenta
 Therefore, care must be taken to ensure that the definition of the event is sufficiently similar to the conditions that would cause a similar impact.
 
 Many of the challenges in Event Attribution arise directly from a poor Event Definition.
-Events that are too narrowly defined may have issues with reproducibility,
-    as will be discussed in~\ref{subsec:eventrepro},
-    while events that are too widely defined may give invalid results,
-    as will be discussed in~\ref{subsec:modelvalid}.
+Events that are too narrowly defined not be reproducible by climate models
+    while events that are too widely will give results for more minor events that would not have had the same impacts as the actual event.
 
 \subsubsection{Variable and Threshold}
 
@@ -126,7 +124,6 @@ In addition to defining a threshold variable,
     it is necessary to define the regions and times at which an event can be considered sufficiently similar to that being analysed.
 This is due to the fact that both historical trend analysis is impossible on a single extreme event at a single place on a single day of the year
     and that climate models will rarely reproduce events in such a narrow definition.
-The second of these factors will be discussed in subsection~\ref{subsec:eventrepro}.
 
 For the spatial region,
     a region with a known climate similar to that in which the event occurred is chosen,
@@ -167,17 +164,13 @@ This class will then be used to find like events in both the historical and mode
 
 \subsection{Model Evaluation}\label{subsec:backmodeleval}
 
+%  TODO Model Validity and Reproducability
+
 \subsection{Likelihood Estimation}\label{subsec:backlikeest}
 
+%  TODO Statistical Independence
+
 \subsection{Interpretation}\label{subsec:backinterp}
-
-\section{Challenges in Event Attribution}\label{sec:attrchallenge}
-
-\subsection{Event Reproducibility}\label{subsec:eventrepro}
-
-\subsection{Statistical Reliability}\label{subsec:statvalid}
-
-\subsection{Validity of Model}\label{subsec:modelvalid}
 
 \section{Extreme Value Statistics}\label{sec:exstats}
 
@@ -189,7 +182,7 @@ Therefore, to model these events,
 
 Throughout the analysis,
     we assume that the variables are independent and identically distributed ($i.i.d.$).
-The issues that may arise from this assumption not being valid are considered in subsection~\ref{subsec:statvalid}.
+%  TODO Statistical independence
 
 For event definitions which average a variable over a season,
     as opposed to focusing on the extreme
@@ -243,7 +236,7 @@ The larger the shape parameter, the thicker the tail of the distribution.
 
 Where $\xi > 0$,
     the distribution is heavy-tailed.
-This type of GEV distribution is also known as a Fr\'{e}chet distribution.
+This type of GEV distribution is also known as a Fréchet distribution.
 Special cases of this distribution have unique properties,
     where $\xi \geq \frac{1}{2}$, the distribution has infinite variance and
     where $\xi \geq 1$, the distribution has infinite mean.

@@ -213,7 +213,7 @@ Due to the separation into 12-hour bins,
     \centering
     \includegraphics[width=100mm]{dataprocessschematic}
     \caption[Diagram representing the data processing.]{
-        Diagram representing the data processing after the maxima of each grid square has been found,
+        Diagram representing the data processing after the maxima of each grid cell has been found,
     within each year.
     `rain' represents the summer maximum rainfall in a grid cell,
         `time' represents the time of this maximum,
@@ -256,12 +256,13 @@ The 991 samples left are greater than the 800 suggested by Booth and Sarkar~\cit
 The model data used in this section is
     the Met Office Hadley Centre's UKCP18 Convection-Permitting Model Projections for the UK at 2.2km resolution~\cite{model_data}.
 This dataset was chosen as the resolution is less than 5km,
-    and so is able to accurately represent convective storms.
+    and so it is able to represent convective storms directly.
 
 The CPM ensemble consists of 12 members and covers the 100 years from 1981 to 2080,
     modelling the RCP8.5 emissions scenario.
 In this investigation,
-    the model's hourly temperature and rainfall data will be used
+    the model's hourly temperature and rainfall data will be used.
+
 
 \subsection{Pre-processing}\label{subsec:preprocess}
 
@@ -413,7 +414,7 @@ This equation can also be explained as $\alpha_1$ representing a form of derivat
 This process is repeated, once with the shape parameter fixed, only applying the scalings $\mu_1 / \mu_0$ and $\sigma_1 / \sigma_0$
     from the model distribution to the empirical distribution and again also applying the third $\xi_1 / \xi_0$ from the shape covariate fit.
 Both of these are repeated four times, using the scalings from the 1, 2, 4 and 8 hour model maxima,
-    although only the 1 hour maxima will be used to directly compute any risk ratios.
+    although only the 1-hour maxima will be used to directly compute any risk ratios.
 
 This changes the empirical event distribution equivalently to the fitting of covariates to the model distribution in subsection~\ref{subsec:covfit},
     as where the model parameters are multiplied by a factor $k$ due to changes in CET,
@@ -422,6 +423,15 @@ The key assumption made here is that the processes driving the change in the max
     on the intensity of extreme events defined in subsection~\ref{subsec:radarprocess}.
 The application of this to the Edinburgh cloud-burst event is discussed in a supplement to~\cite{Tett_Soon},
     while the validity of this assumption in this case is discussed in subsection~\ref{subsec:diseventdef}.
+
+As the new parameters are scaled with temperature,
+    as opposed to time,
+    the results here are not dependent on the RCP8.5 emissions scenario.
+The `2K warmer world' result applies to any scenario heated by 2 degrees relative to Pre-Industrial,
+    including the RCP 3.4 emissions scenario in the year 2100~\cite{Pielke_2021}.
+Using RCP8.5 model data from 1980 ensures that the scalings are interpolated from within a range of simulations
+    covering the Pre-Industrial to 2K warming range,
+    as opposed to extrapolating to a wider temperature range where the effects may be more chaotic.
 
 \subsubsection{Calculating Ratios}
 

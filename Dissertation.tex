@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper]{report}
+\documentclass[12pt,a4paper,oneside]{report}
 
 \usepackage{graphics}
 \usepackage{fullpage,epsf,graphicx}
@@ -74,6 +74,7 @@ This project applies current event attribution techniques for extreme rainfall e
     finding probability ratios for the extreme rainfall to be 1.10 (1.06--1.15 90\% CI),
     1.37 (1.22--1.61) and 1.78 (1.46--2.34) for the 1980s, 2010s and in a 2K warmer world
     respectively over pre-industrial.
+These results are robust when the rainfall is defined as a one-hour event.
 
 \end{abstract}
 
@@ -99,11 +100,11 @@ Code used in this project is given in~\cite{Me_Code},
     code used in my supervisor's paper is given in~\cite{Tett_Code}
 
 Chapter~\ref{ch:results} is entirely my own work,
-    using the same plotting techniques as in~\cite{Tett_Soon}.
+    reusing large amounts of the plotting code from~\cite{Tett_Soon}.
 
 \bigskip
 
-Calculations used Python with many standard packages.
+Calculations used Python with many standard packages, edited in PyCharm.
 
 NumPy and XArray are used to manage and process both real and modelled rainfall data.
 
@@ -184,6 +185,18 @@ making this project possible.
 
 \section{Stonehaven Derailment}\label{sec:stonederail}
 
+On the morning of the 12th of August 2020,
+    after a morning of extreme rainfall,
+    the 06:38 service from Aberdeen to Glasgow is travelling past Carmont,
+    between Stonehaven and Montrose.
+Due to a landslip reported ahead,
+    the train reverses to return to Stonehaven.
+On this journey,
+    the train impacts debris washed out from a drain.
+The train derails,
+    resulting in three fatalities,
+    with the other six passengers being injured.
+
 %  TODO use RAIB analysis
 
 \section{Rainfall in a warmer world}\label{sec:warmerrainfall}
@@ -228,7 +241,7 @@ pages, but not much longer.
 
 %  TODO insert code behind each figure
 
-\chapter{Distribution of events per year}
+\chapter{Supplementary Figures}
 
 \begin{figure}[H]
     \centering
