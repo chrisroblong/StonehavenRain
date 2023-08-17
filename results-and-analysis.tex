@@ -849,7 +849,7 @@ Applying equation~\ref{eq:newradarparams} results in the shape parameter decreas
     resulting in the empirical fit becoming more bounded,
     the opposite of that observed in the model.
 
-It is of note that the documentation of the `fevd' command in the extRemes R package states
+It is of note that the documentation of the `fevd' command in the extRemes R package~\cite{extremes_R} states
     that it is ``ill-advised'' to fit the shape parameter to a covariate.
 
 \begin{itemize}\item Time interval of maxima\end{itemize}
@@ -962,7 +962,8 @@ The model evaluation step is particularly challenging in this scenario.
 This is as the radar data is only available for 18 years,
     making a trend analysis impossible as any change in the events will not be noticeable
     in comparison to natural variability.
-The lack of comparable events in the empirical data makes it very hard to determine the features to use to determine whether a modelled event is comparable.
+The lack of comparable events in the empirical data makes it very hard to determine the features to use to determine whether a modelled event is comparable,
+    as well as giving no opportunity to assess the relevance of bias correction techniques recommended for the UKCP18 dataset~\cite{model_data}
 
 The analysis here uses the intensity of the extreme rainfall Stonehaven Event itself as a threshold for the analysis,
     so the results in this report therefore do not give the probability ratio for the derailment itself.
