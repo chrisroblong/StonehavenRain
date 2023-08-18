@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper,oneside]{report}
+\documentclass[12pt,a4paper,openany]{report}
 
 \usepackage{graphics}
 \usepackage{fullpage,epsf,graphicx}
@@ -9,9 +9,12 @@
 \usepackage{float}
 \usepackage{placeins}
 \usepackage{subcaption}
+\usepackage{tocloft}
 \graphicspath{{figures/}}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\renewcommand\cftfigfont{\small}
+\renewcommand\cftfigpagefont{\small}
 
 \begin{document}
 %  TODO copy paste into google doc and fix grammar and spelling.
@@ -71,8 +74,8 @@
 Extreme rainfall on 12 August 2020 caused the Stonehaven Derailment,
     which resulted in three deaths.
 This project applies current event attribution techniques for extreme rainfall events,
-    finding probability ratios for the extreme rainfall to be 1.10 (1.06--1.15 90\% CI),
-    1.37 (1.22--1.61) and 1.78 (1.46--2.34) for the 1980s, 2010s and in a 2K warmer world
+    finding increases in likelihood for the extreme rainfall to be 10\% (6\%--15\% 5\%--95\% CI),
+    37\% (22\%--61\%) and 78\% (46\%--134\%) for the 1980s, 2012--2021 and in a 2K warmer world
     respectively over pre-industrial.
 These results are robust when the rainfall is defined as a one-hour event.
 
@@ -87,17 +90,19 @@ These results are robust when the rainfall is defined as a one-hour event.
 I declare that this report is entirely my own work unless stated otherwise.
 
 The introduction, chapter~\ref{ch:intro}, describes the motivations for the work.
-This includes the information showing the impact of the extreme rainfall on the derailment by the Rail Accident Investigation Board~\cite{RAIB_2022},
+This includes the information showing the impact of the extreme rainfall on the derailment by the Rail Accident Investigation Branch~\cite{RAIB_2022},
     as well as my supervisor's paper analysing the effect of climate change on the risk of an extreme rainfall event~\cite{Tett_Soon}.
 
 Chapter~\ref{ch:attribution} contains background material,
-    with the first and third sections primarily relying on World Weather Attribution's methodology~\cite{van_Oldenborgh_et_al_2021},
+    with the first section primarily relying on World Weather Attribution's methodology~\cite{van_Oldenborgh_et_al_2021},
     and the second section makes use of the information in Coles' textbook on the topic~\cite{Coles_2001}.
 
 Chapter~\ref{ch:dev} consists of my own work,
-    excepting the use of code and creation of equivalent diagrams to a currently approved but not yet published paper by my supervisor.
+    excepting the use of code and creation of equivalent diagrams to the approved but not yet published paper by my supervisor.
 Code used in this project is given in~\cite{Me_Code},
-    code used in my supervisor's paper is given in~\cite{Tett_Code}
+    code used in my supervisor's paper is given in~\cite{Tett_Code}.
+Citations are made to the code in this project,
+    from which the difference between the code used here and the code used in my supervisor's project is visible in the commit log.
 
 Chapter~\ref{ch:results} is entirely my own work,
     reusing large amounts of the plotting code from~\cite{Tett_Soon}.
@@ -120,9 +125,10 @@ The Model Data is taken from the Met Office Hadley Centre's UKCP18 Convection-Pe
 Tht topography data on an OSGB grid is taken from~\cite{radar_topog}.
 
 The data processing ran on both the JASMIN supercomputer and on my local machine,
-GitHub was used to manage the transfer of both code and data.
+GitHub was used to manage the transfer of both code and data. \\
+Link: https://github.com/chrisroblong/StonehavenRain/tree/master
 
-The majority of the code used in this project is based on the code used by my supervisor performing a similar analysis on the 2021 Edinburgh cloudburst~\cite{Tett_Soon}.
+The majority of the code and the methodology used in this project is based on that used by my supervisor performing a similar analysis on the 2021 Edinburgh cloudburst~\cite{Tett_Soon}.
 
 
 \newpage
@@ -174,9 +180,11 @@ I'd like to thank my supervisor Professor Simon Tett for
 making this project possible.
 
 
-
+\newpage
 \tableofcontents
+\newpage
 \listoftables
+\newpage
 \listoffigures
 
 \pagenumbering{arabic}
@@ -186,8 +194,8 @@ making this project possible.
 \section{Stonehaven Derailment}\label{sec:stonederail}
 
 On the morning of the 12th of August 2020,
-    after a morning of extreme rainfall,
-    the 06:38 service from Aberdeen to Glasgow is travelling past Carmont,
+    after several hours of extreme rainfall,
+    the 06:38 service from Aberdeen to Glasgow travels past Carmont,
     between Stonehaven and Montrose.
 Due to a landslip reported ahead,
     the train reverses to return to Stonehaven.
@@ -197,7 +205,7 @@ The train derails,
     resulting in three fatalities,
     with the other six passengers being injured.
 
-As per the Rail Accident Investigation Board report on the event~\cite{RAIB_2022},
+As per the Rail Accident Investigation Branch report on the event~\cite{RAIB_2022},
     the extreme rainfall caused flows of surface water that the drain was unable to safely manage.
 The RAIB report was created with the intention of preventing railway accidents by finding the causal
     factors contributing to the Stonehaven Derailment that are under the control of the railway
@@ -207,25 +215,56 @@ Therefore,
     and that railway operations did not fully account for the risks posed by the extreme rainfall.
 However,
     as the crash was caused by an extreme weather event,
-    there is a potential additional human-driven causal factor, climate change.
+    there is a potential additional human-driven causal factor, Anthropogenic Climate Change.
 
 Due to the COVID-19 pandemic,
     the train had an extremely low loading of only 9 people.
 Had this not been the case,
-    it has been estimated (\cite{RAIB_2022} p.461) that between 25 and 50 passengers could have been on the train,
+    it has been estimated (\cite{RAIB_2022} para. 461) that between 25 and 50 passengers would have been on the train,
     which had a capacity of around 300.
 With this larger passenger loading,
-    the derailment would have resulted a far higher number of casualties.
+    the derailment would have resulted a far higher number of casualties,
+    although the potential number of casualties cannot be assumed due to the variability of casualty risk throughout the train.
 
-A report released by the government in the aftermath of the derailment~\cite{}
-%  TODO use RAIB analysis
+A report released by the UK Government in the aftermath of the derailment~\cite{NR_DfT_2021}
+    was made to discuss the resilience of the UK's rail infrastructure.
+This report notes that the signal of climate change is becoming more significant,
+    and dedicates a section to the impacts climate change will have on rail infrastructure.
+It is with this consideration that the attribution analysis for the Stonehaven Event is performed here.
 
-%  TODO mention BBC report
+This analysis will proceed by considering the rainfall as the cause of the event.
+As the modelling necessary for either the landslip or the drain debris washout are beyond the scope of this report,
+    intensity of the extreme rainfall itself will be used to define the event.
 
 \section{Rainfall in a warmer world}\label{sec:warmerrainfall}
 
-%  TODO rely on Simon's paper
-%  TODO rely on IPCC report
+It is reasonable to expect that climate change had an impact on the extreme rainfall on 12 August 2020.
+One example of this in the UK is the estimated 40\% increase
+    in the likelihood of one-day events as intense as storm Desmond~\cite{Desmond_2015}.
+Another event in Scotland was the 2021 Edinburgh cloud-burst~\cite{Tett_Soon},
+    which found an increase in likelihood of around 30\%,
+    increasing to approximately 70\% after 2 Kelvin of warming,
+    with the event spanning a 15-minute time period.
+As the Stonehaven Event is in a similar climate to these two events,
+    with a time period in between,
+    sub daily but not sub-hourly,
+    it would not be unreasonable to find similar results.
+
+A warmer climate,
+    through thermodynamic effects captured by the Clausius-Clapeyron relation,
+    gives the air a greater saturation humidity,
+    expected to scale by approximately 7\% per degree of warming~\cite{Fowler_2021}.
+As the air is holding more water,
+    the intensity of precipitation would be expected to scale similarly.
+
+Working Group 1 of the IPCC~\cite{IPCC_2021} states that sub-daily precipitation intensities,
+    such as that of the Stonehaven Event,
+    would be expected to scale between one and two times that expected by Clausius-Clapeyron scaling.
+This is as other properties of the event may also change in a warmer climate.
+For example,
+    if storms move slower in a warmer climate,
+    the rainfall in locations under the storm would scale more greatly than saturation humidity,
+    as the time that the location is exposed to the storm is lengthened.
 
 \begin{comment}
 The Introduction should contain a description of your project and the
@@ -258,14 +297,70 @@ research.
 The conclusion section should be at least one page long, preferably 2
 pages, but not much longer.
 \end{comment}
+The probability ratios in table~\ref{tab:prtable},
+    are taken as representing the change in the probability of the event.
+Rendered as increases in likelihood,
+    these give increases of 10\%, 37\% and 78\% for the 1980s, 2012--2021 and a 2K warmer world respectively.
+
+It was discovered that using a lower quantile,
+    closer to that of the rainfall at the Stonehaven Crash,
+    of an event to define intensity could result in an increase likelihood.
+From figure~\ref{fig:2probradarcpm},
+    it is seen that using the 0.5 quantile definition would give an increase
+    in likelihood of almost 200\% in a 2K warmer world.
+It is therefore tempting to label the likelihood increases given above as underestimating
+    the impact of Anthropogenic Climate Change.
+
+However,
+    as the original definition chosen was at a 0.95 quantile,
+    these are the probability ratios that will be used.
+This is done to prevent bias from a choice of definition that could over-inflate
+    the impacts of warmer temperature,
+    although this does not mean that repeating the analysis at the lower quantile would not be informative.
+
+The area of this project where future work is most needed is on repeating the analysis
+    with an empirical fit to 2-hour and 4-hour maxima,
+    as the rainfall over the Stonehaven Crash location was over a 4-hour timespan
+    and the rainfall at the location was found by the RAIB~\cite{RAIB_2022}
+    to be rarest as a four-hour event.
+In the RAIB report,
+    it is stated that consultants were able to show that the event would not have happened
+    had the drain which had a debris washout onto the tracks been built to specification.
+This calculation likely involved the maximum safe throughput of the drain,
+    which could then be used to determine the appropriate definition to be used.
+
+Multiple takeaways,
+    which may be useful in future event attribution studies
+    which use the techniques in this paper,
+    finding changes in model behaviour with increased temperature
+    and applying those changes to a distribution of empirical events,
+    were found.
+Of note is that the most original insights were found through relatively straightforward mathematical analysis techniques.
+
+Most simple of these is the use of a Taylor series to explain
+    the equivalence of linear fits to saturated humidity.
+On the other hand,
+    the effective proof by contradiction of the invalidity of fitting the shape to a covariate and applying the
+    scaling to the empirical fit could avoid similar choices from being applied in future analysis.
+
+Most useful of these ideas was to break down the intensity for a given return period
+    into the two parts defined by the location and the scale in the survival function.
+This construction allowed the increase in intensity ratios over time to be understood as
 
 \appendix
 % the appendix command just changes heading styles for appendices.
 
-%  TODO insert code behind each figure
 
-\chapter{Supplementary Figures}
+\chapter{Supplementary Figures}\label{ch:supp}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=120mm]{gevshape}
+    \caption[Line graph for GEV distribution with different shape parameters.]{
+       A line graph showing the effect of positive (0.5), negative (-0.5) and zero shape on a GEV
+        distribution with location 0 and scale 1.}
+    \label{fig:gevshape}
+\end{figure}
 \begin{figure}[H]
     \centering
     \includegraphics[width=150mm]{eventsyear}

@@ -168,17 +168,17 @@ As the goal was to use an Extreme Value distribution to model the data,
     it is necessary to draw the extrema out from the data.
 The dataset itself~\cite{radar_data} is composed of \texttt{.tar} files, each of which containing the radar data of a given day.
 
-The \texttt{process\_radar\_data} Python script finds the maximum one-hour rainfall in each of these daily datasets and
+The \texttt{process\_radar\_data}~\cite{Me_Code} Python script finds the maximum one-hour rainfall in each of these daily datasets and
     uses these to generate a dataset with the one-hour maximum rainfall and the time of the one-hour maximum rainfall
     at all points in the Stonehaven Region for a given month, in a NetCDF format
-The \texttt{combine\_summary} Python script then takes these monthly maxima and their times and combines them into a single dataset,
+The \texttt{combine\_summary}~\cite{Me_Code} Python script then takes these monthly maxima and their times and combines them into a single dataset,
     again as a NetCDF .
 
-These Python scripts are called by the Shell scripts \texttt{run\_jobs} and \texttt{run\_combine} respectively.
+These Python scripts are called by the Shell scripts \texttt{run\_jobs} and \texttt{run\_combine}~\cite{Me_Code} respectively.
 The Shell scripts are run on a JASMIN Science Analysis Server and submit the Python scripts as SLURM jobs to the LOTUS Batch Processing Cluster,
     allowing all the monthly maxima to be computed in a single script and the combination of the datasets to access an amount of memory to make the task feasible.
 
-The \texttt{get\_radar\_data} function in the \texttt{stonehavenRainLib} Python script then selects the summer months and
+The \texttt{get\_radar\_data} function in the \texttt{stonehavenRainLib}~\cite{Me_Code} Python script then selects the summer months and
     combines them to get the maximum hourly rainfall in the summer of each year,
     along with the time of the maxima.
 This function also applies the topographical height mask described in subsection~\ref{subsec:furthercons},
@@ -188,7 +188,7 @@ This function also applies the topographical height mask described in subsection
 
 Now that the seasonal maxima have been found,
     the data can be used to define events.
-This process is done in the \texttt{gen\_radar\_data} function in the \texttt{stonehavenRainLib} Python script.
+This process is done in the \texttt{gen\_radar\_data} function in the \texttt{stonehavenRainLib}~\cite{Me_Code} Python script.
 The seasonal maxima,
     of which there is one for each grid cell in each year in the dataset,
     are grouped by the time in which they occurred.
@@ -224,8 +224,8 @@ Due to the separation into 12-hour bins,
 
 \subsubsection{Fitting event distribution}
 
-The radar data is fit to a GEV distribution with the \texttt{comp\_radar\_fits} Python script,
-    which calls the \texttt{gev\_r} Python library to run code in R .
+The radar data is fit to a GEV distribution with the \texttt{comp\_radar\_fits}~\cite{Me_Code} Python script,
+    which calls the \texttt{gev\_r}~\cite{Me_Code} Python library to run code in R .
 The `fevd', fit extreme value distribution,
     command in R is used to fit an extreme value distribution to the radar data,
     which uses MLE, as described in subsection~\ref{subsec:parameterest}.
@@ -273,11 +273,11 @@ The guidance for the model~\cite{model_data} states that the 2.2km model is appr
 
 The CPM data used is on longitude-latitude coordinates,
     with a north pole rotated to near the region the model covers.
-The location of the Stonehaven crash in this alternative coordinate system was found using the \texttt{comp\_rotated\_coords} Python script,
+The location of the Stonehaven crash in this alternative coordinate system was found using the \texttt{comp\_rotated\_coords}~\cite{Me_Code} Python script,
     using CartoPy for the computations.
 This coordinate rotation was also done for the four weather stations used to compute Central England Temperature (CET).
 
-The pre-processing of the CPM data is done using the \texttt{ens\_seas\_max\_coarsen} python script,
+The pre-processing of the CPM data is done using the \texttt{ens\_seas\_max\_coarsen}~\cite{Me_Code} python script,
     which finds the seasonal one-hour rainfall maxima for each grid cell.
 
 \subsubsection{Coarsening}
@@ -308,16 +308,16 @@ This makes the >0m height mask on the model a necessity,
 
 \subsubsection{Time Series}
 
-The \texttt{comp\_cpm\_ts} Python script was used to compute the time series.
+The \texttt{comp\_cpm\_ts}~\cite{Me_Code} Python script was used to compute the time series.
 This script takes each month in each ensemble member the CPM data and computes 3 values.
 These are computed using the 2.2km data without the coarsening or height mask.
 First is the Central England Temperature,
     which takes the CPM data's average monthly temperature at the weather stations used to define CET,
     while the other two time series use the average monthly temperature and precipitation in the Stonehaven Region.
 
-Two additional monthly time series were computed in the \texttt{analyse\_cpm\_data\_rolling} Python script.
+Two additional monthly time series were computed in the \texttt{analyse\_cpm\_data\_rolling}~\cite{Me_Code} Python script.
 One of these takes the median extreme precipitation across the Stonehaven Region
-    using the extrema processed in \texttt{ens\_seas\_max\_coarsen.sh},
+    using the extrema processed in \texttt{ens\_seas\_max\_coarsen.sh}~\cite{Me_Code},
 While another uses the temperature in the Stonehaven Region to find the Saturation Specific Humidity.
 
 The formula used for this is the August-Roche-Magnus approximation to the Clausius-Clapeyron relation~\cite{Alduchov_Eskridge_1996}, given by:
@@ -336,7 +336,7 @@ This was then reduced to 3600 data points by only taking the three summer months
 
 \subsubsection{Fitting Covariates}
 
-\texttt{analyse\_cpm\_data\_rolling} performs a linear fit of the Saturation Specific Humidity,
+\texttt{analyse\_cpm\_data\_rolling}~\cite{Me_Code} performs a linear fit of the Saturation Specific Humidity,
     Stonehaven Region temperature, mean average Stonehaven Region precipitation and mean maximal Stonehaven Region precipitation.
     using the \texttt{statsmodels} Python package's ordinary least squares regression feature.
 This provides the change in each of these variables, as well as the uncertainty with $R^2$ coefficients,
@@ -390,7 +390,7 @@ The covariate $x$ may then be determined as the difference from the CET in a mon
 
 \subsection{Calculating Risk Ratios}\label{subsec:riskratios}
 
-The final calculation steps are performed in the \texttt{plot\_intensity\_risk\_ratios} Python script.
+The final calculation steps are performed in the \texttt{plot\_intensity\_risk\_ratios}~\cite{Me_Code} Python script.
 This begins by finding the value of CET in different time periods.
 For historical time periods,
     this is recorded by the Met Office~\cite{CET},

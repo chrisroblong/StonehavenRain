@@ -19,9 +19,13 @@ computer are not relevant and may mask the correct results.
 
 \subsection{Radar Data Fit}\label{subsec:radardatafit}
 
+Figure~\ref{fig:radarreturnplot} was created using the survival function of the GEV distribution fitted to the event data,
+    getting the return period as the reciprocal of the probability.
+This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi = 0.173$.
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=150mm]{radarreturnplot}
+    \includegraphics[width=110mm]{radarreturnplot}
     \caption[A line graph plotting the return period in years against the intensity of the event.]{
         A line graph plotting the return period in years against the intensity of the event,
         taken from fitting a GEV distribution to the event distribution.
@@ -39,9 +43,6 @@ The intensity of the Stonehaven event,
     the 0.95 quantile of the radar grid cells having their 2020 seasonal maxima in the AM of the 12th of August,
     was found to be 25.2mm/hr.
 
-Figure~\ref{fig:radarreturnplot} was created using the survival function of the GEV distribution fitted to the event data,
-    getting the return period as the reciprocal of the probability.
-This had parameters location $\mu = 10.7$, scale $\sigma = 4.26$ and shape $\xi = 0.173$.
 
 \subsection{Model Data}\label{subsec:modelcorr}
 
@@ -269,7 +270,7 @@ This is as short return period/low intensity events are in the bulk of the GEV d
 The ratio of the intensity ratio to the Clausius-Clapeyron scaling, given by the dotted lines,
     tends to the scaling of $\sigma$ relative to Clausius-Clapeyron,
     given in table~\ref{tab:CCtable}, multiplied by the CET difference from Pre-Industrial as the return period tends to infinity.
-This increase is from the scaling of $\mu$ relative to Clausius-Clapeyron multiplied by CET difference at a return period of
+The intensity ratio of the scaling of $\mu$ multiplied by CET difference occurs at a return period of
     $\left( 1- e^{-1} \right)^{-1} \approx 1.6$, obtained by inverting equation~\ref{eq:gevreturn}.
 
 (c) Shows that there is little difference in the intensity ratio by defining the Stonehaven Event by a different
@@ -914,6 +915,8 @@ It would be desirable to find the same correlations for the Stonehaven Region te
     and Luchars, which is over 70km away.
 An additional challenge with this approach is that the data for Pre-Industrial teperatures would also have
     to be extrapolated, as opposed to read directly like CET .
+This task could then alternatively be completed with the UK-Grid dataset~\cite{UKGrid} for the Stonehaven Region,
+    which exists from 1862 onwards.
 
 One change that would be straightforward to make would be to find the risk ratios
     using an event intensity defined by the quantile that the Stonehaven Crash rainfall was within the Stonehaven Event.
@@ -947,7 +950,7 @@ The event definition could then also be to the model data,
 Whilst the reasons for the shape parameter scaling used in this report being inappropriate are given above,
     that does not mean that the shape parameter must remain fixed.
 By replacing the multiplicative scaling in equation~\ref{eq:newradarparams} with an additive scaling of
-    $\xi_T = \xi + \delta T \xi_1$,
+    $\xi_T = \xi + \delta T \xi_1$ or a fixed-modulus multiplicative scaling of $\xi_T = \xi + \delta T \left\| \frac{\xi}{\xi_0} \right\| \xi_1$,
     the absurd example given is not possible,
     allowing the change in shape parameter to potentially be informative.
 
@@ -968,12 +971,17 @@ The lack of comparable events in the empirical data makes it very hard to determ
 The analysis here uses the intensity of the extreme rainfall Stonehaven Event itself as a threshold for the analysis,
     so the results in this report therefore do not give the probability ratio for the derailment itself.
 For this to be possible,
-    hydrological modelling of the flows necessary to cause the debris washout could be performed,
+    modelling of the flows necessary to cause the debris washout could be performed,
     finding the rainfall threshold at which the event occurs.
 Using this threshold,
     probability ratios for the Stonehaven Derailment could be found,
     although these would not account for additional factors,
     such as the landslip causing the reversal in direction.
+
+The probability ratios found in this report are likely to be an overestimate of the probability ratio for the event with the intensity of the threshold rainfall for the drain washout.
+This is as this threshold will be a lower intensity than the actual rainfall event intensity,
+    which, as illustrated in figure~\ref{fig:2probradarcpm} (b),
+    have lower probability ratios.
 
 \subsection{Implications}\label{subsec:disfield}
 
@@ -989,10 +997,21 @@ As mentioned, this result does not align with the IPCC's~\cite{IPCC_2021}
     expectation of sub-daily rainfall maxima scaling at a rate between in line with and double
     Clausius-Clapeyron.
 The reduced scaling gives an increase in extreme precipitation by only 2\% in the bulk
-    and 5\% in the tail of the distribution per degree of warming.
+    and 5\% in the tail of the distribution per degree of warming,
+    both significantly less than the approximately 7\% increase in atmospheric moisture~\cite{Fowler_2021}.
 Tett et al.~\cite{Tett_Soon} find sub-Clausius-Clapeyron scaling for some grid points in the model,
     but suggest that this effect may be due to a reduction in total rainfall in the region,
     which is also observed in this case, in figure~\ref{fig:2cet_scatter}.
+
+It is clear that having a large number of events is important for having robust results with smaller confidence intervals.
+The paper applying this methodology to the Edinburgh cloud-burst~\cite{Tett_Soon}
+    had much tighter confidence intervals in the probability ratios of around $\pm$0.2
+    in a 2K warmer world, compared to around $\pm$0.4 found in the relevant result
+    in table~\ref{tab:prtable} of this report.
+It is clear that this is because the fit in the Edinburgh cloud burst paper was to 384 events,
+    as opposed to the 77 events in this analysis,
+    giving a stronger confidence interval for the empirical fit.
+A comparison of the grey areas in figure 2f of the Edinburgh cloud-burst paper and figure~\ref{fig:radarreturnplot} illustrates this.
 
 Finally, as per subsection~\ref{subsec:dismodeldef},
     the choice of model resolution used to find scalings with respect to temperature change
