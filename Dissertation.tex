@@ -74,7 +74,7 @@
 Extreme rainfall on 12 August 2020 caused the Stonehaven Derailment,
     which resulted in three deaths.
 This project applies current event attribution techniques for extreme rainfall events,
-    finding increases in likelihood for the extreme rainfall to be 10\% (6\%--15\% 5\%--95\% CI),
+    finding increases in the likelihood of the extreme rainfall to be 10\% (6\%--15\% 5\%--95\% CI),
     37\% (22\%--61\%) and 78\% (46\%--134\%) for the 1980s, 2012--2021 and in a 2K warmer world
     respectively over pre-industrial.
 These results are robust when the rainfall is defined as a one-hour event.
@@ -90,7 +90,7 @@ These results are robust when the rainfall is defined as a one-hour event.
 I declare that this report is entirely my own work unless stated otherwise.
 
 The introduction, chapter~\ref{ch:intro}, describes the motivations for the work.
-This includes the information showing the impact of the extreme rainfall on the derailment by the Rail Accident Investigation Branch~\cite{RAIB_2022},
+This includes the information showing the impact of the extreme rainfall event on the derailment by the Rail Accident Investigation Branch~\cite{RAIB_2022},
     as well as my supervisor's paper analysing the effect of climate change on the risk of an extreme rainfall event~\cite{Tett_Soon}.
 
 Chapter~\ref{ch:attribution} contains background material,
@@ -98,10 +98,10 @@ Chapter~\ref{ch:attribution} contains background material,
     and the second section makes use of the information in Coles' textbook on the topic~\cite{Coles_2001}.
 
 Chapter~\ref{ch:dev} consists of my own work,
-    excepting the use of code and creation of equivalent diagrams to the approved but not yet published paper by my supervisor.
-Code used in this project is given in~\cite{Me_Code},
+    except the use of code and creation of equivalent diagrams to the approved but not yet published paper by my supervisor.
+The code used in this project is given in~\cite{Me_Code},
     code used in my supervisor's paper is given in~\cite{Tett_Code}.
-Citations are made to the code in this project,
+Citations are made to the code for this project,
     from which the difference between the code used here and the code used in my supervisor's project is visible in the commit log.
 
 Chapter~\ref{ch:results} is entirely my own work,
@@ -122,7 +122,7 @@ The Rain Radar Data is taken from the Met Office's NIMROD system~\cite{radar_dat
 
 The Model Data is taken from the Met Office Hadley Centre's UKCP18 Convection-Permitting Model projections~\cite{model_data}.
 
-Tht topography data on an OSGB grid is taken from~\cite{radar_topog}.
+The topography data on an OSGB grid is taken from~\cite{radar_topog}.
 
 The data processing ran on both the JASMIN supercomputer and on my local machine,
 GitHub was used to manage the transfer of both code and data. \\
@@ -137,23 +137,23 @@ The majority of the code and the methodology used in this project is based on th
 \textbf{Personal Statement} % Use Git commits
 \end{center}
 
-I spent the first 2 weeks of the project retro-fitting the Edinburgh castle
+I spent the first 2 weeks of the project retro-fitting the Edinburgh Castle study
 library to apply to the Stonehaven crash.
 This process began by creating plots including the
 rainfall at the crash location on the day and an animation of the rainfall
 in the Stonehaven region, allowing me to find an appropriate event definition.
 
 For the remaining weeks of June, I implemented a topographical height mask
-to the radar data, as well as establish a workspace to transfer data between
+to the radar data, as well as established a workspace to transfer data between
 my laptop and the JASMIN supercomputer.
 
-Following this I began my analysis of the radar data.
+Following this, I began my analysis of the radar data.
 This involved computing and plotting the monthly rainfall maxima in
 the Stonehaven region, as well as finding the quantiles of these extrema,
 as well as using R to find the parameters of a GEV fit to both the empirical
 and a monte carlo bootstrap of the rainfall distribution.
 
-In mid-July, I created plots for these distributions and started to work with the Convection Permitting Model data,
+In mid-July, I created plots for these distributions and started to work with the Convection-Permitting Model data,
     processing it as necessary to be appropriate for the use case.
 This allowed me to create the time series to act as covariates to the CPM rainfall data,
     which were used in the first week of August to compute the probability ratios, intensity ratios and plots.
@@ -193,15 +193,15 @@ making this project possible.
 
 \section{Stonehaven Derailment}\label{sec:stonederail}
 
-On the morning of the 12th of August 2020,
+In the morning of the 12th of August 2020,
     after several hours of extreme rainfall,
-    the 06:38 service from Aberdeen to Glasgow travels past Carmont,
+    the 06:38 service from Aberdeen to Glasgow travelled past Carmont,
     between Stonehaven and Montrose.
 Due to a landslip reported ahead,
     the train reverses to return to Stonehaven.
 On this journey,
     the train impacts debris washed out from a drain.
-The train derails,
+The train derailed,
     resulting in three fatalities,
     with the other six passengers being injured.
 
@@ -218,12 +218,12 @@ However,
     there is a potential additional human-driven causal factor, Anthropogenic Climate Change.
 
 Due to the COVID-19 pandemic,
-    the train had an extremely low loading of only 9 people.
+    the train had an extremely low loading of only nine people.
 Had this not been the case,
     it has been estimated (\cite{RAIB_2022} para. 461) that between 25 and 50 passengers would have been on the train,
     which had a capacity of around 300.
 With this larger passenger loading,
-    the derailment would have resulted a far higher number of casualties,
+    the derailment would have resulted in a far higher number of casualties,
     although the potential number of casualties cannot be assumed due to the variability of casualty risk throughout the train.
 
 A report released by the UK Government in the aftermath of the derailment~\cite{NR_DfT_2021}
@@ -233,21 +233,21 @@ This report notes that the signal of climate change is becoming more significant
 It is with this consideration that the attribution analysis for the Stonehaven Event is performed here.
 
 This analysis will proceed by considering the rainfall as the cause of the event.
-As the modelling necessary for either the landslip or the drain debris washout are beyond the scope of this report,
+As the modelling necessary for either the landslip or the drain debris washout is beyond the scope of this report,
     the intensity of the extreme rainfall itself will be used to define the event.
 
 \section{Rainfall in a warmer world}\label{sec:warmerrainfall}
 
 It is reasonable to expect that climate change had an impact on the extreme rainfall on 12 August 2020.
 One example of this in the UK is the estimated 40\% increase
-    in the likelihood of one-day events as intense as storm Desmond~\cite{Desmond_2015}.
-Another event in Scotland was the 2021 Edinburgh cloud-burst~\cite{Tett_Soon},
-    which found an increase in likelihood of around 30\%,
+    in the likelihood of one-day events as intense as Storm Desmond~\cite{Desmond_2015}.
+Another event in Scotland was the 2021 Edinburgh cloudburst~\cite{Tett_Soon},
+    which found an increase in the likelihood of around 30\%,
     increasing to approximately 70\% after 2 Kelvin of warming,
     with the event spanning a 15-minute time period.
 As the Stonehaven Event is in a similar climate to these two events,
     with a time period in between,
-    sub daily but not sub-hourly,
+    sub-daily but not sub-hourly,
     it would not be unreasonable to find similar results.
 
 A warmer climate,
@@ -297,17 +297,17 @@ research.
 The conclusion section should be at least one page long, preferably 2
 pages, but not much longer.
 \end{comment}
-The probability ratios in table~\ref{tab:prtable},
+The probability ratios in Table~\ref{tab:prtable}
     are taken as representing the change in the probability of the event.
-Rendered as increases in likelihood,
+Rendered as increases in the likelihood,
     these give increases of 10\%, 37\% and 78\% for the 1980s, 2012--2021 and a 2K warmer world respectively.
 
 It was discovered that using a lower quantile,
     closer to that of the rainfall at the Stonehaven Crash,
-    of an event to define intensity could result in an increase likelihood.
-From figure~\ref{fig:2probradarcpm},
-    it is seen that using the 0.5 quantile definition would give an increase
-    in likelihood of almost 200\% in a 2K warmer world.
+    of an event to define intensity could result in an increased likelihood.
+From Figure~\ref{fig:2probradarcpm},
+    it is seen that using the 0.5-quantile definition would give an increase
+    in the likelihood of almost 200\% in a 2K warmer world.
 It is therefore tempting to label the likelihood increases given above as underestimating
     the impact of Anthropogenic Climate Change.
 
@@ -315,7 +315,7 @@ However,
     as the original definition chosen was at a 0.95 quantile,
     these are the probability ratios that will be used.
 This is done to prevent bias from a choice of definition that could over-inflate
-    the impacts of warmer temperature,
+    the impacts of warmer temperatures,
     although this does not mean that repeating the analysis at the lower quantile would not be informative.
 
 The area of this project where future work is most needed is on repeating the analysis
@@ -343,7 +343,7 @@ Multiple takeaways,
     were found.
 Of note is that the most original insights were found through relatively straightforward mathematical analysis techniques.
 
-Most simple of these is the use of a Taylor series to explain
+The most simple of these is the use of a Taylor series to explain
     the equivalence of linear fits to regional temperature and saturated humidity.
 On the other hand,
     the effective proof by contradiction of the invalidity of fitting the shape to a covariate and applying the
@@ -382,8 +382,8 @@ I am hopeful that,
     \centering
     \includegraphics[width=150mm]{eventsyear}
     \caption[A bar chart showing the number of events occurring in each year.]{A bar chart showing the number of events,
-        that being 10 grid cells taking their maximum summer rainfall value within the same 12-hour bin,
-    occuring within each year.}
+        each of which has at least 10 grid cells taking their maximum summer rainfall value within the same 12-hour bin,
+    occurring within each year.}
     \label{fig:eventsyear}
 \end{figure}
 \begin{figure}[H]
@@ -391,7 +391,7 @@ I am hopeful that,
     \includegraphics[width=150mm]{cellsyear}
     \caption[A bar chart showing the number of cells that contribute to events.]{
         A bar chart showing the number of cells that contribute to events,
-        that being having their summer rainfall maxima in the same 12-hour bin as at least 9 other cells.
+        i.e. having their summer rainfall maxima in the same 12-hour bin as at least 9 other cells.
         The theoretical maximum is 185 cells.}
     \label{fig:cellsyear}
 \end{figure}

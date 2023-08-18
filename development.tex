@@ -29,7 +29,7 @@ The coarser dataset was chosen as the Stonehaven event was a Summer convective s
     \label{fig:stonehavendayraingraph}
 \end{figure}
 
-From figure~\ref{fig:stonehavendayraingraph},
+From Figure~\ref{fig:stonehavendayraingraph},
     the rainfall event begins at 4:15 and ends at 8:15.
 The rainfall at the crash location is then given in sixteen 15-minute chunks of time,
     or as across four hours.
@@ -40,12 +40,12 @@ First, it is clear that the rainfall occurred in two 2-hour peaks,
  so a 4-hour definition would not be appropriate for this event.
 Second, in section~\ref{subsec:radarprocess},
     the radar data is processed into chunks,
-    each of which start on an increment of the length of time of the event.
+    each of which starts on an increment of the length of time of the event.
 While this would accurately capture this 4-hour storm, being between 4:00 and 8:00,
     an event from 6:00 to 10:00 would be considered two events of half the size.
 
 A one-hour peak was then used instead.
-This was as it allowed storms of a differing lengths to be quantified by their peak rainfall.
+This was as it allowed storms of differing lengths to be quantified by their peak rainfall.
 
 \subsubsection{Rainfall in the Stonehaven region}
 
@@ -75,7 +75,7 @@ This was as it allowed storms of a differing lengths to be quantified by their p
     \end{subfigure}
     \caption[Map of rainfall in the Stonehaven region at times in the morning of 12th August 2020.]{
         Map of rainfall in the Stonehaven region (+/- 50km of Stonehaven)
-        at times of 5, 6, 7 and 8AM of the 12th August 2020,
+        at times of 5, 6, 7 and 8 AM of the 12th August 2020,
         in the top left, top right, bottom left and bottom right respectively.
     Scale is mm/h.
     Black lines are coastlines, red lines are local authority boundaries.
@@ -90,9 +90,9 @@ This figure is also available as an animation using data from 15-minute interval
 
 The figure also suggests that the event covers a large area,
     validating the use of the coarser-resolution 5km dataset as sufficient to describe the event.
-One unfortunate consequence of using the 5km dataset is on the rainfall described in figure~\ref{fig:stonehavendayraingraph},
+One unfortunate consequence of using the 5km dataset is on the rainfall described in Figure~\ref{fig:stonehavendayraingraph},
     as the crash location lies near the boundary of four cells, yet the data is only taken from the nearest cell,
-    leading to the graph being less accurate approximation of the rainfall at the crash location than would be given by a 1km resolution dataset.
+    leading to the graph being a less accurate approximation of the rainfall at the crash location than would be given by a 1km resolution dataset.
 
 \subsection{Further Constraints}\label{subsec:furthercons}
 
@@ -119,21 +119,21 @@ One unfortunate consequence of using the 5km dataset is on the rainfall describe
     \label{fig:stonetopog}
 \end{figure}
 
-The 4950m resolution data shown in figure~\ref{fig:stonetopog} was found by taking a mean average of 55 of the data points in each dimension,
+The 4950m resolution data shown in Figure~\ref{fig:stonetopog} was found by taking a mean average of 55 of the data points in each dimension,
     giving each grid cell an average of 3250 raw data points.
 
 The area of the Stonehaven crash is around the 200m contour,
     with the crash occurring at around 100m,
     due to the cutting the railway passes through.
-Looking at figure 26 of~\cite{RAIB_2022},
+Looking at Figure 26 of~\cite{RAIB_2022},
     the drain responsible for the crash is 150m above sea level.
 Furthermore, the drain's catchment reaches close to 200m.
 
-The topography of the region for the event attribution analysis was then chosen to be from 0m (sea level),
+The topography of the region for the event attribution analysis was then chosen to be from 0m (sea level)
     to 400m.
 This is done to make the topography around the crash location typical for the region in which the analysis is performed.
-A 200m limit was suggested,
-    to match the limit taken in~\cite{Tett_Soon},
+A 200m limit was suggested
+    to match the limit taken in~\cite{Tett_Soon}
     but was not taken forward as this had the potential to give too few data points to define an event.
 
 \begin{figure}[H]
@@ -159,14 +159,14 @@ As the radar data is at a 5km resolution,
 
 \subsection{Processing and Fitting the Radar Data}\label{subsec:radarprocess}
 
-The steps used in this section are identical to those used to processing and fitting the radar data for the Edinburgh cloudburst event~\cite{Tett_Soon},
+The steps used in this section are identical to those used to process and fit the radar data for the Edinburgh cloudburst event~\cite{Tett_Soon},
     with changes made to fit the different definition and region in this case.
 
 \subsubsection{Computing Maxima}
 
 As the goal was to use an Extreme Value distribution to model the data,
     it is necessary to draw the extrema out from the data.
-The dataset itself~\cite{radar_data} is composed of \texttt{.tar} files, each of which containing the radar data of a given day.
+The dataset itself~\cite{radar_data} is composed of \texttt{.tar} files, each containing the radar data of a given day.
 
 The \texttt{process\_radar\_data}~\cite{Me_Code} Python script finds the maximum one-hour rainfall in each of these daily datasets and
     uses these to generate a dataset with the one-hour maximum rainfall and the time of the one-hour maximum rainfall
@@ -174,7 +174,7 @@ The \texttt{process\_radar\_data}~\cite{Me_Code} Python script finds the maximum
 The \texttt{combine\_summary}~\cite{Me_Code} Python script then takes these monthly maxima and their times and combines them into a single dataset,
     again as a NetCDF .
 
-These Python scripts are called by the Shell scripts \texttt{run\_jobs} and \texttt{run\_combine}~\cite{Me_Code} respectively.
+The Shell scripts \texttt{run\_jobs} and \texttt{run\_combine}~\cite{Me_Code} call the above Python scripts respectively.
 The Shell scripts are run on a JASMIN Science Analysis Server and submit the Python scripts as SLURM jobs to the LOTUS Batch Processing Cluster,
     allowing all the monthly maxima to be computed in a single script and the combination of the datasets to access an amount of memory to make the task feasible.
 
@@ -213,7 +213,7 @@ Due to the separation into 12-hour bins,
     \centering
     \includegraphics[width=100mm]{dataprocessschematic}
     \caption[Diagram representing the data processing.]{
-        Diagram representing the data processing after the maxima of each grid cell has been found,
+        Diagram representing the data processing after the maximum of each grid cell has been found,
     within each year.
     `rain' represents the summer maximum rainfall in a grid cell,
         `time' represents the time of this maximum,
@@ -229,7 +229,7 @@ The radar data is fit to a GEV distribution with the \texttt{comp\_radar\_fits}~
 The `fevd', fit extreme value distribution,
     command in R is used to fit an extreme value distribution to the radar data,
     which uses MLE, as described in subsection~\ref{subsec:parameterest}.
-This command is applied each of the quantiles of the event,
+This command is applied to each of the quantiles of the event,
     with the events as the data points,
     giving the parameters of GEV distributions describing each quantile of the events.
 With these parameters generated,
@@ -240,16 +240,16 @@ To generate uncertainties,
     given in the \texttt{mc\_dist} function.
 This involved generating a list of the same size of the number of events,
     taking a random sample with replacement,
-    then applying the `fevd' command to each sample.
+    and then applying the `fevd' command to each sample.
 
 1000 samples were taken,
     of which 9 provided anomalous (negative) location or scale parameters,
     and so were discarded.
 The discarding process was valid as the value of these parameters was ~-100,
     while all other samples had values of these parameters between 2 and 15,
-    as well as that removing this few samples would not have a significant effect on the 95\% confidence interval.
+    as well as that removing such few samples would not have a significant effect on the 95\% confidence interval.
 The 991 samples left are greater than the 800 suggested by Booth and Sarkar~\cite{Booth_Sarkar_1998}
-    for an effective error estimation.
+    for effective error estimation.
 
 \section{Modelled Data}\label{sec:model}
 
@@ -264,7 +264,7 @@ In this investigation,
     the model's hourly temperature and rainfall data will be used.
 
 This model was created by using a 60km resolution global model to impose boundary conditions on a 12km regional model,
-    which was then used to impose boundary conditions on th 2.2km model.
+    which was then used to impose boundary conditions on the 2.2 km model.
 The guidance for the model~\cite{model_data} states that the 2.2km model is appropriate for sub-daily extrema,
     so long as the assessment is probabilistic,
     which is done in this analysis.
@@ -279,12 +279,12 @@ The model here does not have to represent the event identically as the model dat
 \subsection{Pre-processing}\label{subsec:preprocess}
 
 The CPM data used is on longitude-latitude coordinates,
-    with a north pole rotated to near the region the model covers.
+    with the North Pole rotated to near the region the model covers.
 The location of the Stonehaven crash in this alternative coordinate system was found using the \texttt{comp\_rotated\_coords}~\cite{Me_Code} Python script,
     using CartoPy for the computations.
 This coordinate rotation was also done for the four weather stations used to compute Central England Temperature (CET).
 
-The pre-processing of the CPM data is done using the \texttt{ens\_seas\_max\_coarsen}~\cite{Me_Code} python script,
+The pre-processing of the CPM data is done using the \texttt{ens\_seas\_max\_coarsen}~\cite{Me_Code} Python script,
     which finds the seasonal one-hour rainfall maxima for each grid cell.
 
 \subsubsection{Coarsening}
@@ -316,7 +316,7 @@ This makes the >0m height mask on the model a necessity,
 \subsubsection{Time Series}
 
 The \texttt{comp\_cpm\_ts}~\cite{Me_Code} Python script was used to compute the time series.
-This script takes each month in each ensemble member the CPM data and computes 3 values.
+This script takes each month within each ensemble member of the CPM data and computes three values.
 These are computed using the 2.2km data without the coarsening or height mask.
 First is the Central England Temperature,
     which takes the CPM data's average monthly temperature at the weather stations used to define CET,
@@ -325,7 +325,7 @@ First is the Central England Temperature,
 Two additional monthly time series were computed in the \texttt{analyse\_cpm\_data\_rolling}~\cite{Me_Code} Python script.
 One of these takes the median extreme precipitation across the Stonehaven Region
     using the extrema processed in \texttt{ens\_seas\_max\_coarsen.sh}~\cite{Me_Code},
-While another uses the temperature in the Stonehaven Region to find the Saturation Specific Humidity.
+While another uses the temperature in the Stonehaven Region to find the Saturation Humidity.
 
 The formula used for this is the August-Roche-Magnus approximation to the Clausius-Clapeyron relation~\cite{Alduchov_Eskridge_1996}, given by:
 \begin{equation}\label{eq:qsat}
@@ -333,7 +333,7 @@ The formula used for this is the August-Roche-Magnus approximation to the Clausi
 \end{equation}
 Where $T$ is the temperature in degrees Celsius.
 
-The scaling of the Saturation Specific Humidity with temperature will be described as the Clausius-Clayperon scaling.
+The scaling of the Saturation Humidity with temperature will be described as the Clausius-Clapeyron scaling.
 This is as it represents the amount of moisture that the atmosphere can hold,
     suggesting that rainfall should also scale by this amount with a change in temperature.
 
@@ -343,7 +343,7 @@ This was then reduced to 3600 data points by only taking the three summer months
 
 \subsubsection{Fitting Covariates}
 
-\texttt{analyse\_cpm\_data\_rolling}~\cite{Me_Code} performs a linear fit of the Saturation Specific Humidity,
+\texttt{analyse\_cpm\_data\_rolling}~\cite{Me_Code} performs a linear fit of the Saturation Humidity,
     Stonehaven Region temperature, mean average Stonehaven Region precipitation and mean maximal Stonehaven Region precipitation.
     using the \texttt{statsmodels} Python package's ordinary least squares regression feature.
 This provides the change in each of these variables, as well as the uncertainty with $R^2$ coefficients,
@@ -372,22 +372,22 @@ This data fit is done nine times,
 For each covariate, this is performed with and without the shape parameter varying.
 
 The scaling of the parameters $\mu_1 / \mu_0$, $\sigma_1 / \sigma_0$ and, where the shape is also fit to the covariate,
-    $\xi_1 / \xi_0$ can then be found at each grid cell.
-These fits and scalings are also computed for the 2 hour, 4 hour and 8 hour summer rainfall maxima.
+    $\xi_1 / \xi_0$can then be found at each grid cell.
+These fits and scalings are also computed for the 2-hour, 4-hour and 8-hour summer rainfall maxima.
 
 For the CET fit,
     confidence intervals in these scalings are found using a Monte Carlo bootstrap method.
 This takes a random sample, with replacement, of 1\% of the grid cells and takes the mean of the scaling that sample,
     with the small sample size allowing the assumption of the samples being independent.
 The quantiles of the 1000 samples taken are then used as confidence intervals.
-Both the bootstrap sample means and overall mean of the scalings are saved to be used in the risk ratio calculation.
-The overall mean scalings,
+Both the bootstrap sample means and the overall mean of the scalings are saved to be used in the risk ratio calculation.
+The overall mean scalings
     averaged over the grid cells,
-    will be considered as simply the model scalings for later steps in the development.
+    will be considered as simply the model scalings for later steps in development.
 
 These scalings can be compared to the scaling expected from the Clausius-Clapeyron relationship,
     which is computed by taking the linear fit of $H = H_0 + xH_1$ and computing $H_1 / H_0$.
-This is a valid comparison, as if the rainfall maxima is given by the CDF~\ref{eq:gevcdf},
+This is a valid comparison as if the rainfall maxima are given by the CDF~\ref{eq:gevcdf},
     then the distribution of the rainfall maxima multiplied by a constant is given by the same CDF,
     with the location $\mu$ and scale $\sigma$ multiplied by the same constant.
 
@@ -425,22 +425,22 @@ This equation can also be explained as $\alpha_1$ representing a form of derivat
 
 This process is repeated, once with the shape parameter fixed, only applying the scalings $\mu_1 / \mu_0$ and $\sigma_1 / \sigma_0$
     from the model distribution to the empirical distribution and again also applying the third $\xi_1 / \xi_0$ from the shape covariate fit.
-Both of these are repeated four times, using the scalings from the 1, 2, 4 and 8 hour model maxima,
+Both of these are repeated four times, using the scalings from the 1, 2, 4 and 8-hour model maxima,
     although only the 1-hour maxima will be used to directly compute any risk ratios.
 
 This changes the empirical event distribution equivalently to the fitting of covariates to the model distribution in subsection~\ref{subsec:covfit},
     as where the model parameters are multiplied by a factor $k$ due to changes in CET,
-    the event distribution parameters are assumed to also be multiplied by a factor of $k$.
+    the event distribution parameters are assumed to also be multiplied by a factor $k$.
 The key assumption made here is that the processes driving the change in the maxima from the model will act equivalently
     on the intensity of extreme events defined in subsection~\ref{subsec:radarprocess}.
-The application of this to the Edinburgh cloud-burst event is discussed in a supplement to~\cite{Tett_Soon},
+The application of this to the Edinburgh cloudburst event is discussed in a supplement to~\cite{Tett_Soon},
     while the validity of this assumption in this case is discussed in subsection~\ref{subsec:diseventdef}.
 
 As the new parameters are scaled with temperature,
     as opposed to time,
     the results here are not dependent on the RCP8.5 emissions scenario.
 The `2K warmer world' result applies to any scenario heated by 2 degrees relative to Pre-Industrial,
-    including the RCP 3.4 emissions scenario in the year 2100~\cite{Pielke_2021}.
+    including the RCP3.4 emissions scenario in the year 2100~\cite{Pielke_2021}.
 Using RCP8.5 model data from 1980 ensures that the scalings are interpolated from within a range of simulations
     covering the Pre-Industrial to 2K warming range,
     as opposed to extrapolating to a wider temperature range where the effects may be more chaotic.
@@ -461,11 +461,11 @@ An intensity ratio expected from Clausius-Clapeyron scaling was also computed di
 
 As both the intensity and the return period of the Stonehaven event are known,
     it is straightforward to calculate these ratios.
-The `headline' ratios found in the abstract are those found by applying the 1 hour model maxima scaling to the empirical event distribution.
+The `headline' ratios found in the abstract are those found by applying the 1-hour model maxima scaling to the empirical event distribution.
 However, the ratios were also determined for a collection of intensities and return periods to allow the effect of these on the ratio to be plotted.
-This is repeated for using fits based on the 1, 2, 4 and 8 hour model maxima.
+This is repeated for using fits based on the 1, 2, 4 and 8-hour model maxima.
 
-For the probability and intensity ratios found for the fits based on the 1 hour model maxima,
+For the probability and intensity ratios found for the fits based on the 1-hour model maxima,
     comparing Pre-Industrial to a 2K warmer world,
     a Monte Carlo bootstrap is used to find confidence intervals.
 This takes \textasciitilde1000 random samples, each taking one element of the set of \textasciitilde1000 empirical fits found from the Monte Carlo process in subsection~\ref{subsec:radarprocess}
@@ -475,6 +475,6 @@ The quantiles of these probability and intensity ratios give the confidence inte
 
 The computation of the probability and intensity ratios is repeated with alternative definitions of the intensity of the event
     as each of 0.05, 0.1, 0.2, 0.5, 0.8 and 0.9 quantiles as opposed to the 0.95 quantile from the definition in subsection~\ref{subsec:radarprocess},
-    with the emprical fit for each of these quantiles scaled to the 1 hour model maxima,
+    with the empirical fit for each of these quantiles scaled to the 1-hour model maxima,
     to assess the effect of event definition on the outcome of the analysis.
 The risk ratio analysis is done twice, once with and once without a covariate fit shape parameter.
