@@ -1,9 +1,9 @@
 
 Throughout this chapter,
     reference is made to the `Stonehaven Region'.
-This is defined as +/- 50km of the crash location for radar data,
+This is defined as +/- 50km of the crash location for empirical data,
     which uses an ordinance survey grid,
-    and as +/- 0.5 degrees of the crash location for the radar data.
+    and as +/- 0.5 degrees of the crash location for the model data.
 
 \section{Empirical Data}\label{sec:def}
 
@@ -268,6 +268,13 @@ This model was created by using a 60km resolution global model to impose boundar
 The guidance for the model~\cite{model_data} states that the 2.2km model is appropriate for sub-daily extrema,
     so long as the assessment is probabilistic,
     which is done in this analysis.
+
+The model evaluation steps in~\ref{subsec:backmodeleval} are not applied here.
+This is as an unusual event definition has been created in section~\ref{sec:def},
+    which applying to the model would be beyond the scope of this project.
+The model here does not have to represent the event identically as the model data is only being used to gather information
+    to apply to the empirical fit,
+    not to calculate the risk ratios directly.
 
 \subsection{Pre-processing}\label{subsec:preprocess}
 

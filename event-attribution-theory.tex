@@ -129,8 +129,7 @@ For the spatial region,
     a region with a known climate similar to that in which the event occurred is chosen,
     typically directly around the location of the event.
 This is done so that the frequency and types of event will match the location of the original event,
-    as well as to ensure that the factors that change the climate,
-    whether Anthropomorphic or not,
+    as well as to ensure that the factors that change the climate
     are similar to those changing the climate at the point of the event.
 
 In addition to the aforementioned similarity in location,
@@ -164,13 +163,51 @@ This class will then be used to find like events in both the historical and mode
 
 \subsection{Model Evaluation}\label{subsec:backmodeleval}
 
-%  TODO Model Validity and Reproducability
+For the use of the model to be justified,
+    it must accurately represent the phenomena being studied.
+This can involve three steps~\cite{van_Oldenborgh_et_al_2021}.
 
-\subsection{Likelihood Estimation}\label{subsec:backlikeest}
+First, the model must be capable of representing the event.
+If the area or time period of the event,
+    or the dynamics that drive it, are too small to be represented within the resolution of the model,
+    the model cannot be used for an event attribution analysis.
 
-%  TODO Statistical Independence
+Second is that the statistics of the model match with the statistics of the empirical (observed) extreme event.
+This can be done by fitting relevant distribution to both the empirical and model data sets and ensuring that the
+    parameters governing the behaviour of the tail of the distributions (the extremes) are comparable.
+A visual method is also possible, comparing the model data points to the distribution fit to the empirical data.
+This can be done with a return plot (\cite{van_Oldenborgh_et_al_2021} fig. 4)
+    or with a quantile-quantile plot (as seen in~ Coles' textbook\cite{Coles_2001} fig 3.6. Note that the `empirical and model labels
+    would be reversed as it is the data points of the model that are being compared to a fit to the empirical data points.)
 
-\subsection{Interpretation}\label{subsec:backinterp}
+Finally,
+    the physical processes underlying the extremes in the model must match with observations.
+An example of this is that the frequency of a southern hemisphere drought event maintains its correlation with the El Niño phase,
+    as described in subsection~\ref{subsec:backeventdef}.
+
+\subsection{Likelihood Estimation and Interpretation}\label{subsec:backlikeest}
+
+To apply Allen's~\cite{Allen_2003} probabilistic interpretation,
+    the model can be used to generate a datasets for the world with and without warming.
+With a sufficient number of models run,
+    a distribution can be fit to each of these scenarios.
+
+The probabilities of the event threshold being crossed are then found,
+    with the probability in the world without warming $p_0$ and the probability in the distribution with warming $p_1$.
+From these, a probability ratio of $p_1 / p_0$ can be computed,
+    showing the growth in the likelihood of the extreme event due to climate change.
+
+Alternatively,
+    if the return period of the extreme event is known,
+    the intensity of events corresponding to that return period in the distributions with and without warming can be found,
+    with the difference between these being $\delta I$.
+For rainfall events, it is possible to calculate an intensity ratio $I_1 / I_0$, where $I_1$ is the intensity of the event
+    with warming and $I_0$ is the intensity of the event without warming.
+This shows how the intensity of the rainfall event scales with climate change.
+
+The analysis in this report creates distributions with different levels of warming from a single model,
+    which contains different levels of warming,
+    and computing the effect that the warming within the model has on the distribution of extrema.
 
 \section{Extreme Value Statistics}\label{sec:exstats}
 
@@ -182,7 +219,9 @@ Therefore, to model these events,
 
 Throughout the analysis,
     we assume that the variables are independent and identically distributed ($i.i.d.$).
-%  TODO Statistical independence
+For annual extrema,
+    this is almost always true,
+    as the events are typically a year apart and so are not influencing one another.
 
 For event definitions which average a variable over a season,
     as opposed to focusing on the extreme
@@ -295,7 +334,22 @@ Although this uses the same underlying mathematics as this section,
     the exact algorithm used is beyond the scope of this report.
 
 \subsubsection{Maximum Likelihood Estimation}
-%  TODO
+
+For a set of data points to which a GEV distribution is to be fitted,
+    there is a likelihood function $L(\mu, \sigma, \xi)$,
+    defined as the product of the PDF of the distribution at each data point.
+Related is the log-likelihood,
+    which may be easier to work with as it provides a sum of the log-likelihood of each data point.
+
+The Maximum Likelihood Estimators are the values of the parameters that maximise the likelihood function.
+These values are then taken as the parameters of the distributions.
+
+Multivariable calculus is used to find the Maximum Likelihood Esimators.
+In some cases this can be done analytically,
+    although in others numerical methods must be used.
+
+Section 3.3 of Cole's textbook~\cite{Coles_2001} covers the properties of Maximum Likelihood Estimators for the GEV distribution,
+    as well as inference for return levels.
 
 \subsubsection{Akaike Information Criterion}
 
