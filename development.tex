@@ -37,15 +37,15 @@ The rainfall at the crash location is then given in sixteen 15-minute chunks of 
 This may suggest a four-hour event definition should be used.
 However, this was not done for two reasons.
 First, it is clear that the rainfall occurred in two 2-hour peaks,
- so a 4-hour definition would not be appropriate for this event.
+ so a 4-hour definition may not be appropriate for this event.
 Second, in section~\ref{subsec:radarprocess},
     the radar data is processed into chunks,
     each of which starts on an increment of the length of time of the event.
 While this would accurately capture this 4-hour storm, being between 4:00 and 8:00,
     an event from 6:00 to 10:00 would be considered two events of half the size.
 
-A one-hour peak was then used instead.
-This was as it allowed storms of differing lengths to be quantified by their peak rainfall.
+A one-hour maximum rain definition was used instead,
+    as it allowed storms of differing lengths to be quantified by their peak hourly rainfall.
 
 \subsubsection{Rainfall in the Stonehaven region}
 
@@ -264,7 +264,7 @@ In this investigation,
     the model's hourly temperature and rainfall data will be used.
 
 This model was created by using a 60km resolution global model to impose boundary conditions on a 12km regional model,
-    which was then used to impose boundary conditions on the 2.2 km model.
+    which was then used to impose boundary conditions on the 2.2km model.
 The guidance for the model~\cite{model_data} states that the 2.2km model is appropriate for sub-daily extrema,
     so long as the assessment is probabilistic,
     which is done in this analysis.
@@ -372,7 +372,7 @@ This data fit is done nine times,
 For each covariate, this is performed with and without the shape parameter varying.
 
 The scaling of the parameters $\mu_1 / \mu_0$, $\sigma_1 / \sigma_0$ and, where the shape is also fit to the covariate,
-    $\xi_1 / \xi_0$can then be found at each grid cell.
+    $\xi_1 / \xi_0$ can then be found at each grid cell.
 These fits and scalings are also computed for the 2-hour, 4-hour and 8-hour summer rainfall maxima.
 
 For the CET fit,
@@ -441,7 +441,7 @@ As the new parameters are scaled with temperature,
     the results here are not dependent on the RCP8.5 emissions scenario.
 The `2K warmer world' result applies to any scenario heated by 2 degrees relative to Pre-Industrial,
     including the RCP3.4 emissions scenario in the year 2100~\cite{Pielke_2021}.
-Using RCP8.5 model data from 1980 ensures that the scalings are interpolated from within a range of simulations
+Using RCP8.5 model data from 1980 onwards ensures that the scalings are interpolated from within a range of simulations
     covering the Pre-Industrial to 2K warming range,
     as opposed to extrapolating to a wider temperature range where the effects may be more chaotic.
 
@@ -463,14 +463,14 @@ As both the intensity and the return period of the Stonehaven event are known,
     it is straightforward to calculate these ratios.
 The `headline' ratios found in the abstract are those found by applying the 1-hour model maxima scaling to the empirical event distribution.
 However, the ratios were also determined for a collection of intensities and return periods to allow the effect of these on the ratio to be plotted.
-This is repeated for using fits based on the 1, 2, 4 and 8-hour model maxima.
+This is repeated using scalings from fits  on the 1, 2, 4 and 8-hour model maxima.
 
 For the probability and intensity ratios found for the fits based on the 1-hour model maxima,
     comparing Pre-Industrial to a 2K warmer world,
     a Monte Carlo bootstrap is used to find confidence intervals.
 This takes \textasciitilde1000 random samples, each taking one element of the set of \textasciitilde1000 empirical fits found from the Monte Carlo process in subsection~\ref{subsec:radarprocess}
     and one element of the set of \textasciitilde1000 CPM scalings found in the Monte Carlo process in subsection~\ref{subsec:covfit}.
-Each sample applies its CPM scaling to its Distribution and calculates the risk ratios as described above.
+Each sample applies its CPM scaling to its empirical distribution and calculates the risk ratios as described above.
 The quantiles of these probability and intensity ratios give the confidence intervals.
 
 The computation of the probability and intensity ratios is repeated with alternative definitions of the intensity of the event
